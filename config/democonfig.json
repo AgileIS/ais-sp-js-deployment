@@ -1,4 +1,6 @@
 {
+    "Url": "http://dev2013vm4/sites/demo",
+    "User": "dev\\tuser",
     "Site": [
         {
             "Url": "http://dev2013vm1",
@@ -8,6 +10,14 @@
                 },
                 {
                     "Title": "Hallo2"
+                }
+            ],
+            "Field": [
+                {
+                    "Title": "TestField",
+                    "InternalName": "AIS_TestField",
+                    "FieldTypeKind": 9,
+                    "Group": "AISGroup"
                 }
             ]
         },
@@ -22,5 +32,13 @@
                 }
             ]
         }
-    ]
+    ],
+    "Field": [
+                {
+                    "Title": "TestField",
+                    "InternalName": "AIS_TestField",
+                    "FieldTypeKind": 9,
+                    "Group": "AISGroup"
+                }
+            ]
 }

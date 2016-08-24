@@ -13,7 +13,7 @@ class BasicHttpClient extends HttpClient {
 
     constructor(){
         super();
-        this.authValue = `Basic ${btoa(`${_options.username}:${_options.password}`)}`
+        this.authValue = `Basic ${new Buffer(`${_options.username}:${_options.password}`).toString('base64')}`
     }
 
     fetchRaw(url: string, options?: FetchOptions): Promise<Response>{
