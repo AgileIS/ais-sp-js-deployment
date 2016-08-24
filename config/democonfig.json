@@ -1,0 +1,26 @@
+{
+    "Site": [
+        {
+            "Url": "http://dev2013vm1",
+            "List": [
+                {
+                    "Title": "Hallo"
+                },
+                {
+                    "Title": "Hallo2"
+                }
+            ]
+        },
+        {
+            "Url": "http://dev2013vm1",
+            "List": [
+                {
+                    "Title": "Hallo"
+                },
+                {
+                    "Title": "Hallo2"
+                }
+            ]
+        }
+    ]
+}
