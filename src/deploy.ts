@@ -22,30 +22,15 @@ let fs = require('fs')
 let args = require("minimist")(process.argv.slice(2));
 Logger.write("start deployment script", Logger.LogLevel.Info);
 Logger.write(JSON.stringify(args), 0);
-
+let promises = [];
 
 if (args.f && args.p) {
     let config = JSON.parse(fs.readFileSync(args.f, 'utf8'));
     if (config.Url && config.User) {
         initAuth(config.Url, config.User, args.p);
-        let promises = [];
-        let parentPromise: Promise<any> = Promise.resolve();
+        let siteUrl = config.Url;
         Logger.write(JSON.stringify(config), 0);
-        Object.keys(config).forEach((value, index) => {
-            Logger.write("found config key " + value + " at index " + index, 0);
-            let handler = resolveObjectHandler(value); 
-            if (typeof handler !== "undefined") {
-                if (config[value] instanceof Array) {
-                    config[value].forEach(element => {
-                        parentPromise = handler.execute(element, config.Url, parentPromise);
-                        promises.push(parentPromise);
-                    });
-                } else {
-                    parentPromise = handler.execute(config[value], config.Url, parentPromise);
-                    promises.push(parentPromise);
-                }
-            }
-        });
+        chooseAndUseHandler(config, siteUrl);
         Promise.all(promises).then(() => {
             Logger.write("All Elements created");
         },
@@ -67,6 +52,41 @@ export function resolveObjectHandler(key: string): ISPObjectHandler {
             break;
     }
 }
+
+export function chooseAndUseHandler(config: any, siteUrl: string) {
+    Object.keys(config).forEach((value, index) => {
+        Logger.write("found config key " + value + " at index " + index, 0);
+        let handler = resolveObjectHandler(value);
+        if (typeof handler !== "undefined") {
+            let prom = Promise.resolve();
+            if (config[value] instanceof Array) {
+                config[value].forEach(element => {
+                    prom = prom.then((resolvedPromise) => {
+                        let promi = handler.execute(element, siteUrl);
+                        Logger.write("Resolved Promise: " + resolvedPromise);
+                        if (typeof resolvedPromise !== "undefined") {
+                          chooseAndUseHandler(resolvedPromise, siteUrl);
+                        }
+                        promises.push(promi);
+                        return promi;
+                    }).catch((error) => {
+                        return error;
+                    }) ;
+                });
+            } else {
+                let promi = handler.execute(config[value], siteUrl).then((resolvedPromise) => {
+                    Logger.write("Bla Resolved Promise: " + resolvedPromise);
+                    if (typeof resolvedPromise !== "undefined") {
+                      chooseAndUseHandler(resolvedPromise, siteUrl);
+                    }
+                });
+                promises.push(promi);
+            }
+        }
+    });
+}
+
+
 
 export interface Global {
     Headers: any;

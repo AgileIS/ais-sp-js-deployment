@@ -1,44 +1,43 @@
 {
     "Url": "http://dev2013vm4/sites/demo",
     "User": "dev\\tuser",
-    "Site": [
-        {
-            "Url": "http://dev2013vm1",
-            "List": [
-                {
-                    "Title": "Hallo"
-                },
-                {
-                    "Title": "Hallo2"
-                }
-            ],
-            "Field": [
-                {
-                    "Title": "TestField",
-                    "InternalName": "AIS_TestField",
-                    "FieldTypeKind": 9,
-                    "Group": "AISGroup"
-                }
-            ]
-        },
-        {
-            "Url": "http://dev2013vm1",
-            "List": [
-                {
-                    "Title": "Hallo"
-                },
-                {
-                    "Title": "Hallo2"
-                }
-            ]
-        }
-    ],
-    "Field": [
-                {
-                    "Title": "TestField",
-                    "InternalName": "AIS_TestField",
-                    "FieldTypeKind": 9,
-                    "Group": "AISGroup"
-                }
-            ]
+    "Site": {
+        "Url": "http://dev2013vm1",
+        "List": [
+            {
+                "Title": "Hallo",
+                "Field": [
+                    {
+                        "Title": "TestField3",
+                        "InternalName": "AIS_TestField3",
+                        "FieldTypeKind": 9,
+                        "Group": "AISGroup"
+                    }
+                ]
+            },
+            {
+                "Title": "Hallo2"
+            }
+        ],
+        "Field": [
+            {
+                "Title": "TestField",
+                "InternalName": "AIS_TestField",
+                "FieldTypeKind": 9,
+                "Group": "AISGroup"
+            },
+            {
+                "Title": "TestField1",
+                "InternalName": "AIS_TestField1",
+                "FieldTypeKind": 9,
+                "Group": "AISGroup"
+            },
+            {
+                "Title": "TestField2",
+                "InternalName": "AIS_TestField2",
+                "FieldTypeKind": 9,
+                "Group": "AISGroup"
+            }
+        ]
+    }
 }

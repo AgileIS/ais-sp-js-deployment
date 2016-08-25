@@ -6,9 +6,11 @@ import * as Types from "sp-pnp-js/lib/sharepoint/rest/types";
 import * as web from "sp-pnp-js/lib/sharepoint/rest/webs";
 
 export class ListHandler implements ISPObjectHandler {
-    execute(config: IList, url: string, parent: Promise<ISite>) {
-        return new Promise((resolve, reject) => {
+    execute(config: IList, url: string/*, parent: Promise<ISite>*/) {
+        return new Promise<IList>((resolve, reject) => {
             Logger.write("config " + JSON.stringify(config));
+            Logger.write("List created - AS IF - without code for that");
+            resolve(config);
         });
     }
 }
