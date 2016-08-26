@@ -11,34 +11,47 @@ export class FieldHandler implements ISPObjectHandler {
         let spWeb = new web.Web(url);
         let element = config;
         return new Promise<IField>((resolve, reject) => {
-                Logger.write("config " + JSON.stringify(config));
-                spWeb.fields.filter("InternalName eq '" + element.InternalName + "'").get().then(function (data) {
+            Logger.write("config " + JSON.stringify(config));
+            spWeb.fields.filter("InternalName eq '" + element.InternalName + "'").get().then(
+                (data) => {
                     if (data.length === 0) {
                         if (element.FieldTypeKind) {
                             if (element.FieldTypeKind === 7) {  // 7 = Lookup
                                 resolve(config);
                             }
                             else if (element.FieldTypeKind === 17) { // 17 = Calculated
-                                spWeb.fields.addCalculated(element.InternalName, element.Formula, Types.DateTimeFieldFormatType.DateOnly).then(function (result) {
-                                    result.field.update({ Title: element.Title }).then(function () {
+                                spWeb.fields.addCalculated(element.InternalName, element.Formula, Types.DateTimeFieldFormatType.DateOnly).then((result) => {
+                                    result.field.update({ Title: element.Title }).then(() => {
                                         resolve(config);
                                         Logger.write("Calculated Field with Internal Name '" + element.InternalName + "' created");
+                                    }, (error) => {
+                                        Logger.write(error, 0);
+                                        reject(error);
                                     });
+                                }, (error) => {
+                                    Logger.write(error, 0);
+                                    reject(error);
                                 });
                             }
                             else {
                                 let propertyHash = createTypedHashfromProperties(element);
-                                spWeb.fields.add(element.InternalName, "SP.Field", propertyHash).then(function (result) {
-                                    result.field.update({ Title: element.Title }).then((result) => {
+                                spWeb.fields.add(element.InternalName, "SP.Field", propertyHash).then((result) => {
+                                    result.field.update({ Title: element.Title }).then(() => {
                                         resolve(config);
                                         Logger.write("Field with Internal Name'" + element.InternalName + "' created");
+                                    }, (error) => {
+                                        Logger.write(error, 0);
+                                        reject(error);
                                     });
+                                }, (error) => {
+                                    Logger.write(error, 0);
+                                    reject(error);
                                 });
                             }
                         }
                         else {
                             let error = "FieldTypKind could not be resolved";
-                            resolve(config);
+                            reject(error);
                             Logger.write(error);
                         }
                     }
@@ -47,7 +60,11 @@ export class FieldHandler implements ISPObjectHandler {
                         resolve(config);
                         Logger.write(error);
                     }
-                });
+                }, (error) => {
+                    Logger.write(error, 0);
+                    reject(error);
+                }
+            );
         });
     }
 }
