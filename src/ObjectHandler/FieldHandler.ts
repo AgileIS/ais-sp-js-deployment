@@ -45,7 +45,7 @@ export class FieldHandler implements ISPObjectHandler {
                                     });
                                 }, (error) => {
                                     Logger.write(error, 0);
-                                    reject(error);
+                                    reject(error + " - " + element.InternalName);
                                 });
                             }
                         }

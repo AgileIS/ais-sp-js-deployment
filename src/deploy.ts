@@ -67,11 +67,19 @@ export function chooseAndUseHandler(config: any, siteUrl: string) {
                             prom = prom.then(() => {
                                 let promise = handler.execute(element, siteUrl);
                                 return promise;
+                            }, (error) => {
+                                return Promise.reject(error);
                             }).then((resolvedPromise) => {
                                 Logger.write("Resolved Promise: " + JSON.stringify(resolvedPromise), 0);
-                                chooseAndUseHandler(resolvedPromise, siteUrl).then(() => { resolve(); }, () => { reject(); });
-                            }).catch((error) => {
-                                return error;
+                                chooseAndUseHandler(resolvedPromise, siteUrl).then(() => {
+                                    resolve();
+                                }, (error) => {
+                                    reject(error);
+                                });
+                            }, (error) => {
+                                reject(error);
+                                Logger.write("Rejected: " + error, 0);
+                                return null;
                             });
                         }));
                     });
@@ -82,21 +90,23 @@ export function chooseAndUseHandler(config: any, siteUrl: string) {
                             chooseAndUseHandler(resolvedPromise, siteUrl).then(
                                 () => {
                                     resolve();
-                                }, () => {
-                                    reject();
+                                }, (error) => {
+                                    reject(error);
                                 });
-                        }).catch((error) => {
-                            return error;
+                        }, (error) => {
+                            reject(error);
+                            Logger.write("Rejected: " + error, 0);
                         });
                     }));
                 }
             }
         });
         Promise.all(promiseArray).then(() => {
-            Logger.write("All Promises resolved");
+            Logger.write("All Promises resolved", 0);
             resolve(true);
         }, (error) => {
-            reject("Not all Promises resolved - " + error);
+            Logger.write("Not all Promises resolved - " + error, 0);
+            reject(error);
         });
     });
 }
