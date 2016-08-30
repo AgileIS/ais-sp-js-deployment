@@ -1,3 +1,3 @@
 export interface ISPObjectHandler{
-    execute(config: any, url: string): Promise<any>;
+    execute(config: any, url: string, parentConfig: any): Promise<any>;
 }

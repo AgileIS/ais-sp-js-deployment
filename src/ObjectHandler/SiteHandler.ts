@@ -4,7 +4,7 @@ import * as web from "sp-pnp-js/lib/sharepoint/rest/webs";
 import {ISite} from "../interface/Types/ISite";
 
 export class SiteHandler implements ISPObjectHandler {
-    execute(config: ISite, url: string) {
+    execute(config: ISite, url: string, parentConfig: any) {
         return new Promise<ISite>((resolve, reject) => {
             let spWeb = new web.Web(url);
             spWeb.lists.get().then((result) => {

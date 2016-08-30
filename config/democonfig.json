@@ -5,38 +5,83 @@
         "Url": "http://dev2013vm1",
         "List": [
             {
-                "Title": "Hallo",
+                "Title": "TestListe1",
+                "Description": "",
+                "ControlOption": "",
+                "TemplateType": 100,
+                "InternalName": "AIS_TestList1",
+                "EnableContentTypes": true,
                 "Field": [
                     {
-                        "Title": "TestField3",
-                        "InternalName": "AIS_TestField3",
+                        "Title": "TestList1Field1",
+                        "InternalName": "AIS_TestList1Field1",
                         "FieldTypeKind": 9,
-                        "Group": "AISGroup"
+                        "ControlOption": ""
+                    },
+                    {
+                        "Title": "TestList1Field2",
+                        "InternalName": "AIS_TestList1Field2",
+                        "FieldTypeKind": 9,
+                        "ControlOption": ""
+                    },
+                    {
+                        "Title": "TestList1Field3",
+                        "InternalName": "AIS_TestList1Field3",
+                        "FieldTypeKind": 9,
+                        "ControlOption": ""
                     }
                 ]
             },
             {
-                "Title": "Hallo2"
+                "Title": "TestListe2",
+                "Description": "",
+                "ControlOption": "",
+                "TemplateType": 100,
+                "InternalName": "AIS_TestList2",
+                "EnableContentTypes": true,
+                "Field": [
+                    {
+                        "Title": "TestList2Field1",
+                        "InternalName": "AIS_TestList2Field1",
+                        "FieldTypeKind": 9,
+                        "ControlOption": ""
+                    },
+                    {
+                        "Title": "TestList2Field2",
+                        "InternalName": "AIS_TestList2Field2",
+                        "FieldTypeKind": 9,
+                        "ControlOption": ""
+                    },
+                    {
+                        "Title": "TestList2Field3",
+                        "InternalName": "AIS_TestList2Field3",
+                        "FieldTypeKind": 9,
+                        "ControlOption": ""
+                    }
+                ]
             }
         ],
-        "Field": [
-            {
-                "Title": "TestField",
-                "InternalName": "AIS_TestField",
-                "FieldTypeKind": 9,
-                "Group": "AISGroup"
-            },
+        "SiteField": [
             {
                 "Title": "TestField1",
                 "InternalName": "AIS_TestField1",
                 "FieldTypeKind": 9,
-                "Group": "AISGroup"
+                "Group": "AISGroup",
+                "ControlOption": ""
             },
             {
                 "Title": "TestField2",
                 "InternalName": "AIS_TestField2",
                 "FieldTypeKind": 9,
-                "Group": "AISGroup"
+                "Group": "AISGroup",
+                "ControlOption": ""
+            },
+            {
+                "Title": "TestField3",
+                "InternalName": "AIS_TestField3",
+                "FieldTypeKind": 9,
+                "Group": "AISGroup",
+                "ControlOption": ""
             }
         ]
     }

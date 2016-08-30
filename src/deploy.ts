@@ -6,6 +6,7 @@ import {ISPObjectHandler} from "./interface/ObjectHandler/ispobjecthandler";
 import {SiteHandler} from "./ObjectHandler/SiteHandler";
 import {ListHandler} from "./ObjectHandler/ListHandler";
 import {FieldHandler} from "./ObjectHandler/FieldHandler";
+import {SiteFieldHandler} from "./ObjectHandler/SiteFieldHandler";
 import {initAuth} from "./lib/initClient";
 import * as fetch from "node-fetch";
 
@@ -48,6 +49,8 @@ export function resolveObjectHandler(key: string): ISPObjectHandler {
             return new ListHandler();
         case "Field":
             return new FieldHandler();
+        case "SiteField":
+            return new SiteFieldHandler();
         default:
             break;
     }
@@ -65,7 +68,7 @@ export function chooseAndUseHandler(config: any, siteUrl: string) {
                     config[value].forEach(element => {
                         promiseArray.push(new Promise((resolve, reject) => {
                             prom = prom.then(() => {
-                                let promise = handler.execute(element, siteUrl);
+                                let promise = handler.execute(element, siteUrl, config);
                                 return promise;
                             }, (error) => {
                                 return Promise.reject(error);
@@ -85,7 +88,7 @@ export function chooseAndUseHandler(config: any, siteUrl: string) {
                     });
                 } else {
                     promiseArray.push(new Promise((resolve, reject) => {
-                        let promise = handler.execute(config[value], siteUrl).then((resolvedPromise) => {
+                        let promise = handler.execute(config[value], siteUrl,config).then((resolvedPromise) => {
                             Logger.write("Resolved Promise: " + JSON.stringify(resolvedPromise), 0);
                             chooseAndUseHandler(resolvedPromise, siteUrl).then(
                                 () => {
