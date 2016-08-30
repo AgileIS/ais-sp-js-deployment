@@ -30,6 +30,24 @@
                         "FieldTypeKind": 9,
                         "ControlOption": ""
                     }
+                ], 
+                "View": [
+                    {
+                        "Title": "All Items",
+                        "PersonalView": false,
+                        "ViewFields": [
+                            "TestList1Field1",
+                            "TestList1Field2"
+                        ]
+                    },
+                     {
+                        "Title": "TestView1",
+                        "PersonalView": false,
+                        "ViewFields": [
+                            "TestList1Field1",
+                            "TestList1Field2"
+                        ]
+                    }
                 ]
             },
             {

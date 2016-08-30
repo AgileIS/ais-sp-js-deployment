@@ -55,6 +55,7 @@ function createTypedHashfromProperties(pElement) {
     delete parsedObject.EnableContentTypes;
     delete parsedObject.ControlOption;
     delete parsedObject.Field;
+    delete parsedObject.View;
     delete parsedObject.Title;
     delete parsedObject.Description;
     delete parsedObject.TemplateType;

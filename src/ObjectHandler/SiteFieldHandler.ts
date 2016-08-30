@@ -82,7 +82,6 @@ function createTypedHashfromProperties(pElement: IField) {
     let parsedObject = JSON.parse(stringifiedObject);
     delete parsedObject.ControlOption;
     delete parsedObject.Title;
-    delete parsedObject.Description;
     stringifiedObject = JSON.stringify(parsedObject);
     return JSON.parse(stringifiedObject);
 }

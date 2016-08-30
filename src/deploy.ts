@@ -7,6 +7,7 @@ import {SiteHandler} from "./ObjectHandler/SiteHandler";
 import {ListHandler} from "./ObjectHandler/ListHandler";
 import {FieldHandler} from "./ObjectHandler/FieldHandler";
 import {SiteFieldHandler} from "./ObjectHandler/SiteFieldHandler";
+import {ViewHandler} from "./ObjectHandler/ViewHandler";
 import {initAuth} from "./lib/initClient";
 import * as fetch from "node-fetch";
 
@@ -51,6 +52,8 @@ export function resolveObjectHandler(key: string): ISPObjectHandler {
             return new FieldHandler();
         case "SiteField":
             return new SiteFieldHandler();
+        case "View":
+            return new ViewHandler();
         default:
             break;
     }
@@ -88,7 +91,7 @@ export function chooseAndUseHandler(config: any, siteUrl: string) {
                     });
                 } else {
                     promiseArray.push(new Promise((resolve, reject) => {
-                        let promise = handler.execute(config[value], siteUrl,config).then((resolvedPromise) => {
+                        let promise = handler.execute(config[value], siteUrl, config).then((resolvedPromise) => {
                             Logger.write("Resolved Promise: " + JSON.stringify(resolvedPromise), 0);
                             chooseAndUseHandler(resolvedPromise, siteUrl).then(
                                 () => {
