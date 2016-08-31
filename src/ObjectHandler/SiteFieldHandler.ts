@@ -15,9 +15,8 @@ export class SiteFieldHandler implements ISPObjectHandler {
                 return UpdateField(config, url);
             case "Delete":
                 return DeleteField(config, url);
-
             default:
-                return Promise.reject("Control Option on Element not found");
+                return AddField(config, url);
         }
     }
 }
@@ -28,59 +27,57 @@ function AddField(config: IField, url: string) {
     let element = config;
     return new Promise<IField>((resolve, reject) => {
         Logger.write("config " + JSON.stringify(config));
-        spWeb.fields.filter("InternalName eq '" + element.InternalName + "'").select("Id").get().then(
-            (data) => {
-                if (data.length === 0) {
-                    if (element.FieldTypeKind) {
-                        if (element.FieldTypeKind === 7) {  // 7 = Lookup
-                            resolve(config);
-                        }
-                        else if (element.FieldTypeKind === 17) { // 17 = Calculated
-                            spWeb.fields.addCalculated(element.InternalName, element.Formula, Types.DateTimeFieldFormatType.DateOnly).then((result) => {
-                                result.field.update({ Title: element.Title }).then(() => {
-                                    resolve(config);
-                                    Logger.write("Calculated Field with Internal Name '" + element.InternalName + "' created");
-                                }, (error) => {
-                                    Logger.write(error, 0);
-                                    reject(error);
-                                });
-                            }, (error) => {
+        spWeb.fields.filter("InternalName eq '" + element.InternalName + "'").select("Id").get().then((data) => {
+            if (data.length === 0) {
+                if (element.FieldTypeKind) {
+                    if (element.FieldTypeKind === 7) {  // 7 = Lookup
+                        resolve(config);
+                    }
+                    else if (element.FieldTypeKind === 17) { // 17 = Calculated
+                        spWeb.fields.addCalculated(element.InternalName, element.Formula, Types.DateTimeFieldFormatType.DateOnly).then((result) => {
+                            result.field.update({ Title: element.Title }).then(() => {
+                                resolve(config);
+                                Logger.write("Calculated Field with Internal Name '" + element.InternalName + "' created", 1);
+                            }).catch((error) => {
                                 Logger.write(error, 0);
                                 reject(error);
                             });
-                        }
-                        else {
-                            let propertyHash = createTypedHashfromProperties(element);
-                            spWeb.fields.add(element.InternalName, "SP.Field", propertyHash).then((result) => {
-                                result.field.update({ Title: element.Title }).then(() => {
-                                    resolve(config);
-                                    Logger.write("Field with Internal Name'" + element.InternalName + "' created");
-                                }, (error) => {
-                                    Logger.write(error, 0);
-                                    reject(error);
-                                });
-                            }, (error) => {
-                                Logger.write(error, 0);
-                                reject(error + " - " + element.InternalName);
-                            });
-                        }
+                        }).catch((error) => {
+                            Logger.write(error, 0);
+                            reject(error);
+                        });
                     }
                     else {
-                        let error = "FieldTypKind could not be resolved";
-                        reject(error);
-                        Logger.write(error);
+                        let propertyHash = createTypedHashfromProperties(element);
+                        spWeb.fields.add(element.InternalName, "SP.Field", propertyHash).then((result) => {
+                            result.field.update({ Title: element.Title }).then(() => {
+                                resolve(config);
+                                Logger.write("Field with Internal Name'" + element.InternalName + "' created", 1);
+                            }).catch((error) => {
+                                Logger.write(error, 0);
+                                reject(error);
+                            });
+                        }).catch((error) => {
+                            Logger.write(error, 0);
+                            reject(error + " - " + element.InternalName);
+                        });
                     }
                 }
                 else {
-                    let error = "Field with Internal Name '" + element.InternalName + "' already exists";
-                    resolve(config);
+                    let error = "FieldTypKind could not be resolved";
+                    reject(error);
                     Logger.write(error);
                 }
-            }, (error) => {
-                Logger.write(error, 0);
-                reject(error);
             }
-        );
+            else {
+                let error = "Field with Internal Name '" + element.InternalName + "' already exists";
+                resolve(config);
+                Logger.write(error);
+            }
+        }).catch((error) => {
+            Logger.write(error, 0);
+            reject(error);
+        });
     });
 };
 
@@ -94,18 +91,12 @@ function UpdateField(config: IField, url: string) {
             if (result.length === 1) {
                 let fieldId = result[0].Id;
                 let properties = updateTypedHashfromProperties(element);
-                if (properties) {
-                    spWeb.fields.getById(fieldId).update(properties).then(() => {
-                        resolve(config)
-                        Logger.write(`Field with Internal Name '${element.InternalName}' updated`);
-                    }, (error) => {
-                        reject(error);
-                    });
-                } else {
-                    let error = `No changes on Field '${element.InternalName}' found`;
+                spWeb.fields.getById(fieldId).update(properties).then(() => {
+                    resolve(config);
+                    Logger.write(`Field with Internal Name '${element.InternalName}' updated`, 1);
+                }).catch((error) => {
                     reject(error);
-                    Logger.write(error);
-                }
+                });
             }
             else {
                 let error = `Field with Internal Name '${element.InternalName}' does not exist`;
@@ -124,15 +115,13 @@ function DeleteField(config: IField, url: string) {
         spWeb.fields.filter(`InternalName eq '${element.InternalName}'`).select("Id").get().then((result) => {
             if (result.length === 1) {
                 let fieldId = result[0].Id;
-                spWeb.fields.getById(fieldId).delete().then(
-                    () => {
-                        Logger.write(`Field with Internal Name '${element.InternalName}' deleted`);
-                        resolve(config);
-                    },
+                spWeb.fields.getById(fieldId).delete().then(() => {
+                    Logger.write(`Field with Internal Name '${element.InternalName}' deleted`, 1);
+                    resolve(config);
+                }).catch(
                     (error) => {
                         reject(error);
-                    }
-                );
+                    });
             }
             else {
                 let error = `Field with Internal Name '${element.InternalName}' does not exist`;

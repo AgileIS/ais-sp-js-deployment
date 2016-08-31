@@ -75,37 +75,33 @@ export function chooseAndUseHandler(config: any, siteUrl: string) {
                     config[value].forEach(element => {
                         promiseArray.push(new Promise((resolve, reject) => {
                             prom = prom.then(() => {
-                                let promise = handler.execute(element, siteUrl, config);
-                                return promise;
-                            }, (error) => {
-                                return Promise.reject(error);
+                                return handler.execute(element, siteUrl, config);
+                            }).catch((error) => {
+                                reject(error);
                             }).then((resolvedPromise) => {
                                 Logger.write("Resolved Promise: " + JSON.stringify(resolvedPromise), 0);
                                 chooseAndUseHandler(resolvedPromise, siteUrl).then(() => {
                                     resolve();
-                                }, (error) => {
+                                }).catch((error) => {
                                     reject(error);
                                 });
-                            }, (error) => {
+                            }).catch((error) => {
                                 reject(error);
                                 Logger.write("Rejected: " + error, 0);
                                 return Promise.reject(error);
                             });
                         }));
-                    }); 
+                    });
                 } else {
                     promiseArray.push(new Promise((resolve, reject) => {
                         let promise = handler.execute(config[value], siteUrl, config).then((resolvedPromise) => {
                             Logger.write("Resolved Promise: " + JSON.stringify(resolvedPromise), 0);
-                            chooseAndUseHandler(resolvedPromise, siteUrl).then(
-                                () => {
-                                    resolve()
-                                },
-                                (error) => {
-                                    reject(error)
-                                }
-                            )
-                        }, (error) => {
+                            chooseAndUseHandler(resolvedPromise, siteUrl).then(() => {
+                                resolve();
+                            }).catch((error) => {
+                                reject(error);
+                            });
+                        }).catch((error) => {
                             reject(error);
                             Logger.write("Rejected: " + error, 0);
                         });
