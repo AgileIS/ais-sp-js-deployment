@@ -33,6 +33,9 @@ export class FieldHandler implements ISPObjectHandler {
                                                 reject(error);
                                             }
                                         );
+                                    },
+                                    (error) => {
+                                        reject(error);
                                     });
                                 }
                                 else {
@@ -47,7 +50,11 @@ export class FieldHandler implements ISPObjectHandler {
                                                 reject(error);
                                             }
                                         );
-                                    });
+                                    },
+                                    (error) => {
+                                        reject(error);
+                                    }
+                                    );
                                 }
                             }
                             else {

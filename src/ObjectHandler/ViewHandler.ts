@@ -26,24 +26,18 @@ export class ViewHandler implements ISPObjectHandler {
                                     (result) => {
                                         result.view.fields.removeAll().then(
                                             () => {
-                                                let prom = Promise.resolve();
+                                                let promiseArray = [];
                                                 for (let viewField of element.ViewFields) {
-                                                    prom = prom.then(() => {
-                                                        return spWeb.lists.getById(listId).views.getByTitle(element.Title).fields.add(viewField).then(
-                                                            () => {
-                                                                Promise.resolve(); //TODO Field soll hinzugefügt werden bevor es erstellt worden ist
-                                                            },
-                                                            (error) => {
-                                                                Promise.reject(error);
-                                                            }
-                                                        );
-                                                    },
-                                                        (error) => {
-                                                            return Promise.reject(error);
-                                                        }
-                                                    );
+                                                    promiseArray.push(spWeb.lists.getById(listId).views.getByTitle(element.Title).fields.add(viewField));  // Timing Problem
                                                 }
-                                                resolve(config);
+                                                Promise.all(promiseArray).then(
+                                                    () => {
+                                                         resolve(config);
+                                                        },
+                                                    (error) => {
+                                                        reject(error);
+                                                    }
+                                                )
                                             },
                                             (error) => {
                                                 reject(error);

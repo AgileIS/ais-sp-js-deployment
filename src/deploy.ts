@@ -60,9 +60,13 @@ export function resolveObjectHandler(key: string): ISPObjectHandler {
 }
 
 export function chooseAndUseHandler(config: any, siteUrl: string) {
-    return new Promise<boolean>((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         let promiseArray = [];
+
         Object.keys(config).forEach((value, index) => {
+
+
+
             Logger.write("found config key " + value + " at index " + index, 0);
             let handler = resolveObjectHandler(value);
             if (typeof handler !== "undefined") {
@@ -85,20 +89,22 @@ export function chooseAndUseHandler(config: any, siteUrl: string) {
                             }, (error) => {
                                 reject(error);
                                 Logger.write("Rejected: " + error, 0);
-                                return null;
+                                return Promise.reject(error);
                             });
                         }));
-                    });
+                    }); 
                 } else {
                     promiseArray.push(new Promise((resolve, reject) => {
                         let promise = handler.execute(config[value], siteUrl, config).then((resolvedPromise) => {
                             Logger.write("Resolved Promise: " + JSON.stringify(resolvedPromise), 0);
                             chooseAndUseHandler(resolvedPromise, siteUrl).then(
                                 () => {
-                                    resolve();
-                                }, (error) => {
-                                    reject(error);
-                                });
+                                    resolve()
+                                },
+                                (error) => {
+                                    reject(error)
+                                }
+                            )
                         }, (error) => {
                             reject(error);
                             Logger.write("Rejected: " + error, 0);
@@ -106,10 +112,12 @@ export function chooseAndUseHandler(config: any, siteUrl: string) {
                     }));
                 }
             }
+
+
         });
         Promise.all(promiseArray).then(() => {
             Logger.write("All Promises resolved", 0);
-            resolve(true);
+            resolve();
         }, (error) => {
             Logger.write("Not all Promises resolved - " + error, 0);
             reject(error);
