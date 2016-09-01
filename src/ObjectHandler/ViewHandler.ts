@@ -24,40 +24,30 @@ export class ViewHandler implements ISPObjectHandler {
                             else if (result.length === 0) {
                                 spWeb.lists.getById(listId).views.add(element.Title, element.PersonalView, propertyHash).then(
                                     (result) => {
-                                        result.view.fields.removeAll().then(
-                                            () => {
-                                                let promiseArray = [];
-                                                for (let viewField of element.ViewFields) {
-                                                    promiseArray.push(spWeb.lists.getById(listId).views.getByTitle(element.Title).fields.add(viewField));  // Timing Problem
-                                                }
-                                                Promise.all(promiseArray).then(
-                                                    () => {
-                                                        resolve(config);
-                                                    },
-                                                    (error) => {
-                                                        reject(error + " - " + element.Title);
-                                                    }
-                                                );
-                                            },
-                                            (error) => {
-                                                reject(error + " - " + element.Title);
+                                        result.view.fields.removeAll().then(() => {
+                                            let promiseArray = [];
+                                            for (let viewField of element.ViewFields) {
+                                                promiseArray.push(spWeb.lists.getById(listId).views.getByTitle(element.Title).fields.add(viewField));  // Timing Problem
                                             }
-                                        );
-                                    },
-                                    (error) => {
+                                            Promise.all(promiseArray).then(() => {
+                                                resolve(config);
+                                            }).catch((error) => {
+                                                reject(error + " - " + element.Title);
+                                            });
+                                        }).catch((error) => {
+                                            reject(error + " - " + element.Title);
+                                        });
+                                    }).catch((error) => {
                                         reject(error + " - " + element.Title);
-                                    }
-                                );
+                                    });
                             }
                             else {
                                 let error = `More than one Views wit Title '${element.Title}' found`;
                                 reject(error);
                             }
-                        },
-                        (error) => {
+                        }).catch((error) => {
                             reject(error + " - " + element.Title);
-                        }
-                    );
+                        });
                 }
                 else {
                     let error = `List with Internal Name '${listName}' does not exist`;

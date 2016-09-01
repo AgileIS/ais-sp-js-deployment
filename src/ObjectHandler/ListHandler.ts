@@ -31,7 +31,7 @@ function AddList(config: IList, url: string) {
         if (element.TemplateType) {
             spWeb.lists.filter(`RootFolder/Name eq '${element.InternalName}'`).select("Id").get().then((result) => {
                 if (result.length === 0) {
-                    let propertyHash = createTypedHashfromProperties(element);
+                    let propertyHash = CreateProperties(element);
                     spWeb.lists.add(element.InternalName, element.Description, element.TemplateType, element.EnableContentTypes, propertyHash).then((result) => {
                         result.list.update({ Title: element.Title }).then((result) => {
                             resolve(config);
@@ -64,7 +64,7 @@ function UpdateList(config: IList, url: string) {
         spWeb.lists.filter(`RootFolder/Name eq '${element.InternalName}'`).select("Id").get().then((result) => {
             if (result.length === 1) {
                 let listId = result[0].Id;
-                let properties = updateTypedHashfromProperties(element);
+                let properties = CreateProperties(element);
                 spWeb.lists.getById(listId).update(properties).then(() => {
                     resolve(config);
                     Logger.write(`List with Internal Name '${element.InternalName}' updated`, 1);
@@ -90,7 +90,8 @@ function DeleteList(config: IList, url: string) {
             if (result.length === 1) {
                 let listId = result[0].Id;
                 spWeb.lists.getById(listId).delete().then(() => {
-                    resolve(config);
+                    let configForDelete = CreateProperties(config);
+                    resolve(configForDelete);
                     Logger.write(`List with Internal Name '${element.InternalName}' deleted`, 1);
                 }).catch((error) => {
                     reject(error + " - " + element.InternalName);
@@ -107,33 +108,38 @@ function DeleteList(config: IList, url: string) {
 }
 
 
-function createTypedHashfromProperties(pElement) {
-    let element = pElement;
-    let stringifiedObject;
-    stringifiedObject = JSON.stringify(element);
-    let parsedObject = JSON.parse(stringifiedObject);
-    delete parsedObject.InternalName;
-    delete parsedObject.EnableContentTypes;
-    delete parsedObject.ControlOption;
-    delete parsedObject.Field;
-    delete parsedObject.View;
-    delete parsedObject.Title;
-    delete parsedObject.Description;
-    delete parsedObject.TemplateType;
-    stringifiedObject = JSON.stringify(parsedObject);
-    return JSON.parse(stringifiedObject);
-}
-
-function updateTypedHashfromProperties(pElement: IList) {
+function CreateProperties(pElement: IList) {
     let element = pElement;
     let stringifiedObject: string;
     stringifiedObject = JSON.stringify(element);
     let parsedObject = JSON.parse(stringifiedObject);
-    delete parsedObject.InternalName;
-    delete parsedObject.ControlOption;
-    delete parsedObject.Field;
-    delete parsedObject.View;
-    delete parsedObject.TemplateType;
+    switch (element.ControlOption) {
+        case "":
+            delete parsedObject.InternalName;
+            delete parsedObject.EnableContentTypes;
+            delete parsedObject.ControlOption;
+            delete parsedObject.Field;
+            delete parsedObject.View;
+            delete parsedObject.Title;
+            delete parsedObject.Description;
+            delete parsedObject.TemplateType;
+            break;
+        case "Update":
+            delete parsedObject.InternalName;
+            delete parsedObject.ControlOption;
+            delete parsedObject.Field;
+            delete parsedObject.EnableContentTypes;
+            delete parsedObject.View;
+            delete parsedObject.TemplateType;
+            break;
+        case "Delete":
+            delete parsedObject.Field;
+            delete parsedObject.View;
+            delete parsedObject.ContentType;
+            break;
+        default:
+            break;
+    }
     stringifiedObject = JSON.stringify(parsedObject);
     return JSON.parse(stringifiedObject);
 }

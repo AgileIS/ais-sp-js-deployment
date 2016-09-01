@@ -56,7 +56,7 @@ function AddField(config: IField, url: string, parentConfig: IList) {
                                     });
                             }
                             else {
-                                let propertyHash = createTypedHashfromProperties(element);
+                                let propertyHash = CreateProperties(element);
                                 spWeb.lists.getById(listId).fields.add(element.InternalName, "SP.Field", propertyHash).then((result) => {
                                     result.field.update({ Title: element.Title }).then(
                                         () => {
@@ -116,7 +116,7 @@ function UpdateField(config: IField, url: string, parentConfig: IList) {
                 spWeb.lists.getById(listId).fields.filter(`InternalName eq '${element.InternalName}'`).select("Id").get().then(function (result) {
                     if (result.length === 1) {
                         let fieldId = result[0].Id;
-                        let properties = updateTypedHashfromProperties(element);
+                        let properties = CreateProperties(element);
                         if (properties) {
                             spWeb.lists.getById(listId).fields.getById(fieldId).update(properties).then(function () {
                                 resolve(config);
@@ -174,33 +174,24 @@ function DeleteField(config: IField, url: string, parentConfig: IList) {
     });
 }
 
-
-
-function createFieldHash(pElement: IField) {
-    let element = pElement;
-    let stringifiedObject = JSON.stringify(element);
-    return JSON.parse(stringifiedObject);
-}
-
-function createTypedHashfromProperties(pElement: IField) {
+function CreateProperties(pElement: IField) {
     let element = pElement;
     let stringifiedObject: string;
     stringifiedObject = JSON.stringify(element);
     let parsedObject = JSON.parse(stringifiedObject);
-    delete parsedObject.ControlOption;
-    delete parsedObject.Title;
-    delete parsedObject.Description;
-    stringifiedObject = JSON.stringify(parsedObject);
-    return JSON.parse(stringifiedObject);
-}
-
-function updateTypedHashfromProperties(pElement: IField) {
-    let element = pElement;
-    let stringifiedObject: string;
-    stringifiedObject = JSON.stringify(element);
-    let parsedObject = JSON.parse(stringifiedObject);
-    delete parsedObject.ControlOption;
-    delete parsedObject.InternalName;
+    switch (element.ControlOption) {
+        case "":
+            delete parsedObject.ControlOption;
+            delete parsedObject.Title;
+            delete parsedObject.Description;
+            break;
+        case "Update":
+            delete parsedObject.ControlOption;
+            delete parsedObject.InternalName;
+            break;
+        default:
+            break;
+    }
     stringifiedObject = JSON.stringify(parsedObject);
     return JSON.parse(stringifiedObject);
 }

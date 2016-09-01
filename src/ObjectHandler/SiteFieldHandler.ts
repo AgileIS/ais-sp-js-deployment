@@ -48,7 +48,7 @@ function AddField(config: IField, url: string) {
                         });
                     }
                     else {
-                        let propertyHash = createTypedHashfromProperties(element);
+                        let propertyHash = CreateProperties(element);
                         spWeb.fields.add(element.InternalName, "SP.Field", propertyHash).then((result) => {
                             result.field.update({ Title: element.Title }).then(() => {
                                 resolve(config);
@@ -90,7 +90,7 @@ function UpdateField(config: IField, url: string) {
         spWeb.fields.filter(`InternalName eq '${element.InternalName}'`).select("Id").get().then((result) => {
             if (result.length === 1) {
                 let fieldId = result[0].Id;
-                let properties = updateTypedHashfromProperties(element);
+                let properties = CreateProperties(element);
                 spWeb.fields.getById(fieldId).update(properties).then(() => {
                     resolve(config);
                     Logger.write(`Field with Internal Name '${element.InternalName}' updated`, 1);
@@ -133,30 +133,24 @@ function DeleteField(config: IField, url: string) {
 }
 
 
-function createFieldHash(pElement: IField) {
-    let element = pElement;
-    let stringifiedObject = JSON.stringify(element);
-    return JSON.parse(stringifiedObject);
-}
-
-function createTypedHashfromProperties(pElement: IField) {
+function CreateProperties(pElement: IField) {
     let element = pElement;
     let stringifiedObject: string;
     stringifiedObject = JSON.stringify(element);
     let parsedObject = JSON.parse(stringifiedObject);
-    delete parsedObject.ControlOption;
-    delete parsedObject.Title;
-    stringifiedObject = JSON.stringify(parsedObject);
-    return JSON.parse(stringifiedObject);
-}
-
-function updateTypedHashfromProperties(pElement: IField) {
-    let element = pElement;
-    let stringifiedObject: string;
-    stringifiedObject = JSON.stringify(element);
-    let parsedObject = JSON.parse(stringifiedObject);
-    delete parsedObject.ControlOption;
-    delete parsedObject.InternalName;
+    switch (element.ControlOption) {
+        case "":
+            delete parsedObject.ControlOption;
+            delete parsedObject.Title;
+            delete parsedObject.Description;
+            break;
+        case "Update":
+            delete parsedObject.ControlOption;
+            delete parsedObject.InternalName;
+            break;
+        default:
+            break;
+    }
     stringifiedObject = JSON.stringify(parsedObject);
     return JSON.parse(stringifiedObject);
 }
