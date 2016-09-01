@@ -8,4 +8,6 @@ export interface IView {
     SetAsDefaultView: boolean;
     ViewFields: Array<string>;
     ViewTypeKind: string;
+    ControlOption: string;
+    ParentListId: any;
 }

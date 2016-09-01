@@ -8,6 +8,7 @@ import {ListHandler} from "./ObjectHandler/ListHandler";
 import {FieldHandler} from "./ObjectHandler/FieldHandler";
 import {SiteFieldHandler} from "./ObjectHandler/SiteFieldHandler";
 import {ViewHandler} from "./ObjectHandler/ViewHandler";
+import {ViewFieldHandler} from "./ObjectHandler/ViewFieldHandler";
 import {initAuth} from "./lib/initClient";
 import * as fetch from "node-fetch";
 
@@ -54,6 +55,8 @@ export function resolveObjectHandler(key: string): ISPObjectHandler {
             return new SiteFieldHandler();
         case "View":
             return new ViewHandler();
+        case "ViewField":
+            return new ViewFieldHandler();
         default:
             break;
     }

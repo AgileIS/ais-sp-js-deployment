@@ -31,12 +31,12 @@ function AddField(config: IField, url: string) {
             if (data.length === 0) {
                 if (element.FieldTypeKind) {
                     if (element.FieldTypeKind === 7) {  // 7 = Lookup
-                        resolve(config);
+                        resolve(element);
                     }
                     else if (element.FieldTypeKind === 17) { // 17 = Calculated
                         spWeb.fields.addCalculated(element.InternalName, element.Formula, Types.DateTimeFieldFormatType.DateOnly).then((result) => {
                             result.field.update({ Title: element.Title }).then(() => {
-                                resolve(config);
+                                resolve(element);
                                 Logger.write("Calculated Field with Internal Name '" + element.InternalName + "' created", 1);
                             }).catch((error) => {
                                 Logger.write(error, 0);
@@ -51,7 +51,7 @@ function AddField(config: IField, url: string) {
                         let propertyHash = CreateProperties(element);
                         spWeb.fields.add(element.InternalName, "SP.Field", propertyHash).then((result) => {
                             result.field.update({ Title: element.Title }).then(() => {
-                                resolve(config);
+                                resolve(element);
                                 Logger.write("Field with Internal Name'" + element.InternalName + "' created", 1);
                             }).catch((error) => {
                                 Logger.write(error, 0);
@@ -92,7 +92,7 @@ function UpdateField(config: IField, url: string) {
                 let fieldId = result[0].Id;
                 let properties = CreateProperties(element);
                 spWeb.fields.getById(fieldId).update(properties).then(() => {
-                    resolve(config);
+                    resolve(element);
                     Logger.write(`Field with Internal Name '${element.InternalName}' updated`, 1);
                 }).catch((error) => {
                     reject(error + " - " + element.InternalName);
@@ -117,7 +117,7 @@ function DeleteField(config: IField, url: string) {
                 let fieldId = result[0].Id;
                 spWeb.fields.getById(fieldId).delete().then(() => {
                     Logger.write(`Field with Internal Name '${element.InternalName}' deleted`, 1);
-                    resolve(config);
+                    resolve(element);
                 }).catch(
                     (error) => {
                         reject(error + " - " + element.InternalName);

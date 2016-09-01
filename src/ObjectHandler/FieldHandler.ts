@@ -44,7 +44,7 @@ function AddField(config: IField, url: string, parentConfig: IList) {
                                     result.field.update({ Title: element.Title }).then(
                                         () => {
                                             Logger.write(`Calculated Field with Internal Name '${element.InternalName}' created`);
-                                            resolve(config);
+                                            resolve(element);
                                         },
                                         (error) => {
                                             reject(error + " - " + element.InternalName);
@@ -61,7 +61,7 @@ function AddField(config: IField, url: string, parentConfig: IList) {
                                     result.field.update({ Title: element.Title }).then(
                                         () => {
                                             Logger.write(`Field with Internal Name '${element.InternalName}' created`);
-                                            resolve(config);
+                                            resolve(element);
                                         },
                                         (error) => {
                                             reject(error + " - " + element.InternalName);
@@ -84,7 +84,7 @@ function AddField(config: IField, url: string, parentConfig: IList) {
                         spWeb.lists.getById(listId).fields.getById(fieldId).update({ Title: element.Title }).then(
                             () => {
                                 Logger.write("Existing Field with Title '" + element.Title + "' updated");
-                                resolve(config);
+                                resolve(element);
                             },
                             (error) => {
                                 reject(error + " - " + element.InternalName);
@@ -92,7 +92,7 @@ function AddField(config: IField, url: string, parentConfig: IList) {
                         );
                     }
                     else {
-                        resolve(config);
+                        resolve(element);
                         Logger.write(`Field with Internal Name '${element.InternalName}' already exists`);
                     }
                 });
@@ -119,7 +119,7 @@ function UpdateField(config: IField, url: string, parentConfig: IList) {
                         let properties = CreateProperties(element);
                         if (properties) {
                             spWeb.lists.getById(listId).fields.getById(fieldId).update(properties).then(function () {
-                                resolve(config);
+                                resolve(element);
                                 Logger.write(`Field with Internal Name '${element.InternalName}' updated`);
                             });
                         } else {
@@ -153,7 +153,7 @@ function DeleteField(config: IField, url: string, parentConfig: IList) {
                     if (result.length === 1) {
                         let fieldId = result[0].Id;
                         spWeb.lists.getById(listId).fields.getById(fieldId).delete().then(() => {
-                            resolve(config);
+                            resolve(element);
                             Logger.write(`Field with Internal Name '${element.InternalName}' deleted`);
                         }).catch((error) => {
                             reject(error + " - " + element.InternalName);

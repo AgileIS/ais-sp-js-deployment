@@ -32,73 +32,17 @@
                     }
                 ], 
                 "View": [
-                    {
+                     {
                         "Title": "All Items",
                         "PersonalView": false,
-                        "ViewFields": [
-                           
-                        ]
-                    },
-                     {
-                        "Title": "TestView1",
-                        "PersonalView": false,
-                        "ViewFields": [
-                            "Author"
-                            
+                        "ControlOption": "Update",
+                        "ViewField": [
+                            "Title",
+                            "Author",
+                            "AIS_TestList1Field3"
                         ]
                     }
                 ]
-            },
-            {
-                "Title": "TestListe2",
-                "Description": "",
-                "ControlOption": "",
-                "TemplateType": 100,
-                "InternalName": "AIS_TestList2",
-                "EnableContentTypes": true,
-                "Field": [
-                    {
-                        "Title": "TestList2Field1",
-                        "InternalName": "AIS_TestList2Field1",
-                        "FieldTypeKind": 9,
-                        "ControlOption": ""
-                    },
-                    {
-                        "Title": "TestList2Field2",
-                        "InternalName": "AIS_TestList2Field2",
-                        "FieldTypeKind": 9,
-                        "ControlOption": ""
-                    },
-                    {
-                        "Title": "TestList2Field3",
-                        "InternalName": "AIS_TestList2Field3",
-                        "FieldTypeKind": 9,
-                        "ControlOption": ""
-                    }
-                ]
-            }
-        ],
-        "SiteField": [
-            {
-                "Title": "TestField1",
-                "InternalName": "AIS_TestField1",
-                "FieldTypeKind": 9,
-                "Group": "AISGroup",
-                "ControlOption": ""
-            },
-            {
-                "Title": "TestField2",
-                "InternalName": "AIS_TestField2",
-                "FieldTypeKind": 9,
-                "Group": "AISGroup",
-                "ControlOption": ""
-            },
-            {
-                "Title": "TestField3",
-                "InternalName": "AIS_TestField3",
-                "FieldTypeKind": 9,
-                "Group": "AISGroup",
-                "ControlOption": ""
             }
         ]
     }

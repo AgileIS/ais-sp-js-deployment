@@ -17,7 +17,7 @@ export class ListHandler implements ISPObjectHandler {
                 return DeleteList(config, url);
 
             default:
-                return Promise.reject("Control Option on Element not found");
+                 return AddList(config, url);
         }
     }
 }
@@ -34,7 +34,7 @@ function AddList(config: IList, url: string) {
                     let propertyHash = CreateProperties(element);
                     spWeb.lists.add(element.InternalName, element.Description, element.TemplateType, element.EnableContentTypes, propertyHash).then((result) => {
                         result.list.update({ Title: element.Title }).then((result) => {
-                            resolve(config);
+                            resolve(element);
                             Logger.write(`List ${element.Title} created`, 0);
                         }, (error) => {
                             reject(error + " - " + element.InternalName);
@@ -43,7 +43,7 @@ function AddList(config: IList, url: string) {
                         reject(error + " - " + element.InternalName);
                     });
                 } else {
-                    resolve(config);
+                    resolve(element);
                     Logger.write(`List with Internal Name '${element.InternalName}' already exists`, 0);
                 }
             }, (error) => {
@@ -66,7 +66,7 @@ function UpdateList(config: IList, url: string) {
                 let listId = result[0].Id;
                 let properties = CreateProperties(element);
                 spWeb.lists.getById(listId).update(properties).then(() => {
-                    resolve(config);
+                    resolve(element);
                     Logger.write(`List with Internal Name '${element.InternalName}' updated`, 1);
                 }).catch((error) => {
                     reject(error + " - " + element.InternalName);
