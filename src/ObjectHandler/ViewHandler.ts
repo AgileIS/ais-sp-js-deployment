@@ -32,38 +32,36 @@ export class ViewHandler implements ISPObjectHandler {
                                                 }
                                                 Promise.all(promiseArray).then(
                                                     () => {
-                                                         resolve(config);
-                                                        },
+                                                        resolve(config);
+                                                    },
                                                     (error) => {
-                                                        reject(error);
+                                                        reject(error + " - " + element.Title);
                                                     }
-                                                )
+                                                );
                                             },
                                             (error) => {
-                                                reject(error);
+                                                reject(error + " - " + element.Title);
                                             }
                                         );
                                     },
                                     (error) => {
-                                        reject(error);
+                                        reject(error + " - " + element.Title);
                                     }
                                 );
                             }
                             else {
                                 let error = `More than one Views wit Title '${element.Title}' found`;
                                 reject(error);
-                                Logger.write(error, 0);
                             }
                         },
                         (error) => {
-                            reject(error);
+                            reject(error + " - " + element.Title);
                         }
                     );
                 }
                 else {
                     let error = `List with Internal Name '${listName}' does not exist`;
                     reject(error);
-                    Logger.write(error, 0);
                 }
             });
         });

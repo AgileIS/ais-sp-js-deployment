@@ -18,10 +18,8 @@ export class FieldHandler implements ISPObjectHandler {
                 return DeleteField(config, url, parentConfig);
 
             default:
-                return Promise.reject("Control Option on Element not found");
+                return AddField(config, url, parentConfig);
         }
-
-
     }
 }
 
@@ -49,12 +47,12 @@ function AddField(config: IField, url: string, parentConfig: IList) {
                                             resolve(config);
                                         },
                                         (error) => {
-                                            reject(error);
+                                            reject(error + " - " + element.InternalName);
                                         }
                                     );
                                 },
                                     (error) => {
-                                        reject(error);
+                                        reject(error + " - " + element.InternalName);
                                     });
                             }
                             else {
@@ -66,12 +64,12 @@ function AddField(config: IField, url: string, parentConfig: IList) {
                                             resolve(config);
                                         },
                                         (error) => {
-                                            reject(error);
+                                            reject(error + " - " + element.InternalName);
                                         }
                                     );
                                 },
                                     (error) => {
-                                        reject(error);
+                                        reject(error + " - " + element.InternalName);
                                     }
                                 );
                             }
@@ -79,7 +77,6 @@ function AddField(config: IField, url: string, parentConfig: IList) {
                         else {
                             let error = `FieldTypKind for '${element.InternalName}' could not be resolved`;
                             reject(error);
-                            Logger.write(error, 0);
                         }
                     }
                     else if (result.length === 1 && element.FieldTypeKind === undefined) {
@@ -90,7 +87,7 @@ function AddField(config: IField, url: string, parentConfig: IList) {
                                 resolve(config);
                             },
                             (error) => {
-                                reject(error);
+                                reject(error + " - " + element.InternalName);
                             }
                         );
                     }
@@ -103,9 +100,8 @@ function AddField(config: IField, url: string, parentConfig: IList) {
             else {
                 let error = `List with Title '${parentElement.InternalName}' for Field '${element.InternalName}' does not exist`;
                 reject(error);
-                Logger.write(error, 0);
             }
-        })
+        });
     });
 }
 
@@ -129,20 +125,17 @@ function UpdateField(config: IField, url: string, parentConfig: IList) {
                         } else {
                             let error = `No changes on Field '${element.InternalName}' found`;
                             reject(error);
-                            Logger.write(error, 0);
                         }
                     }
                     else {
                         let error = `Field with Internal Name '${element.Title}' does not exist`;
                         reject(error);
-                        Logger.write(error, 0);
                     }
                 });
             }
             else {
                 let error = `List with Title '${listName}' for Field '${element.InternalName}' does not exist`;
                 reject(error);
-                Logger.write(error, 0);
             }
         });
     });
@@ -161,13 +154,14 @@ function DeleteField(config: IField, url: string, parentConfig: IList) {
                         let fieldId = result[0].Id;
                         spWeb.lists.getById(listId).fields.getById(fieldId).delete().then(() => {
                             resolve(config);
-                            console.log(`Field with Internal Name '${element.InternalName}' deleted`);
+                            Logger.write(`Field with Internal Name '${element.InternalName}' deleted`);
+                        }).catch((error) => {
+                            reject(error + " - " + element.InternalName);
                         });
                     }
                     else {
                         let error = `Field with Internal Name '${element.Title}' does not exist`;
                         reject(error);
-                        Logger.write(error, 0);
                     }
                 });
             }
@@ -175,7 +169,6 @@ function DeleteField(config: IField, url: string, parentConfig: IList) {
 
                 let error = `List with Title '${listName}' for Field '${element.InternalName}' does not exist`;
                 reject(error);
-                Logger.write(error, 0);
             }
         });
     });

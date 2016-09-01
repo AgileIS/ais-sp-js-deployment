@@ -40,11 +40,11 @@ function AddField(config: IField, url: string) {
                                 Logger.write("Calculated Field with Internal Name '" + element.InternalName + "' created", 1);
                             }).catch((error) => {
                                 Logger.write(error, 0);
-                                reject(error);
+                                reject(error + " - " + element.InternalName);
                             });
                         }).catch((error) => {
                             Logger.write(error, 0);
-                            reject(error);
+                            reject(error + " - " + element.InternalName);
                         });
                     }
                     else {
@@ -55,7 +55,7 @@ function AddField(config: IField, url: string) {
                                 Logger.write("Field with Internal Name'" + element.InternalName + "' created", 1);
                             }).catch((error) => {
                                 Logger.write(error, 0);
-                                reject(error);
+                                reject(error + " - " + element.InternalName);
                             });
                         }).catch((error) => {
                             Logger.write(error, 0);
@@ -66,17 +66,17 @@ function AddField(config: IField, url: string) {
                 else {
                     let error = "FieldTypKind could not be resolved";
                     reject(error);
-                    Logger.write(error);
+                    Logger.write(error + " - " + element.InternalName);
                 }
             }
             else {
                 let error = "Field with Internal Name '" + element.InternalName + "' already exists";
                 resolve(config);
-                Logger.write(error);
+                Logger.write(error + " - " + element.InternalName);
             }
         }).catch((error) => {
             Logger.write(error, 0);
-            reject(error);
+            reject(error + " - " + element.InternalName);
         });
     });
 };
@@ -95,7 +95,7 @@ function UpdateField(config: IField, url: string) {
                     resolve(config);
                     Logger.write(`Field with Internal Name '${element.InternalName}' updated`, 1);
                 }).catch((error) => {
-                    reject(error);
+                    reject(error + " - " + element.InternalName);
                 });
             }
             else {
@@ -120,7 +120,7 @@ function DeleteField(config: IField, url: string) {
                     resolve(config);
                 }).catch(
                     (error) => {
-                        reject(error);
+                        reject(error + " - " + element.InternalName);
                     });
             }
             else {
@@ -128,7 +128,7 @@ function DeleteField(config: IField, url: string) {
                 reject(error);
                 Logger.write(error);
             }
-        })
+        });
     });
 }
 

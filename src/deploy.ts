@@ -18,16 +18,16 @@ class MyConsoleLogger implements LogListener {
 }
 
 
-Logger.subscribe(new MyConsoleLogger())
+Logger.subscribe(new MyConsoleLogger());
 Logger.activeLogLevel = Logger.LogLevel.Verbose;
 
-let fs = require('fs')
+let fs = require("fs");
 let args = require("minimist")(process.argv.slice(2));
 Logger.write("start deployment script", Logger.LogLevel.Info);
 Logger.write(JSON.stringify(args), 0);
 
 if (args.f && args.p) {
-    let config = JSON.parse(fs.readFileSync(args.f, 'utf8'));
+    let config = JSON.parse(fs.readFileSync(args.f, "utf8"));
     if (config.Url && config.User) {
         initAuth(config.Url, config.User, args.p);
         let siteUrl = config.Url;
@@ -59,6 +59,12 @@ export function resolveObjectHandler(key: string): ISPObjectHandler {
     }
 }
 
+function promiseStatus(p) {
+    return p.then(function (val) { return { status: "resolved", val: val }; },
+        function (val) { return { status: "rejected", val: val }; }
+    );
+}
+
 export function chooseAndUseHandler(config: any, siteUrl: string) {
     return new Promise((resolve, reject) => {
         let promiseArray = [];
@@ -66,35 +72,31 @@ export function chooseAndUseHandler(config: any, siteUrl: string) {
         Object.keys(config).forEach((value, index) => {
 
 
-
             Logger.write("found config key " + value + " at index " + index, 0);
             let handler = resolveObjectHandler(value);
             if (typeof handler !== "undefined") {
                 if (config[value] instanceof Array) {
-                    let prom = Promise.resolve();
+                    let prom: Promise<any> = Promise.resolve();
                     config[value].forEach(element => {
                         promiseArray.push(new Promise((resolve, reject) => {
                             prom = prom.then(() => {
                                 return handler.execute(element, siteUrl, config);
-                            }).catch((error) => {
-                                reject(error);
                             }).then((resolvedPromise) => {
-                                Logger.write("Resolved Promise: " + JSON.stringify(resolvedPromise), 0);
                                 chooseAndUseHandler(resolvedPromise, siteUrl).then(() => {
                                     resolve();
                                 }).catch((error) => {
                                     reject(error);
+
                                 });
                             }).catch((error) => {
                                 reject(error);
-                                Logger.write("Rejected: " + error, 0);
-                                return Promise.reject(error);
+
                             });
                         }));
                     });
                 } else {
                     promiseArray.push(new Promise((resolve, reject) => {
-                        let promise = handler.execute(config[value], siteUrl, config).then((resolvedPromise) => {
+                        handler.execute(config[value], siteUrl, config).then((resolvedPromise) => {
                             Logger.write("Resolved Promise: " + JSON.stringify(resolvedPromise), 0);
                             chooseAndUseHandler(resolvedPromise, siteUrl).then(() => {
                                 resolve();
@@ -108,15 +110,18 @@ export function chooseAndUseHandler(config: any, siteUrl: string) {
                     }));
                 }
             }
-
-
         });
-        Promise.all(promiseArray).then(() => {
+        Promise.all(promiseArray.map(promiseStatus)).then((result) => {
+            for (let promise of result) {
+                if (promise.status === "rejected") {
+                    reject(promise.val);
+                    Logger.write("Not all Promises resolved - " + promise.val, 0);
+                    break;
+                }
+            }
             Logger.write("All Promises resolved", 0);
             resolve();
-        }, (error) => {
-            Logger.write("Not all Promises resolved - " + error, 0);
-            reject(error);
         });
     });
 }
+
