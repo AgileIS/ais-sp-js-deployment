@@ -4,23 +4,15 @@ import * as web from "sp-pnp-js/lib/sharepoint/rest/webs";
 import {ISite} from "../interface/Types/ISite";
 
 export class SiteHandler implements ISPObjectHandler {
-    execute(config: any, url: string, parent: Promise<any>) {
-        let parentPromise = parent;
-        let promise: Promise<ISite>;
+    execute(config: ISite, url: string, parentConfig: any) {
         return new Promise<ISite>((resolve, reject) => {
-            parentPromise.then(() => {
-                let spWeb = new web.Web(url);
-                if (spWeb) {
-                    resolve();
-                    Logger.write("config " + JSON.stringify(config));
-                }
-            },
-                () => {
-                    let error = "Parent Promise not resolved";
-                    reject(error);
-                    Logger.write(error);
-                }
-            )
-        })
+            let spWeb = new web.Web(url);
+            spWeb.lists.get().then((result) => {
+                resolve(config);
+                Logger.write("config " + JSON.stringify(config), 0);
+            }).catch((error) => {
+                reject(error);
+            });
+        });
     };
 }

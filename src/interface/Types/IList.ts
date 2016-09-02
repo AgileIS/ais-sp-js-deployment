@@ -34,4 +34,7 @@ export interface IList {
     Views: Array<IView>;
     DataRows: Array<Object>;
     Security: ISecurity;
+    InternalName: string;
+    EnableContentTypes: boolean;
+    ControlOption: string;
 }

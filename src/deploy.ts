@@ -6,6 +6,10 @@ import {ISPObjectHandler} from "./interface/ObjectHandler/ispobjecthandler";
 import {SiteHandler} from "./ObjectHandler/SiteHandler";
 import {ListHandler} from "./ObjectHandler/ListHandler";
 import {FieldHandler} from "./ObjectHandler/FieldHandler";
+import {SiteFieldHandler} from "./ObjectHandler/SiteFieldHandler";
+import {ViewHandler} from "./ObjectHandler/ViewHandler";
+import {ViewFieldHandler} from "./ObjectHandler/ViewFieldHandler";
+import {initAuth} from "./lib/initClient";
 import * as fetch from "node-fetch";
 
 class MyConsoleLogger implements LogListener {
@@ -15,38 +19,22 @@ class MyConsoleLogger implements LogListener {
 }
 
 
-Logger.subscribe(new MyConsoleLogger())
+Logger.subscribe(new MyConsoleLogger());
 Logger.activeLogLevel = Logger.LogLevel.Verbose;
 
-let fs = require('fs')
+let fs = require("fs");
 let args = require("minimist")(process.argv.slice(2));
 Logger.write("start deployment script", Logger.LogLevel.Info);
 Logger.write(JSON.stringify(args), 0);
 
-
 if (args.f && args.p) {
-    let config = JSON.parse(fs.readFileSync(args.f, 'utf8'));
+    let config = JSON.parse(fs.readFileSync(args.f, "utf8"));
     if (config.Url && config.User) {
         initAuth(config.Url, config.User, args.p);
-        let promises = [];
-        let parentPromise: Promise<any> = Promise.resolve();
+        let siteUrl = config.Url;
         Logger.write(JSON.stringify(config), 0);
-        Object.keys(config).forEach((value, index) => {
-            Logger.write("found config key " + value + " at index " + index, 0);
-            let handler = resolveObjectHandler(value); 
-            if (typeof handler !== "undefined") {
-                if (config[value] instanceof Array) {
-                    config[value].forEach(element => {
-                        parentPromise = handler.execute(element, config.Url, parentPromise);
-                        promises.push(parentPromise);
-                    });
-                } else {
-                    parentPromise = handler.execute(config[value], config.Url, parentPromise);
-                    promises.push(parentPromise);
-                }
-            }
-        });
-        Promise.all(promises).then(() => {
+        let promise = chooseAndUseHandler(config, siteUrl);
+        promise.then(() => {
             Logger.write("All Elements created");
         },
             (error) => {
@@ -63,40 +51,80 @@ export function resolveObjectHandler(key: string): ISPObjectHandler {
             return new ListHandler();
         case "Field":
             return new FieldHandler();
+        case "SiteField":
+            return new SiteFieldHandler();
+        case "View":
+            return new ViewHandler();
+        case "ViewField":
+            return new ViewFieldHandler();
         default:
             break;
     }
 }
 
-export interface Global {
-    Headers: any;
-    Request: any;
-    fetch: any;
+function promiseStatus(p) {
+    return p.then(function (val) { return { status: "resolved", val: val }; },
+        function (val) { return { status: "rejected", val: val }; }
+    );
 }
 
-export function initAuth(url: string, username: string, password: string) {
-    // Fixed missing Header & Request in node
-    let fetch = require('node-fetch');
-    global["Headers"] = fetch.Headers;
-    global["Request"] = fetch.Request;
-    global["fetch"] = fetch;
+export function chooseAndUseHandler(config: any, siteUrl: string) {
+    return new Promise((resolve, reject) => {
+        let promiseArray = [];
 
-    // var httpNTLMClient = require("./lib/NTLMHttpClient");
-    // httpNTLMClient.options.username = username;
-    // httpNTLMClient.options.password = password;
-    // httpNTLMClient.options.domain = domain;
-    // httpNTLMClient.options.workstation = "";
+        Object.keys(config).forEach((value, index) => {
 
-    // var httpClient = require("agileis-sp-pnp-js/lib/net/HttpClient");
-    // httpClient.HttpClient = httpNTLMClient.client;
 
-    let httpBasicClient = require("./lib/BasicHttpClient");
+            Logger.write("found config key " + value + " at index " + index, 0);
+            let handler = resolveObjectHandler(value);
+            if (typeof handler !== "undefined") {
+                if (config[value] instanceof Array) {
+                    let prom: Promise<any> = Promise.resolve();
+                    config[value].forEach(element => {
+                        promiseArray.push(new Promise((resolve, reject) => {
+                            prom = prom.then(() => {
+                                return handler.execute(element, siteUrl, config);
+                            }).then((resolvedPromise) => {
+                                chooseAndUseHandler(resolvedPromise, siteUrl).then(() => {
+                                    resolve();
+                                }).catch((error) => {
+                                    reject(error);
 
-    let userAndDommain = username.split("\\");
+                                });
+                            }).catch((error) => {
+                                reject(error);
 
-    httpBasicClient.options.username = userAndDommain[0] + "\\" + userAndDommain[1];
-    httpBasicClient.options.password = password;
-
-    let httpClient = require("sp-pnp-js/lib/net/HttpClient");
-    httpClient.HttpClient = httpBasicClient.client;
+                            });
+                        }));
+                    });
+                } else {
+                    promiseArray.push(new Promise((resolve, reject) => {
+                        handler.execute(config[value], siteUrl, config).then((resolvedPromise) => {
+                            Logger.write("Resolved Promise: " + JSON.stringify(resolvedPromise), 0);
+                            chooseAndUseHandler(resolvedPromise, siteUrl).then(() => {
+                                resolve();
+                            }).catch((error) => {
+                                reject(error);
+                            });
+                        }).catch((error) => {
+                            reject(error);
+                            Logger.write("Rejected: " + error, 0);
+                        });
+                    }));
+                }
+            }
+        });
+        Promise.all(promiseArray.map(promiseStatus)).then((result) => {
+            for (let promise of result) {
+                if (promise.status === "rejected") {
+                    reject(promise.val);
+                    Logger.write("Not all Promises resolved - " + promise.val, 0);
+                    break;
+                }
+            }
+            Logger.write("All Promises resolved", 0);
+            resolve();
+        });
+    });
 }
+
