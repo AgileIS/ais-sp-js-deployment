@@ -3,6 +3,7 @@ import {Logger} from "sp-pnp-js/lib/utils/logging";
 import * as web from "sp-pnp-js/lib/sharepoint/rest/webs";
 import {IView} from "../interface/Types/IView";
 import {IViewField} from "../interface/Types/IViewField";
+import {RejectAndLog} from "../lib/Util/Util";
 
 export class ViewFieldHandler implements ISPObjectHandler {
     execute(config: IViewField, url: string, parentConfig: IView) {
@@ -14,11 +15,14 @@ export class ViewFieldHandler implements ISPObjectHandler {
         return new Promise<IViewField>((resolve, reject) => {
             spWeb.lists.getById(listId).get().then((result) => {
                 if (result) {
-                    spWeb.lists.getById(listId).views.filter(`Title eq '${parentElement.Title}'`).select("Id").get().then(
-                        (result) => {
-                            if (result.length === 1) {
-                                spWeb.lists.getById(listId).views.getByTitle(parentConfig.Title).get().then(
-                                    (result) => {
+                    spWeb.lists.getById(listId).views.filter(`Title eq '${parentElement.Title}'`).select("Id").get().then((result) => {
+                        if (result.length === 1) {
+                            spWeb.lists.getById(listId).views.getByTitle(parentConfig.Title).fields.filter(`Title eq '${elementAsString}'`).get().then((result) => {
+
+                                spWeb.lists.getById(listId).views.getByTitle(parentConfig.Title).fields.add(elementAsString).then(() => {
+                                    resolve(element);
+                                }).catch((error) => {
+                                    setTimeout(function () {
                                         spWeb.lists.getById(listId).views.getByTitle(parentConfig.Title).fields.add(elementAsString).then(() => {
                                             resolve(element);
                                         }).catch((error) => {
@@ -26,35 +30,33 @@ export class ViewFieldHandler implements ISPObjectHandler {
                                                 spWeb.lists.getById(listId).views.getByTitle(parentConfig.Title).fields.add(elementAsString).then(() => {
                                                     resolve(element);
                                                 }).catch((error) => {
-                                                    setTimeout(function () {
-                                                        spWeb.lists.getById(listId).views.getByTitle(parentConfig.Title).fields.add(elementAsString).then(() => {
-                                                            resolve(element);
-                                                        }).catch((error) => {
-                                                            reject(error + " - " + parentElement.Title);
-                                                        });
-                                                    }, 500);
+                                                    RejectAndLog(error, elementAsString, reject);
                                                 });
-                                            }, 1000);
+                                            }, 500);
                                         });
-                                    }).catch((error) => {
-                                        reject(error + " - " + parentElement.Title);
-                                    });
-                            }
-                            else if (result.length === 0) {
-                                let error = `Views with Title '${parentElement.Title}' not found`;
-                                reject(error);
-                            }
-                            else {
-                                let error = `More than one Views with Title '${parentElement.Title}' found`;
-                                reject(error);
-                            }
-                        }).catch((error) => {
-                            reject(error + " - " + parentElement.Title);
-                        });
+                                    }, 1000);
+                                });
+
+
+                            }).catch((error) => {
+                                RejectAndLog(error, elementAsString, reject);
+                            });
+                        }
+                        else if (result.length === 0) {
+                            let error = `Views with Title '${parentElement.Title}' not found`;
+                            RejectAndLog(error, elementAsString, reject);
+                        }
+                        else {
+                            let error = `More than one Views with Title '${parentElement.Title}' found`;
+                            RejectAndLog(error, elementAsString, reject);
+                        }
+                    }).catch((error) => {
+                        RejectAndLog(error, elementAsString, reject);
+                    });
                 }
                 else {
                     let error = `List with Id '${listId}' does not exist`;
-                    reject(error);
+                    RejectAndLog(error, elementAsString, reject);
                 }
             });
         });

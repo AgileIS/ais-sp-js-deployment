@@ -3,6 +3,7 @@ import {Logger} from "sp-pnp-js/lib/utils/logging";
 import * as web from "sp-pnp-js/lib/sharepoint/rest/webs";
 import {IView} from "../interface/Types/IView";
 import {IList} from "../interface/Types/IList";
+import {RejectAndLog} from "../lib/Util/Util";
 
 
 export class ViewHandler implements ISPObjectHandler {
@@ -43,23 +44,23 @@ function AddView(config: IView, url: string, parentConfig: IList) {
                                         let configForAddView = AddListNameProperty(element, listId);
                                         resolve(configForAddView);
                                     }).catch((error) => {
-                                        reject(error + " - " + element.Title);
+                                        RejectAndLog(error, element.Title, reject);
                                     });
                                 }).catch((error) => {
-                                    reject(error + " - " + element.Title);
+                                    RejectAndLog(error, element.Title, reject);
                                 });
                         }
                         else {
                             let error = `More than one Views wit Title '${element.Title}' found`;
-                            reject(error);
+                            RejectAndLog(error, element.Title, reject);
                         }
                     }).catch((error) => {
-                        reject(error + " - " + element.Title);
+                        RejectAndLog(error, element.Title, reject);
                     });
             }
             else {
                 let error = `List with Internal Name '${listName}' does not exist`;
-                reject(error);
+                RejectAndLog(error, element.Title, reject);
             }
         });
     });
@@ -82,22 +83,22 @@ function UpdateView(config: IView, url: string, parentConfig: IList) {
                                 let configForAddView = AddListNameProperty(element, listId);
                                 resolve(configForAddView);
                             }).catch((error) => {
-                                reject(error + " - " + element.Title);
+                                RejectAndLog(error, element.Title, reject);
                             });
                         });
                     }
                     else if (result.length === 0) {
                         let error = `View with Title '${element.Title}' does not exist`;
-                        reject(error + " - " + element.Title);
+                        RejectAndLog(error, element.Title, reject);
                     }
                 });
             }
             else {
                 let error = `List with Internal Name '${listName}' does not exist`;
-                reject(error + " - " + element.Title);
+                RejectAndLog(error, element.Title, reject);
             }
         }).catch((error) => {
-            reject(error + " - " + element.Title);
+            RejectAndLog(error, element.Title, reject);
         });
     });
 }
@@ -122,13 +123,13 @@ function DeleteView(config: IView, url: string, parentConfig: IList) {
                     }
                     else if (result.length === 0) {
                         let error = `View with Title '${element.Title}' does not exist`;
-                        reject(error + " - " + element.Title);
+                        RejectAndLog(error, element.Title, reject);
                     }
                 });
             }
             else {
                 let error = `List with Internal Name '${listName}' does not exist`;
-                reject(error + " - " + element.Title);
+                RejectAndLog(error, element.Title, reject);
 
             }
         });

@@ -5,6 +5,7 @@ import {IList} from "../interface/Types/IList";
 import {ISite} from "../interface/Types/ISite";
 import * as Types from "sp-pnp-js/lib/sharepoint/rest/types";
 import * as web from "sp-pnp-js/lib/sharepoint/rest/webs";
+import {RejectAndLog} from "../lib/Util/Util";
 
 export class SiteFieldHandler implements ISPObjectHandler {
     execute(config: IField, url: string, parentConfig: ISite) {
@@ -40,12 +41,10 @@ function AddField(config: IField, url: string) {
                                 resolve(element);
                                 Logger.write("Calculated Field with Internal Name '" + element.InternalName + "' created", 1);
                             }).catch((error) => {
-                                Logger.write(error, 0);
-                                reject(error + " - " + element.InternalName);
+                                RejectAndLog(error, element.InternalName, reject);
                             });
                         }).catch((error) => {
-                            Logger.write(error, 0);
-                            reject(error + " - " + element.InternalName);
+                            RejectAndLog(error, element.InternalName, reject);
                         });
                     }
                     else {
@@ -55,29 +54,24 @@ function AddField(config: IField, url: string) {
                                 resolve(element);
                                 Logger.write("Field with Internal Name'" + element.InternalName + "' created", 1);
                             }).catch((error) => {
-                                Logger.write(error, 0);
-                                reject(error + " - " + element.InternalName);
+                                RejectAndLog(error, element.InternalName, reject);
                             });
                         }).catch((error) => {
-                            Logger.write(error, 0);
-                            reject(error + " - " + element.InternalName);
+                            RejectAndLog(error, element.InternalName, reject);
                         });
                     }
                 }
                 else {
                     let error = "FieldTypKind could not be resolved";
-                    reject(error);
-                    Logger.write(error + " - " + element.InternalName);
+                    RejectAndLog(error, element.InternalName, reject);
                 }
             }
             else {
                 let error = "Field with Internal Name '" + element.InternalName + "' already exists";
-                resolve(config);
-                Logger.write(error + " - " + element.InternalName);
+                RejectAndLog(error, element.InternalName, reject);
             }
         }).catch((error) => {
-            Logger.write(error, 0);
-            reject(error + " - " + element.InternalName);
+            RejectAndLog(error, element.InternalName, reject);
         });
     });
 };
@@ -96,13 +90,12 @@ function UpdateField(config: IField, url: string) {
                     resolve(element);
                     Logger.write(`Field with Internal Name '${element.InternalName}' updated`, 1);
                 }).catch((error) => {
-                    reject(error + " - " + element.InternalName);
+                    RejectAndLog(error, element.InternalName, reject);
                 });
             }
             else {
                 let error = `Field with Internal Name '${element.InternalName}' does not exist`;
-                reject(error);
-                Logger.write(error);
+                RejectAndLog(error, element.InternalName, reject);
             }
         });
     });
@@ -119,15 +112,13 @@ function DeleteField(config: IField, url: string) {
                 spWeb.fields.getById(fieldId).delete().then(() => {
                     Logger.write(`Field with Internal Name '${element.InternalName}' deleted`, 1);
                     resolve(element);
-                }).catch(
-                    (error) => {
-                        reject(error + " - " + element.InternalName);
-                    });
+                }).catch((error) => {
+                    RejectAndLog(error, element.InternalName, reject);
+                });
             }
             else {
                 let error = `Field with Internal Name '${element.InternalName}' does not exist`;
-                reject(error);
-                Logger.write(error);
+                RejectAndLog(error, element.InternalName, reject);
             }
         });
     });

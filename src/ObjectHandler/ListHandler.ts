@@ -5,6 +5,7 @@ import {ISite} from "../interface/Types/ISite";
 import {ListTemplates} from "../lib/ListTemplates";
 import * as Types from "sp-pnp-js/lib/sharepoint/rest/types";
 import * as web from "sp-pnp-js/lib/sharepoint/rest/webs";
+import {RejectAndLog} from "../lib/Util/Util";
 
 export class ListHandler implements ISPObjectHandler {
     execute(config: IList, url: string, parentConfig: ISite) {
@@ -17,7 +18,7 @@ export class ListHandler implements ISPObjectHandler {
                 return DeleteList(config, url);
 
             default:
-                 return AddList(config, url);
+                return AddList(config, url);
         }
     }
 }
@@ -37,22 +38,22 @@ function AddList(config: IList, url: string) {
                             resolve(element);
                             Logger.write(`List ${element.Title} created`, 0);
                         }, (error) => {
-                            reject(error + " - " + element.InternalName);
+                            RejectAndLog(error, element.InternalName, reject);
                         });
                     }, (error) => {
-                        reject(error + " - " + element.InternalName);
+                        RejectAndLog(error, element.InternalName, reject);
                     });
                 } else {
                     resolve(element);
                     Logger.write(`List with Internal Name '${element.InternalName}' already exists`, 0);
                 }
             }, (error) => {
-                reject(error + " - " + element.InternalName);
+                RejectAndLog(error, element.InternalName, reject);
             });
         }
         else {
             let error = `List Template Type could not be resolved for List: ${element.InternalName}`;
-            reject(error);
+            RejectAndLog(error, element.InternalName, reject);
         }
     });
 }
@@ -69,15 +70,15 @@ function UpdateList(config: IList, url: string) {
                     resolve(element);
                     Logger.write(`List with Internal Name '${element.InternalName}' updated`, 1);
                 }).catch((error) => {
-                    reject(error + " - " + element.InternalName);
+                    RejectAndLog(error, element.InternalName, reject);
                 });
             }
             else {
                 let error = `List with Internal Name '${element.InternalName}' does not exist`;
-                reject(error);
+                RejectAndLog(error, element.InternalName, reject);
             }
         }).catch((error) => {
-            reject(error + " - " + element.InternalName);
+            RejectAndLog(error, element.InternalName, reject);
         });
     });
 }
@@ -94,15 +95,15 @@ function DeleteList(config: IList, url: string) {
                     resolve(configForDelete);
                     Logger.write(`List with Internal Name '${element.InternalName}' deleted`, 1);
                 }).catch((error) => {
-                    reject(error + " - " + element.InternalName);
+                    RejectAndLog(error, element.InternalName, reject);
                 });
             }
             else {
                 let error = `List with Internal Name '${element.InternalName}' does not exist`;
-                reject(error);
+                RejectAndLog(error, element.InternalName, reject);
             }
         }).catch((error) => {
-            reject(error + " - " + element.InternalName);
+            RejectAndLog(error, element.InternalName, reject);
         });
     });
 }

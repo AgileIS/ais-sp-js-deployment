@@ -35,11 +35,10 @@ if (args.f && args.p) {
         Logger.write(JSON.stringify(config), 0);
         let promise = chooseAndUseHandler(config, siteUrl);
         promise.then(() => {
-            Logger.write("All Elements created");
-        },
-            (error) => {
-                Logger.write("Error occured while creating Elemets - " + error);
-            });
+            Logger.write("All Elements created", 1);
+        }).catch((error) => {
+            Logger.write("Error occured while creating Elemets - " + error, 1);
+        });
     }
 }
 
@@ -61,6 +60,7 @@ export function resolveObjectHandler(key: string): ISPObjectHandler {
             break;
     }
 }
+
 
 function promiseStatus(p) {
     return p.then(function (val) { return { status: "resolved", val: val }; },
@@ -118,11 +118,9 @@ export function chooseAndUseHandler(config: any, siteUrl: string) {
             for (let promise of result) {
                 if (promise.status === "rejected") {
                     reject(promise.val);
-                    Logger.write("Not all Promises resolved - " + promise.val, 0);
                     break;
                 }
             }
-            Logger.write("All Promises resolved", 0);
             resolve();
         });
     });

@@ -5,6 +5,7 @@ import {IList} from "../interface/Types/IList";
 import {ISite} from "../interface/Types/ISite";
 import * as Types from "sp-pnp-js/lib/sharepoint/rest/types";
 import * as web from "sp-pnp-js/lib/sharepoint/rest/webs";
+import {RejectAndLog} from "../lib/Util/Util";
 
 export class FieldHandler implements ISPObjectHandler {
     execute(config: IField, url: string, parentConfig: IList) {
@@ -36,7 +37,7 @@ function AddField(config: IField, url: string, parentConfig: IList) {
                 spWeb.lists.getById(listId).fields.filter(`InternalName eq '${element.InternalName}'`).select("Id").get().then((result) => {
                     if (result.length === 0) {
                         if (element.FieldTypeKind) {
-                            if (element.FieldTypeKind === "Lookup") {
+                            if (element.FieldTypeKind === 7) {
                                 // Lookup nicht vorhanden umsetzten als create FieldAsXml
                             }
                             else if (element.FieldTypeKind === 17) {
@@ -46,12 +47,10 @@ function AddField(config: IField, url: string, parentConfig: IList) {
                                         resolve(element);
                                         Logger.write("Calculated Field with Internal Name '" + element.InternalName + "' created", 1);
                                     }).catch((error) => {
-                                        Logger.write(error, 0);
-                                        reject(error + " - " + element.InternalName);
+                                        RejectAndLog(error, element.InternalName, reject);
                                     });
                                 }).catch((error) => {
-                                    Logger.write(error, 0);
-                                    reject(error + " - " + element.InternalName);
+                                    RejectAndLog(error, element.InternalName, reject);
                                 });
                             }
                             else {
@@ -61,44 +60,41 @@ function AddField(config: IField, url: string, parentConfig: IList) {
                                         Logger.write(`Field with Internal Name '${element.InternalName}' created`);
                                         resolve(element);
                                     }).catch((error) => {
-                                        reject(error + " - " + element.InternalName);
+                                        RejectAndLog(error, element.InternalName, reject);
                                     });
                                 }).catch((error) => {
-                                    reject(error + " - " + element.InternalName);
+                                    RejectAndLog(error, element.InternalName, reject);
                                 });
                             }
                         }
                         else {
                             let error = `FieldTypKind for '${element.InternalName}' could not be resolved`;
-                            reject(error);
+                            RejectAndLog(error, element.InternalName, reject);
                         }
                     }
                     else if (result.length === 1 && element.FieldTypeKind === undefined) {
                         let fieldId = result[0].Id;
-                        spWeb.lists.getById(listId).fields.getById(fieldId).update({ Title: element.Title }).then(
-                            () => {
-                                Logger.write("Existing Field with Title '" + element.Title + "' updated");
-                                resolve(element);
-                            },
-                            (error) => {
-                                reject(error + " - " + element.InternalName);
-                            }
-                        );
+                        spWeb.lists.getById(listId).fields.getById(fieldId).update({ Title: element.Title }).then(() => {
+                            Logger.write("Existing Field with Title '" + element.Title + "' updated");
+                            resolve(element);
+                        }).catch((error) => {
+                            RejectAndLog(error, element.InternalName, reject);
+                        });
                     }
                     else {
                         resolve(element);
                         Logger.write(`Field with Internal Name '${element.InternalName}' already exists`);
                     }
                 }).catch((error) => {
-                    reject(error + " - " + element.InternalName);
+                    RejectAndLog(error, element.InternalName, reject);
                 });
             }
             else {
                 let error = `List with Title '${parentElement.InternalName}' for Field '${element.InternalName}' does not exist`;
-                reject(error);
+                RejectAndLog(error, element.InternalName, reject);
             }
         }).catch((error) => {
-            reject(error + " - " + element.InternalName);
+            RejectAndLog(error, element.InternalName, reject);
         });
     });
 }
@@ -120,27 +116,27 @@ function UpdateField(config: IField, url: string, parentConfig: IList) {
                                 resolve(element);
                                 Logger.write(`Field with Internal Name '${element.InternalName}' updated`);
                             }).catch((error) => {
-                                reject(error + " - " + element.InternalName);
+                                RejectAndLog(error, element.InternalName, reject);
                             });
                         } else {
                             let error = `No changes on Field '${element.InternalName}' found`;
-                            reject(error);
+                            RejectAndLog(error, element.InternalName, reject);
                         }
                     }
                     else {
                         let error = `Field with Internal Name '${element.Title}' does not exist`;
-                        reject(error);
+                        RejectAndLog(error, element.InternalName, reject);
                     }
                 }).catch((error) => {
-                    reject(error + " - " + element.InternalName);
+                    RejectAndLog(error, element.InternalName, reject);
                 });
             }
             else {
                 let error = `List with Title '${listName}' for Field '${element.InternalName}' does not exist`;
-                reject(error);
+                RejectAndLog(error, element.InternalName, reject);
             }
         }).catch((error) => {
-            reject(error + " - " + element.InternalName);
+            RejectAndLog(error, element.InternalName, reject);
         });
     });
 }
@@ -160,19 +156,19 @@ function DeleteField(config: IField, url: string, parentConfig: IList) {
                             resolve(element);
                             Logger.write(`Field with Internal Name '${element.InternalName}' deleted`);
                         }).catch((error) => {
-                            reject(error + " - " + element.InternalName);
+                            RejectAndLog(error, element.InternalName, reject);
                         });
                     }
                     else {
                         let error = `Field with Internal Name '${element.Title}' does not exist`;
-                        reject(error);
+                        RejectAndLog(error, element.InternalName, reject);
                     }
                 });
             }
             else {
 
                 let error = `List with Title '${listName}' for Field '${element.InternalName}' does not exist`;
-                reject(error);
+                RejectAndLog(error, element.InternalName, reject);
             }
         });
     });
