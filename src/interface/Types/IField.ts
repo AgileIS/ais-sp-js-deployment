@@ -28,5 +28,7 @@ export interface IField {
     ValidationMessage: string;
     Type: string;
     Formula: string;
+    DateFormat: string;
+    OutputType: string;
     ControlOption: string;
 }

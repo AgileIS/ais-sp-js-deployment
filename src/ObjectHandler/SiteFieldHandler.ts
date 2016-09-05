@@ -34,8 +34,9 @@ function AddField(config: IField, url: string) {
                         resolve(element);
                     }
                     else if (element.FieldTypeKind === 17) { // 17 = Calculated
-                        spWeb.fields.addCalculated(element.InternalName, element.Formula, Types.DateTimeFieldFormatType.DateOnly).then((result) => {
-                            result.field.update({ Title: element.Title }).then(() => {
+                        let propertyHash = CreateProperties(element);
+                        spWeb.fields.addCalculated(element.InternalName, element.Formula, Types.DateTimeFieldFormatType[element.DateFormat], Types.FieldTypes[element.OutputType], propertyHash).then((result) => {
+                            result.field.update({ Title: element.Title, Description: element.Description }).then(() => {
                                 resolve(element);
                                 Logger.write("Calculated Field with Internal Name '" + element.InternalName + "' created", 1);
                             }).catch((error) => {
@@ -143,10 +144,17 @@ function CreateProperties(pElement: IField) {
             delete parsedObject.ControlOption;
             delete parsedObject.Title;
             delete parsedObject.Description;
+            delete parsedObject.DateFormat;
+            delete parsedObject.Formula;
+            delete parsedObject.OutputType;
             break;
         case "Update":
             delete parsedObject.ControlOption;
             delete parsedObject.InternalName;
+            delete parsedObject.FieldTypeKind;
+            delete parsedObject.DateFormat;
+            delete parsedObject.OutputType;
+            delete parsedObject.Formula;
             break;
         default:
             break;
