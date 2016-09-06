@@ -42,7 +42,7 @@ if (args.f && args.p) {
     }
 }
 
-export function resolveObjectHandler(key: string): ISPObjectHandler {
+function resolveObjectHandler(key: string): ISPObjectHandler {
     switch (key) {
         case "Site":
             return new SiteHandler();
@@ -61,20 +61,16 @@ export function resolveObjectHandler(key: string): ISPObjectHandler {
     }
 }
 
-
 function promiseStatus(p) {
     return p.then(function (val) { return { status: "resolved", val: val }; },
         function (val) { return { status: "rejected", val: val }; }
     );
 }
 
-export function chooseAndUseHandler(config: any, siteUrl: string) {
+function chooseAndUseHandler(config: any, siteUrl: string) {
     return new Promise((resolve, reject) => {
         let promiseArray = [];
-
         Object.keys(config).forEach((value, index) => {
-
-
             Logger.write("found config key " + value + " at index " + index, 0);
             let handler = resolveObjectHandler(value);
             if (typeof handler !== "undefined") {

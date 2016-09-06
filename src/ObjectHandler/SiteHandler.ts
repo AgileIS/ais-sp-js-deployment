@@ -5,7 +5,7 @@ import {ISite} from "../interface/Types/ISite";
 import {RejectAndLog} from "../lib/Util/Util";
 
 export class SiteHandler implements ISPObjectHandler {
-    execute(config: ISite, url: string, parentConfig: any) {
+    public execute(config: ISite, url: string, parentConfig: any) {
         return new Promise<ISite>((resolve, reject) => {
             let spWeb = new web.Web(url);
             spWeb.lists.get().then((result) => {
