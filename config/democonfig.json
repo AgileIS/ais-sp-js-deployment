@@ -29,13 +29,36 @@
                         "InternalName": "AIS_TestList1Field3",
                         "FieldTypeKind": 9,
                         "ControlOption": ""
+                    },
+                    {
+                        "Title": "TestList1Field4",
+                        "InternalName": "AIS_TestList1Field4",
+                        "FieldTypeKind": 17,
+                        "DateFormat": "DateOnly",
+                        "OutputType": "Text",
+                        "Formula": "=IF(TestList1Field1<=1,\"OK\",\"Nicht OK\")",
+                        "ControlOption": ""
                     }
-                ], 
+                ],
                 "View": [
-                     {
+                    {
                         "Title": "All Items",
-                        "PersonalView": false,
                         "ControlOption": "Update",
+                        "PersonalView": false,
+                        "ViewField": [
+                            "Title",
+                            "Author",
+                            "Created",
+                            "AIS_TestList1Field4",
+                            "AIS_TestList1Field3",
+                            "AIS_TestList1Field2",
+                            "AIS_TestList1Field1"
+                        ]
+                    },
+                    {
+                        "Title": "TestView1",
+                        "ControlOption": "",
+                        "PersonalView": false,
                         "ViewField": [
                             "Title",
                             "Author",
@@ -43,6 +66,70 @@
                         ]
                     }
                 ]
+            },
+            {
+                "Title": "TestListe2",
+                "Description": "",
+                "ControlOption": "",
+                "TemplateType": 100,
+                "InternalName": "AIS_TestList2",
+                "EnableContentTypes": true,
+                "Field": [
+                    {
+                        "Title": "TestList2Field1",
+                        "InternalName": "AIS_TestList2Field1",
+                        "FieldTypeKind": 9,
+                        "ControlOption": ""
+                    },
+                    {
+                        "Title": "TestList2Field2",
+                        "InternalName": "AIS_TestList2Field2",
+                        "FieldTypeKind": 9,
+                        "ControlOption": ""
+                    },
+                    {
+                        "Title": "TestList2Field3",
+                        "InternalName": "AIS_TestList2Field3",
+                        "FieldTypeKind": 9,
+                        "ControlOption": ""
+                    }
+                ],
+                "View": [
+                    {
+                        "Title": "All Items",
+                        "ControlOption": "Update",
+                        "PersonalView": false,
+                        "ViewField": [
+                            "Title",
+                            "Author",
+                            "Created",
+                            "ID"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "SiteField": [
+            {
+                "Title": "TestField1",
+                "InternalName": "AIS_TestField1",
+                "FieldTypeKind": 9,
+                "Group": "AISGroup",
+                "ControlOption": ""
+            },
+            {
+                "Title": "TestField2",
+                "InternalName": "AIS_TestField2",
+                "FieldTypeKind": 9,
+                "Group": "AISGroup",
+                "ControlOption": ""
+            },
+            {
+                "Title": "TestField3",
+                "InternalName": "AIS_TestField3",
+                "FieldTypeKind": 9,
+                "Group": "AISGroup",
+                "ControlOption": ""
             }
         ]
     }

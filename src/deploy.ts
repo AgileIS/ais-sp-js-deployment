@@ -35,15 +35,14 @@ if (args.f && args.p) {
         Logger.write(JSON.stringify(config), 0);
         let promise = chooseAndUseHandler(config, siteUrl);
         promise.then(() => {
-            Logger.write("All Elements created");
-        },
-            (error) => {
-                Logger.write("Error occured while creating Elemets - " + error);
-            });
+            Logger.write("All Elements created", 1);
+        }).catch((error) => {
+            Logger.write("Error occured while creating Elemets - " + error, 1);
+        });
     }
 }
 
-export function resolveObjectHandler(key: string): ISPObjectHandler {
+function resolveObjectHandler(key: string): ISPObjectHandler {
     switch (key) {
         case "Site":
             return new SiteHandler();
@@ -68,13 +67,10 @@ function promiseStatus(p) {
     );
 }
 
-export function chooseAndUseHandler(config: any, siteUrl: string) {
+function chooseAndUseHandler(config: any, siteUrl: string) {
     return new Promise((resolve, reject) => {
         let promiseArray = [];
-
         Object.keys(config).forEach((value, index) => {
-
-
             Logger.write("found config key " + value + " at index " + index, 0);
             let handler = resolveObjectHandler(value);
             if (typeof handler !== "undefined") {
@@ -118,11 +114,9 @@ export function chooseAndUseHandler(config: any, siteUrl: string) {
             for (let promise of result) {
                 if (promise.status === "rejected") {
                     reject(promise.val);
-                    Logger.write("Not all Promises resolved - " + promise.val, 0);
                     break;
                 }
             }
-            Logger.write("All Promises resolved", 0);
             resolve();
         });
     });
