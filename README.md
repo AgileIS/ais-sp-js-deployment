@@ -2,6 +2,7 @@
 
 ##install
 npm install
+typings install
 
 ##build
 tsc || tsc -w (mit watch)
