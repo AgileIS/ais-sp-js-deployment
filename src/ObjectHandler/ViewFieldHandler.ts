@@ -3,7 +3,7 @@ import {Logger} from "sp-pnp-js/lib/utils/logging";
 import {Web} from "sp-pnp-js/lib/sharepoint/rest/webs";
 import {IView} from "../interface/Types/IView";
 import {IViewField} from "../interface/Types/IViewField";
-import * as Utils from "../lib/Util/Util";
+import {RejectAndLog} from "../lib/Util/Util";
 
 export class ViewFieldHandler implements ISPObjectHandler {
     public execute(config: IViewField, url: string, parentConfig: IView) {
@@ -31,7 +31,7 @@ export class ViewFieldHandler implements ISPObjectHandler {
                                                 resolve({});
                                                 Logger.write(`Viewfield '${elementAsString}' in View ${parentConfig.Title} created`);
                                             }).catch((error) => {
-                                                Utils.RejectAndLog(error, elementAsString, reject);
+                                                RejectAndLog(error, elementAsString, reject);
                                             });
                                         }, 500);
                                     });
@@ -41,19 +41,19 @@ export class ViewFieldHandler implements ISPObjectHandler {
                         }
                         else if (result.length === 0) {
                             let error = `Views with Title '${parentElement.Title}' not found`;
-                            Utils.RejectAndLog(error, elementAsString, reject);
+                            RejectAndLog(error, elementAsString, reject);
                         }
                         else {
                             let error = `More than one Views with Title '${parentElement.Title}' found`;
-                            Utils.RejectAndLog(error, elementAsString, reject);
+                            RejectAndLog(error, elementAsString, reject);
                         }
                     }).catch((error) => {
-                        Utils.RejectAndLog(error, elementAsString, reject);
+                        RejectAndLog(error, elementAsString, reject);
                     });
                 }
                 else {
                     let error = `List with Id '${listId}' does not exist`;
-                    Utils.RejectAndLog(error, elementAsString, reject);
+                    RejectAndLog(error, elementAsString, reject);
                 }
             });
         });
