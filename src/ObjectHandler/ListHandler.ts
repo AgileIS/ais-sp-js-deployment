@@ -4,14 +4,12 @@ import {IList} from "../interface/Types/IList";
 import {ISite} from "../interface/Types/ISite";
 import {ListTemplates} from "../lib/ListTemplates";
 import * as Types from "sp-pnp-js/lib/sharepoint/rest/types";
-import * as web from "sp-pnp-js/lib/sharepoint/rest/webs";
+import {Web} from "sp-pnp-js/lib/sharepoint/rest/webs";
 import {RejectAndLog} from "../lib/Util/Util";
 
 export class ListHandler implements ISPObjectHandler {
     execute(config: IList, url: string, parentConfig: ISite) {
         switch (config.ControlOption) {
-            case "":
-                return this.AddList(config, url);
             case "Update":
                 return this.UpdateList(config, url);
             case "Delete":
@@ -24,7 +22,7 @@ export class ListHandler implements ISPObjectHandler {
 
     private AddList(config: IList, url: string) {
         let element = config;
-        let spWeb = new web.Web(url);
+        let spWeb = new Web(url);
         return new Promise<IList>((resolve, reject) => {
             Logger.write("config " + JSON.stringify(config), 0);
             if (element.TemplateType) {
@@ -58,7 +56,7 @@ export class ListHandler implements ISPObjectHandler {
 
     private UpdateList(config: IList, url: string) {
         let element = config;
-        let spWeb = new web.Web(url);
+        let spWeb = new Web(url);
         return new Promise<IList>((resolve, reject) => {
             spWeb.lists.filter(`RootFolder/Name eq '${element.InternalName}'`).select("Id").get().then((result) => {
                 if (result.length === 1) {
@@ -83,7 +81,7 @@ export class ListHandler implements ISPObjectHandler {
 
     private DeleteList(config: IList, url: string) {
         let element = config;
-        let spWeb = new web.Web(url);
+        let spWeb = new Web(url);
         return new Promise<IList>((resolve, reject) => {
             spWeb.lists.filter(`RootFolder/Name eq '${element.InternalName}'`).select("Id").get().then((result) => {
                 if (result.length === 1) {

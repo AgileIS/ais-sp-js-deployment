@@ -109,7 +109,7 @@
                 ]
             }
         ],
-        "SiteField": [
+        "Field": [
             {
                 "Title": "TestField1",
                 "InternalName": "AIS_TestField1",

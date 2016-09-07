@@ -9,8 +9,6 @@ import {RejectAndLog} from "../lib/Util/Util";
 export class ViewHandler implements ISPObjectHandler {
     public execute(config: IView, url: string, parentConfig: IList): Promise<IView> {
         switch (config.ControlOption) {
-            case "":
-                return this.AddView(config, url, parentConfig);
             case "Update":
                 return this.UpdateView(config, url, parentConfig);
             case "Delete":

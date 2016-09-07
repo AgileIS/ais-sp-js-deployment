@@ -6,17 +6,16 @@ import {ISPObjectHandler} from "./interface/ObjectHandler/ispobjecthandler";
 import {SiteHandler} from "./ObjectHandler/SiteHandler";
 import {ListHandler} from "./ObjectHandler/ListHandler";
 import {FieldHandler} from "./ObjectHandler/FieldHandler";
-import {SiteFieldHandler} from "./ObjectHandler/SiteFieldHandler";
 import {ViewHandler} from "./ObjectHandler/ViewHandler";
 import {ViewFieldHandler} from "./ObjectHandler/ViewFieldHandler";
-import {initAuth} from "./lib/initClient";
-import * as fetch from "node-fetch";
+import {HttpClient} from "./lib/initClient";
 
 class MyConsoleLogger implements LogListener {
     log(entry: LogEntry) {
         console.log(entry.data + " - " + entry.level + " - " + entry.message);
     }
 }
+
 
 
 Logger.subscribe(new MyConsoleLogger());
@@ -30,7 +29,7 @@ Logger.write(JSON.stringify(args), 0);
 if (args.f && args.p) {
     let config = JSON.parse(fs.readFileSync(args.f, "utf8"));
     if (config.Url && config.User) {
-        initAuth(config.Url, config.User, args.p);
+        HttpClient.initAuth(config.Url, config.User, args.p);
         let siteUrl = config.Url;
         Logger.write(JSON.stringify(config), 0);
         let promise = chooseAndUseHandler(config, siteUrl);
@@ -50,8 +49,6 @@ function resolveObjectHandler(key: string): ISPObjectHandler {
             return new ListHandler();
         case "Field":
             return new FieldHandler();
-        case "SiteField":
-            return new SiteFieldHandler();
         case "View":
             return new ViewHandler();
         case "ViewField":
