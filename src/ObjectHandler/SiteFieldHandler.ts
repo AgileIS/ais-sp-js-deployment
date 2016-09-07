@@ -6,6 +6,7 @@ import {ISite} from "../interface/Types/ISite";
 import * as Types from "sp-pnp-js/lib/sharepoint/rest/types";
 import * as web from "sp-pnp-js/lib/sharepoint/rest/webs";
 import {RejectAndLog} from "../lib/Util/Util";
+import {FieldTypeKind} from "../lib/FieldTypeKind";
 
 export class SiteFieldHandler implements ISPObjectHandler {
     public execute(config: IField, url: string, parentConfig: ISite) {
@@ -29,10 +30,10 @@ export class SiteFieldHandler implements ISPObjectHandler {
             spWeb.fields.filter("InternalName eq '" + element.InternalName + "'").select("Id").get().then((data) => {
                 if (data.length === 0) {
                     if (element.FieldTypeKind) {
-                        if (element.FieldTypeKind === 7) {  // 7 = Lookup
+                        if (element.FieldTypeKind === FieldTypeKind.Lookup) {
                             resolve(element);
                         }
-                        else if (element.FieldTypeKind === 17) { // 17 = Calculated
+                        else if (element.FieldTypeKind === FieldTypeKind.Calculated) {
                             let propertyHash = this.CreateProperties(element);
                             spWeb.fields.addCalculated(element.InternalName, element.Formula, Types.DateTimeFieldFormatType[element.DateFormat], Types.FieldTypes[element.OutputType], propertyHash).then((result) => {
                                 result.field.update({ Title: element.Title, Description: element.Description }).then(() => {
