@@ -102,12 +102,9 @@ export class FieldHandler implements ISPObjectHandler {
                             if (element.FieldTypeKind) {
                                 if (element.FieldTypeKind === FieldTypeKind.Lookup) {
                                     // Lookup nicht vorhanden umsetzten als create FieldAsXml
-<<<<<<< HEAD
-                                } else if (element.FieldTypeKind === 17) {
-=======
+
                                 }
                                 else if (element.FieldTypeKind === FieldTypeKind.Calculated) {
->>>>>>> dd6ae578df306e0a08e2f084e5c480116eaa59a1
                                     let propertyHash = this.CreateProperties(element);
                                     spWeb.lists.getById(listId).fields.addCalculated(element.InternalName, element.Formula, Types.DateTimeFieldFormatType[element.DateFormat], Types.FieldTypes[element.OutputType], propertyHash).then((result) => {
                                         result.field.update({ Title: element.Title, Description: element.Description }).then(() => {
