@@ -1,12 +1,6 @@
 import {Logger} from "sp-pnp-js/lib/utils/logging";
 import {Web} from "sp-pnp-js/lib/sharepoint/rest/webs";
 
-export function RejectAndLog(pError: string, pElementName: string, reject: any) {
-    let errorMsg = `${pError}  - '${pElementName}'`;
-    Logger.write(errorMsg, 1);
-    reject(errorMsg);
-}
-
 export function ViewFieldRetry(pSpWeb: Web, pListId: string, pParentTitle: string, pElementName: string, pTimeout: number): Promise<void> {
      let promise: Promise<void>;
     setTimeout(() => {
@@ -15,14 +9,14 @@ export function ViewFieldRetry(pSpWeb: Web, pListId: string, pParentTitle: strin
     return promise;
 }
 
-export function Resolve(pError: string, pElementName: string, value?) {
-    let errorMsg = `${pError}  - '${pElementName}'`;
+export function Resolve(resolve: any, pError: string, pElementName: string, value?: any) {
+    let errorMsg = `${pError} - '${pElementName}'`;
     Logger.write(errorMsg, Logger.LogLevel.Info);
-    this.resolve(value);
+    resolve(value);
 }
 
-export function Reject(pError: string, pElementName: string, value?) {
-    let errorMsg = `${pError}  - '${pElementName}'`;
+export function Reject(reject: any, pError: string, pElementName: string, value?: any) {
+    let errorMsg = `${pError} - '${pElementName}'`;
     Logger.write(errorMsg, Logger.LogLevel.Info);
-    this.reject(value);
+    reject(value);
 }
