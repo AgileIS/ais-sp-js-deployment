@@ -6,8 +6,8 @@ import {ISite} from "../interface/Types/ISite";
 import * as Types from "sp-pnp-js/lib/sharepoint/rest/types";
 import {Fields} from "sp-pnp-js/lib/sharepoint/rest/Fields";
 import {Web} from "sp-pnp-js/lib/sharepoint/rest/webs";
-import {RejectAndLog} from "../lib/Util/Util";
-import {FieldTypeKind} from "../lib/FieldTypeKind";
+import {RejectAndLog} from "../Util/Util";
+import {FieldTypeKind} from "../Constants/FieldTypeKind";
 
 export class FieldHandler {
     execute(config: IField, url: string, parent: Promise<any>): Promise<any> {

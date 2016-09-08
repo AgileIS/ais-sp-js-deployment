@@ -2,7 +2,7 @@ import {ISPObjectHandler} from "../interface/ObjectHandler/ispobjecthandler";
 import {Logger} from "sp-pnp-js/lib/utils/logging";
 import * as web from "sp-pnp-js/lib/sharepoint/rest/webs";
 import {IView} from "../interface/Types/IView";
-import {RejectAndLog} from "../lib/Util/Util";
+import {RejectAndLog} from "../Util/Util";
 
 
 export class ViewHandler /*implements ISPObjectHandler*/ {

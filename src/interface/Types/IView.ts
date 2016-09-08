@@ -1,4 +1,3 @@
-
 export interface IView {
     Title: string;
     Paged: boolean;

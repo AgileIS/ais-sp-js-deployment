@@ -1,12 +1,12 @@
 import {ISPObjectHandler} from "../interface/ObjectHandler/ispobjecthandler";
 import {Logger} from "sp-pnp-js/lib/utils/logging";
 import {IList, } from "../interface/Types/IList";
-import {ListTemplates} from "../lib/ListTemplates";
+import {ListTemplates} from "../Constants/ListTemplates";
 import * as Types from "sp-pnp-js/lib/sharepoint/rest/types";
 import {Web} from "sp-pnp-js/lib/sharepoint/rest/webs";
 import {List, Lists} from "sp-pnp-js/lib/sharepoint/rest/lists";
 import {Queryable} from "sp-pnp-js/lib/sharepoint/rest/queryable";
-import {RejectAndLog} from "../lib/Util/Util";
+import {RejectAndLog} from "../Util/Util";
 
 export class ListHandler implements ISPObjectHandler {
 
