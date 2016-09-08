@@ -3,7 +3,7 @@ import {Logger} from "sp-pnp-js/lib/utils/logging";
 import {Web} from "sp-pnp-js/lib/sharepoint/rest/webs";
 import {IView} from "../interface/Types/IView";
 import {IViewField} from "../interface/Types/IViewField";
-import {RejectAndLog} from "../Util/Util";
+import {Reject, Resolve} from "../Util/Util";
 
 export class ViewFieldHandler /*implements ISPObjectHandler*/ {
     public execute(config: IViewField, url: string, parentConfig: IView) {
@@ -31,7 +31,7 @@ export class ViewFieldHandler /*implements ISPObjectHandler*/ {
                                                 resolve({});
                                                 Logger.write(`Viewfield '${elementAsString}' in View ${parentConfig.Title} created`);
                                             }).catch((error) => {
-                                                RejectAndLog(error, elementAsString, reject);
+                                                Reject(reject, error, elementAsString);
                                             });
                                         }, 500);
                                     });
@@ -41,19 +41,19 @@ export class ViewFieldHandler /*implements ISPObjectHandler*/ {
                         }
                         else if (result.length === 0) {
                             let error = `Views with Title '${parentElement.Title}' not found`;
-                            RejectAndLog(error, elementAsString, reject);
+                            Reject(reject, error, elementAsString);
                         }
                         else {
                             let error = `More than one Views with Title '${parentElement.Title}' found`;
-                            RejectAndLog(error, elementAsString, reject);
+                            Reject(reject, error, elementAsString);
                         }
                     }).catch((error) => {
-                        RejectAndLog(error, elementAsString, reject);
+                        Reject(reject, error, elementAsString);
                     });
                 }
                 else {
                     let error = `List with Id '${listId}' does not exist`;
-                    RejectAndLog(error, elementAsString, reject);
+                    Reject(reject, error, elementAsString);
                 }
             });
         });
