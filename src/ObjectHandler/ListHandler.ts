@@ -34,8 +34,7 @@ export class ListHandler implements ISPObjectHandler {
                                 let listId = result.data.Id;
                                 result.list.update({ Title: config.Title }).then((result) => {
                                     let list = parentInstance.lists.getById(listId);
-                                    resolve(list);
-                                    Logger.write(`List ${config.Title} created`, 0);
+                                    Resolve(resolve, `List ${config.Title} created`, config.InternalName, list);
                                 }, (error) => {
                                     Reject(reject, error, config.Title);
                                 });
@@ -45,7 +44,6 @@ export class ListHandler implements ISPObjectHandler {
                         } else {
                             let list = parentInstance.lists.getById(result[0].Id);
                             Resolve(resolve, `List with Internal Name '${config.InternalName}' already exists`, config.InternalName, list);
-                            Logger.write(`List with Internal Name '${config.InternalName}' already exists`, 0);
                         }
                     }, (error) => {
                         Reject(reject, error, config.Title);
@@ -70,8 +68,7 @@ export class ListHandler implements ISPObjectHandler {
                         let listId = result[0].Id;
                         let properties = this.CreateProperties(config);
                         list.update(properties).then(() => {
-                            resolve(list);
-                            Logger.write(`List with Internal Name '${config.InternalName}' updated`, 1);
+                            Resolve(resolve, `List with Internal Name '${config.InternalName}' updated`, config.InternalName, list);
                         }).catch((error) => {
                             Reject(reject, error, config.Title);
                         });
@@ -99,8 +96,7 @@ export class ListHandler implements ISPObjectHandler {
                         let listId = result[0].Id;
                         list.delete().then(() => {
                             let configForDelete = this.CreateProperties(config);
-                            resolve(configForDelete);
-                            Logger.write(`List with Internal Name '${config.InternalName}' deleted`, 1);
+                            Resolve(resolve, `List with Internal Name '${config.InternalName}' deleted`, config.InternalName, configForDelete);
                         }).catch((error) => {
                             Reject(reject, error, config.Title);
                         });
