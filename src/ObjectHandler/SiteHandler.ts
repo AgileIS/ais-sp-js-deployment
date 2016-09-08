@@ -11,7 +11,7 @@ export class SiteHandler implements ISPObjectHandler {
             let spWeb = new Web(config.Url);
             spWeb.get().then((result) => {
                 //TODO: implement logic for Site CRUD
-                Resolve(spWeb, "Web exists", "spWeb");
+                Resolve(resolve, "Web exists", "spWeb", spWeb);
             }).catch(reject);
         });
     };
