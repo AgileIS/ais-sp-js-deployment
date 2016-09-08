@@ -25,6 +25,7 @@ export class ListHandler implements ISPObjectHandler {
         return new Promise<List>((resolve, reject) => {
             parent.then(parentInstance => {
                 Logger.write("config " + JSON.stringify(config), 0);
+                Logger.write("Entering Add List", 1);
                 if (config.TemplateType) {
                     parentInstance.lists.filter(`RootFolder/Name eq '${config.InternalName}'`).select("Id").get().then((result) => {
                         if (result.length === 0) {
@@ -62,6 +63,7 @@ export class ListHandler implements ISPObjectHandler {
         return new Promise<List>((resolve, reject) => {
             parent.then(parentInstance => {
                 Logger.write("config " + JSON.stringify(config), 0);
+                Logger.write("Entering Update List", 1);
                 let list = parentInstance.lists.getByTitle(config.Title);
                 parentInstance.lists.filter(`RootFolder/Name eq '${config.InternalName}'`).select("Id").get().then((result) => {
                     if (result.length === 1) {
@@ -81,7 +83,7 @@ export class ListHandler implements ISPObjectHandler {
                 }).catch((error) => {
                     RejectAndLog(error, config.Title, reject);
                 });
-            })
+            });
 
         });
     }
@@ -90,6 +92,7 @@ export class ListHandler implements ISPObjectHandler {
         return new Promise<List>((resolve, reject) => {
             parent.then(parentInstance => {
                 Logger.write("config " + JSON.stringify(config), 0);
+                Logger.write("Entering Delete List", 1);
                 let list = parentInstance.lists.getByTitle(config.Title);
                 parentInstance.lists.filter(`RootFolder/Name eq '${config.InternalName}'`).select("Id").get().then((result) => {
                     if (result.length === 1) {
