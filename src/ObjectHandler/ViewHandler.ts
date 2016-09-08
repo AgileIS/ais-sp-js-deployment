@@ -27,14 +27,14 @@ export class ViewHandler implements ISPObjectHandler {
                         let properties = this.CreateProperties(viewConfig);
                         parentInstance.views.add(viewConfig.Title, viewConfig.PersonalView, properties).then((result) => {
                             result.view.fields.removeAll().then(() => {
-                                Resolve(`View '${viewConfig.Title}' added`, viewConfig.Title, view);
-                            }).catch((error) => { Reject(`Error while deleting all view fields '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
-                        }).catch((error) => { Reject(`Error while adding view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
+                                Resolve(resolve, `View '${viewConfig.Title}' added`, viewConfig.Title, view);
+                            }).catch((error) => { Reject(reject, `Error while deleting all view fields '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
+                        }).catch((error) => { Reject(reject, `Error while adding view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
                     }
-                    else if (result.length === 1) { Reject(`View '${viewConfig.Title}' already exists`, viewConfig.Title, view); }
-                    else { Reject(`Found more than one view with the title '${viewConfig.Title}'`, viewConfig.Title, view); }
-                }).catch((error) => { Reject(`Error while requesting view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
-            }).catch((error) => { Reject(error, viewConfig.Title); });
+                    else if (result.length === 1) { Reject(reject, `View '${viewConfig.Title}' already exists`, viewConfig.Title, view); }
+                    else { Reject(reject, `Found more than one view with the title '${viewConfig.Title}'`, viewConfig.Title, view); }
+                }).catch((error) => { Reject(reject, `Error while requesting view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
+            }).catch((error) => { Reject(reject, error, viewConfig.Title); });
         });
     }
 
@@ -48,13 +48,13 @@ export class ViewHandler implements ISPObjectHandler {
                         let properties = this.CreateProperties(viewConfig);
                         view.update(properties).then((result) => {
                             view.fields.removeAll().then((result) => {
-                                Resolve(`View '${viewConfig.Title}' updated`, viewConfig.Title, view);
-                            }).catch((error) => { Reject(`Error while deleting all view fields '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
-                        }).catch((error) => { Reject(`Error while updating view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
+                                Resolve(resolve, `View '${viewConfig.Title}' updated`, viewConfig.Title, view);
+                            }).catch((error) => { Reject(reject, `Error while deleting all view fields '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
+                        }).catch((error) => { Reject(reject, `Error while updating view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
                     }
-                    else if (result.length === 0) { Reject(`View '${viewConfig.Title}' does not exists`, viewConfig.Title, view); }
-                }).catch((error) => { Reject(`Error while requesting view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
-            })).catch((error) => { Reject(error, viewConfig.Title); });
+                    else if (result.length === 0) { Reject(reject, `View '${viewConfig.Title}' does not exists`, viewConfig.Title, view); }
+                }).catch((error) => { Reject(reject, `Error while requesting view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
+            })).catch((error) => { Reject(reject, error, viewConfig.Title); });
         });
     }
 
@@ -66,12 +66,12 @@ export class ViewHandler implements ISPObjectHandler {
                 view.get().then((result) => {
                     if (result.length === 1) {
                         view.delete().then(() => {
-                            Resolve(`View '${viewConfig.Title}' removed`, viewConfig.Title, view);
-                        }).catch((error) => { Reject(`Error while deleting view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
+                            Resolve(resolve, `View '${viewConfig.Title}' removed`, viewConfig.Title, view);
+                        }).catch((error) => { Reject(reject, `Error while deleting view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
                     }
-                    else if (result.length === 0) { Reject(`View '${viewConfig.Title}' does not exist`, viewConfig.Title, view); }
-                }).catch((error) => { Reject(`Error while requesting view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
-            }).catch((error) => { Reject(error, viewConfig.Title); });
+                    else if (result.length === 0) { Reject(reject, `View '${viewConfig.Title}' does not exist`, viewConfig.Title, view); }
+                }).catch((error) => { Reject(reject, `Error while requesting view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
+            }).catch((error) => { Reject(reject, error, viewConfig.Title); });
         });
     }
 

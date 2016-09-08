@@ -8,7 +8,7 @@ import {Fields} from "sp-pnp-js/lib/sharepoint/rest/Fields";
 import {Web} from "sp-pnp-js/lib/sharepoint/rest/webs";
 import {Field} from "sp-pnp-js/lib/sharepoint/rest/fields";
 import {List} from "sp-pnp-js/lib/sharepoint/rest/Lists";
-import {RejectAndLog} from "../Util/Util";
+import {Reject, Resolve} from "../Util/Util";
 import {FieldTypeKind} from "../Constants/FieldTypeKind";
 
 export class FieldHandler {
@@ -37,7 +37,7 @@ export class FieldHandler {
                         if (config.FieldTypeKind) {
                             if (config.FieldTypeKind === FieldTypeKind.Lookup) {
                                 let error = `Not implemented yet - createFieldAsXml`;
-                                 RejectAndLog(error, config.Title, reject);
+                                 Reject(reject, error, config.Title);
                             }
                             else if (config.FieldTypeKind === FieldTypeKind.Calculated) {
                                 let propertyHash = this.CreateProperties(config);
@@ -47,10 +47,10 @@ export class FieldHandler {
                                         resolve(field);
                                         Logger.write("Calculated Field with Internal Name '" + config.InternalName + "' created", 1);
                                     }).catch((error) => {
-                                         RejectAndLog(error, config.Title, reject);
+                                         Reject(reject, error, config.Title);
                                     });
                                 }).catch((error) => {
-                                     RejectAndLog(error, config.Title, reject);
+                                     Reject(reject, error, config.Title);
                                 });
                             } else {
                                 let propertyHash = this.CreateProperties(config);
@@ -60,15 +60,15 @@ export class FieldHandler {
                                         Logger.write(`Field with Internal Name '${config.InternalName}' created`);
                                         resolve(field);
                                     }).catch((error) => {
-                                         RejectAndLog(error, config.Title, reject);
+                                         Reject(reject, error, config.Title);
                                     });
                                 }).catch((error) => {
-                                     RejectAndLog(error, config.Title, reject);
+                                     Reject(reject, error, config.Title);
                                 });
                             }
                         } else {
                             let error = `FieldTypKind for '${config.InternalName}' could not be resolved`;
-                             RejectAndLog(error, config.Title, reject);
+                             Reject(reject, error, config.Title);
                         }
                     } else {
                         let field = parentInstance.fields.getById(result[0].Id);
@@ -76,7 +76,7 @@ export class FieldHandler {
                         Logger.write(`Field with Internal Name '${config.InternalName}' already exists`);
                     }
                 }).catch((error) => {
-                     RejectAndLog(error, config.Title, reject);
+                     Reject(reject, error, config.Title);
                 });
             });
         });
@@ -96,12 +96,12 @@ export class FieldHandler {
                             resolve(field);
                             Logger.write(`Field with Internal Name '${config.InternalName}' updated`, 1);
                         }).catch((error) => {
-                             RejectAndLog(error, config.Title, reject);
+                             Reject(reject, error, config.Title);
                         });
                     }
                     else {
                         let error = `Field with Internal Name '${config.InternalName}' does not exist`;
-                         RejectAndLog(error, config.Title, reject);
+                         Reject(reject, error, config.Title);
                     }
                 });
             });
@@ -122,12 +122,12 @@ export class FieldHandler {
                             Logger.write(`Field with Internal Name '${config.InternalName}' deleted`, 1);
                             resolve(field);
                         }).catch((error) => {
-                             RejectAndLog(error, config.Title, reject);
+                             Reject(reject, error, config.Title);
                         });
                     }
                     else {
                         let error = `Field with Internal Name '${config.InternalName}' does not exist`;
-                         RejectAndLog(error, config.Title, reject);
+                         Reject(reject, error, config.Title);
                     }
                 });
             });
