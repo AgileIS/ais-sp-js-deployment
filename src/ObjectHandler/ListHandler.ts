@@ -6,7 +6,7 @@ import * as Types from "sp-pnp-js/lib/sharepoint/rest/types";
 import {Web} from "sp-pnp-js/lib/sharepoint/rest/webs";
 import {List, Lists} from "sp-pnp-js/lib/sharepoint/rest/lists";
 import {Queryable} from "sp-pnp-js/lib/sharepoint/rest/queryable";
-import {RejectAndLog} from "../Util/Util";
+import {Resolve, Reject} from "../Util/Util";
 
 export class ListHandler implements ISPObjectHandler {
 
@@ -37,23 +37,23 @@ export class ListHandler implements ISPObjectHandler {
                                     resolve(list);
                                     Logger.write(`List ${config.Title} created`, 0);
                                 }, (error) => {
-                                    RejectAndLog(error, config.Title, reject);
+                                    Reject(reject, error, config.Title);
                                 });
                             }, (error) => {
-                                reject(error);
+                                Reject(reject, error, config.Title);
                             });
                         } else {
                             let list = parentInstance.lists.getById(result[0].Id);
-                            resolve(list);
+                            Resolve(resolve, `List with Internal Name '${config.InternalName}' already exists`, config.InternalName, list);
                             Logger.write(`List with Internal Name '${config.InternalName}' already exists`, 0);
                         }
                     }, (error) => {
-                        RejectAndLog(error, config.Title, reject);
+                        Reject(reject, error, config.Title);
                     });
                 }
                 else {
                     let error = `List Template Type could not be resolved for List: ${config.InternalName}`;
-                    RejectAndLog(error, config.Title, reject);
+                    Reject(reject, error, config.Title);
                 }
             });
         });
@@ -73,15 +73,15 @@ export class ListHandler implements ISPObjectHandler {
                             resolve(list);
                             Logger.write(`List with Internal Name '${config.InternalName}' updated`, 1);
                         }).catch((error) => {
-                            RejectAndLog(error, config.Title, reject);
+                            Reject(reject, error, config.Title);
                         });
                     }
                     else {
                         let error = `List with Internal Name '${config.InternalName}' does not exist`;
-                        RejectAndLog(error, config.Title, reject);
+                        Reject(reject, error, config.Title);
                     }
                 }).catch((error) => {
-                    RejectAndLog(error, config.Title, reject);
+                    Reject(reject, error, config.Title);
                 });
             });
 
@@ -102,15 +102,15 @@ export class ListHandler implements ISPObjectHandler {
                             resolve(configForDelete);
                             Logger.write(`List with Internal Name '${config.InternalName}' deleted`, 1);
                         }).catch((error) => {
-                            RejectAndLog(error, config.Title, reject);
+                            Reject(reject, error, config.Title);
                         });
                     }
                     else {
                         let error = `List with Internal Name '${config.InternalName}' does not exist`;
-                        RejectAndLog(error, config.Title, reject);
+                        Reject(reject, error, config.Title);
                     }
                 }).catch((error) => {
-                    RejectAndLog(error, config.Title, reject);
+                    Reject(reject, error, config.Title);
                 });
             })
 
