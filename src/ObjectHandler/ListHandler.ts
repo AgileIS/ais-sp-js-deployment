@@ -11,17 +11,6 @@ import {RejectAndLog} from "../Util/Util";
 export class ListHandler implements ISPObjectHandler {
 
     execute(config: IList, parent: Promise<Web>): Promise<List> {
-        /* return new Promise<List>((resolve, reject) => {
-             parent.then((parentInstance) => {
-                 Logger.write("enter List execute", 0);
-                 let list = parentInstance.lists.getByTitle(config.Title);
-                 list.get().then(result => {
-                     resolve(list);
-                 });
-             });
- 
-         });*/
-
         switch (config.ControlOption) {
             case "Update":
                 return this.UpdateList(config, parent);
@@ -30,56 +19,42 @@ export class ListHandler implements ISPObjectHandler {
             default:
                 return this.AddList(config, parent);
         }
-
     }
-    /*    execute(config: IList, url: string, parentConfig: ISite) {
-            switch (config.ControlOption) {
-                case "Update":
-                    return this.UpdateList(config, url);
-                case "Delete":
-                    return this.DeleteList(config, url);
-    
-                default:
-                    return this.AddList(config, url);
-            }
-        }*/
 
     private AddList(config: IList, parent: Promise<Web>): Promise<List> {
         return new Promise<List>((resolve, reject) => {
             parent.then(parentInstance => {
                 Logger.write("config " + JSON.stringify(config), 0);
-                let list = parentInstance.lists.getByTitle(config.Title);
-                if (list !== undefined) {
-                    if (config.TemplateType) {
-                        parentInstance.lists.filter(`RootFolder/Name eq '${config.InternalName}'`).select("Id").get().then((result) => {
-                            if (result.length === 0) {
-                                let propertyHash = this.CreateProperties(config);
-                                parentInstance.lists.add(config.InternalName, config.Description, config.TemplateType, config.EnableContentTypes, propertyHash).then((result) => {
-                                    result.list.update({ Title: config.Title }).then((result) => {
-                                        resolve(list);
-                                        Logger.write(`List ${config.Title} created`, 0);
-                                    }, (error) => {
-                                        reject(error);
-                                    });
+                if (config.TemplateType) {
+                    parentInstance.lists.filter(`RootFolder/Name eq '${config.InternalName}'`).select("Id").get().then((result) => {
+                        if (result.length === 0) {
+                            let propertyHash = this.CreateProperties(config);
+                            parentInstance.lists.add(config.InternalName, config.Description, config.TemplateType, config.EnableContentTypes, propertyHash).then((result) => {
+                                let listId = result.data.Id;
+                                result.list.update({ Title: config.Title }).then((result) => {
+                                    let list = parentInstance.lists.getById(listId);
+                                    resolve(list);
+                                    Logger.write(`List ${config.Title} created`, 0);
                                 }, (error) => {
-                                    reject(error);
+                                    RejectAndLog(error, config.Title, reject);
                                 });
-                            } else {
-                                resolve(list);
-                                Logger.write(`List with Internal Name '${config.InternalName}' already exists`, 0);
-                            }
-                        }, (error) => {
-                            reject(error);
-                        });
-                    }
-                    else {
-                        let error = `List Template Type could not be resolved for List: ${config.InternalName}`;
-                        reject(error);
-                    }
+                            }, (error) => {
+                                reject(error);
+                            });
+                        } else {
+                            let list = parentInstance.lists.getById(result[0].Id);
+                            resolve(list);
+                            Logger.write(`List with Internal Name '${config.InternalName}' already exists`, 0);
+                        }
+                    }, (error) => {
+                        RejectAndLog(error, config.Title, reject);
+                    });
                 }
-
-            })
-
+                else {
+                    let error = `List Template Type could not be resolved for List: ${config.InternalName}`;
+                    RejectAndLog(error, config.Title, reject);
+                }
+            });
         });
     }
 
@@ -96,15 +71,15 @@ export class ListHandler implements ISPObjectHandler {
                             resolve(list);
                             Logger.write(`List with Internal Name '${config.InternalName}' updated`, 1);
                         }).catch((error) => {
-                            reject(error);
+                            RejectAndLog(error, config.Title, reject);
                         });
                     }
                     else {
                         let error = `List with Internal Name '${config.InternalName}' does not exist`;
-                        reject(error);
+                        RejectAndLog(error, config.Title, reject);
                     }
                 }).catch((error) => {
-                    reject(error);
+                    RejectAndLog(error, config.Title, reject);
                 });
             })
 
@@ -124,15 +99,15 @@ export class ListHandler implements ISPObjectHandler {
                             resolve(configForDelete);
                             Logger.write(`List with Internal Name '${config.InternalName}' deleted`, 1);
                         }).catch((error) => {
-                            reject(error);
+                            RejectAndLog(error, config.Title, reject);
                         });
                     }
                     else {
                         let error = `List with Internal Name '${config.InternalName}' does not exist`;
-                        reject(error);
+                        RejectAndLog(error, config.Title, reject);
                     }
                 }).catch((error) => {
-                    reject(error);
+                    RejectAndLog(error, config.Title, reject);
                 });
             })
 
