@@ -2,7 +2,7 @@ import {ISPObjectHandler} from "../interface/ObjectHandler/ispobjecthandler";
 import {Logger} from "sp-pnp-js/lib/utils/logging";
 import {Web} from "sp-pnp-js/lib/sharepoint/rest/webs";
 import {ISite} from "../interface/Types/ISite";
-import {RejectAndLog} from "../lib/Util/Util";
+import {RejectAndLog} from "../Util/Util";
 import { Queryable } from "sp-pnp-js/lib/sharepoint/rest/queryable";
 
 

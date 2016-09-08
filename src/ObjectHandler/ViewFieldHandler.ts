@@ -3,7 +3,7 @@ import {Logger} from "sp-pnp-js/lib/utils/logging";
 import {Web} from "sp-pnp-js/lib/sharepoint/rest/webs";
 import {IView} from "../interface/Types/IView";
 import {IViewField} from "../interface/Types/IViewField";
-import {RejectAndLog} from "../lib/Util/Util";
+import {RejectAndLog} from "../Util/Util";
 
 export class ViewFieldHandler /*implements ISPObjectHandler*/ {
     public execute(config: IViewField, url: string, parentConfig: IView) {
