@@ -39,8 +39,8 @@ function resolveObjectHandler(key: string): ISPObjectHandler {
             return new SiteHandler();
         case "List":
             return new ListHandler();
-/*        case "Field":
-            return new FieldHandler();*/
+        case "Field":
+            return new FieldHandler();
         case "View":
             return new ViewHandler();
         /* do we need this handler any more?

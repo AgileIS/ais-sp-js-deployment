@@ -37,46 +37,43 @@ export class FieldHandler {
                         if (config.FieldTypeKind) {
                             if (config.FieldTypeKind === FieldTypeKind.Lookup) {
                                 let error = `Not implemented yet - createFieldAsXml`;
-                                 Reject(reject, error, config.Title);
+                                Reject(reject, error, config.Title);
                             }
                             else if (config.FieldTypeKind === FieldTypeKind.Calculated) {
                                 let propertyHash = this.CreateProperties(config);
                                 parentInstance.fields.addCalculated(config.InternalName, config.Formula, Types.DateTimeFieldFormatType[config.DateFormat], Types.FieldTypes[config.OutputType], propertyHash).then((result) => {
                                     result.field.update({ Title: config.Title, Description: config.Description }).then((result) => {
                                         let field = parentInstance.fields.getById(result.data.Id);
-                                        resolve(field);
-                                        Logger.write("Calculated Field with Internal Name '" + config.InternalName + "' created", 1);
+                                        Resolve(resolve, `Calculated Field with Internal Name ' ${config.InternalName}' created`, config.InternalName, field);
                                     }).catch((error) => {
-                                         Reject(reject, error, config.Title);
+                                        Reject(reject, error, config.Title);
                                     });
                                 }).catch((error) => {
-                                     Reject(reject, error, config.Title);
+                                    Reject(reject, error, config.Title);
                                 });
                             } else {
                                 let propertyHash = this.CreateProperties(config);
                                 parentInstance.fields.add(config.InternalName, "SP.Field", propertyHash).then((result) => {
                                     result.field.update({ Title: config.Title }).then(() => {
                                         let field = parentInstance.fields.getById(result.data.Id);
-                                        Logger.write(`Field with Internal Name '${config.InternalName}' created`);
-                                        resolve(field);
+                                        Resolve(resolve, `Field with Internal Name '${config.InternalName}' created`, config.InternalName, field);
                                     }).catch((error) => {
-                                         Reject(reject, error, config.Title);
+                                        Reject(reject, error, config.Title);
                                     });
                                 }).catch((error) => {
-                                     Reject(reject, error, config.Title);
+                                    Reject(reject, error, config.Title);
                                 });
                             }
                         } else {
                             let error = `FieldTypKind for '${config.InternalName}' could not be resolved`;
-                             Reject(reject, error, config.Title);
+                            Reject(reject, error, config.Title);
                         }
                     } else {
                         let field = parentInstance.fields.getById(result[0].Id);
-                        resolve(field);
-                        Logger.write(`Field with Internal Name '${config.InternalName}' already exists`);
+                        Resolve(resolve, `Field with Internal Name '${config.InternalName}' already exists`, config.InternalName, field);
                     }
                 }).catch((error) => {
-                     Reject(reject, error, config.Title);
+                    Reject(reject, error, config.Title);
                 });
             });
         });
@@ -90,18 +87,17 @@ export class FieldHandler {
                 Logger.write("Entering update Field", 1);
                 parentInstance.fields.filter(`InternalName eq '${config.InternalName}'`).select("Id").get().then((result) => {
                     if (result.length === 1) {
-                        let field =  parentInstance.fields.getById(result[0].Id);
+                        let field = parentInstance.fields.getById(result[0].Id);
                         let properties = this.CreateProperties(config);
                         field.update(properties).then(() => {
-                            resolve(field);
-                            Logger.write(`Field with Internal Name '${config.InternalName}' updated`, 1);
+                            Resolve(resolve, `Field with Internal Name '${config.InternalName}' updated`, config.InternalName, field);
                         }).catch((error) => {
-                             Reject(reject, error, config.Title);
+                            Reject(reject, error, config.Title);
                         });
                     }
                     else {
                         let error = `Field with Internal Name '${config.InternalName}' does not exist`;
-                         Reject(reject, error, config.Title);
+                        Reject(reject, error, config.Title);
                     }
                 });
             });
@@ -119,15 +115,14 @@ export class FieldHandler {
                     if (result.length === 1) {
                         let field = parentInstance.fields.getById(result[0].Id);
                         field.delete().then(() => {
-                            Logger.write(`Field with Internal Name '${config.InternalName}' deleted`, 1);
-                            resolve(field);
+                            Resolve(resolve, `Field with Internal Name '${config.InternalName}' deleted`, config.InternalName, field);
                         }).catch((error) => {
-                             Reject(reject, error, config.Title);
+                            Reject(reject, error, config.Title);
                         });
                     }
                     else {
                         let error = `Field with Internal Name '${config.InternalName}' does not exist`;
-                         Reject(reject, error, config.Title);
+                        Reject(reject, error, config.Title);
                     }
                 });
             });
