@@ -1,14 +1,32 @@
 import {ISPObjectHandler} from "../interface/ObjectHandler/ispobjecthandler";
 import {Logger} from "sp-pnp-js/lib/utils/logging";
-import {IList} from "../interface/Types/IList";
-import {ISite} from "../interface/Types/ISite";
+import {IList, IListInstance} from "../interface/Types/IList";
+import {ISiteInstance} from "../interface/Types/ISite";
 import {ListTemplates} from "../lib/ListTemplates";
 import * as Types from "sp-pnp-js/lib/sharepoint/rest/types";
 import {Web} from "sp-pnp-js/lib/sharepoint/rest/webs";
+import {List, Lists} from "sp-pnp-js/lib/sharepoint/rest/lists";
+import {Queryable} from "sp-pnp-js/lib/sharepoint/rest/queryable";
 import {RejectAndLog} from "../lib/Util/Util";
 
 export class ListHandler implements ISPObjectHandler {
-    execute(config: IList, url: string, parentConfig: ISite) {
+
+    execute(config: IList, url: string, parent: Promise<ISiteInstance>):Promise<IListInstance> {
+        return new Promise<IList>((resolve, reject) => {
+            parent.then((parentInstance) => {
+                Logger.write("enter List execute", 0);
+                // das hier geht noch nicht INstance eventuell überdenken!
+                let site = new Web(parentInstance.uri);
+                site.lists.get().then(lists =>{
+
+                });
+                resolve(config);
+            });
+
+        });
+
+    }
+/*    execute(config: IList, url: string, parentConfig: ISite) {
         switch (config.ControlOption) {
             case "Update":
                 return this.UpdateList(config, url);
@@ -18,7 +36,7 @@ export class ListHandler implements ISPObjectHandler {
             default:
                 return this.AddList(config, url);
         }
-    }
+    }*/
 
     private AddList(config: IList, url: string) {
         let element = config;

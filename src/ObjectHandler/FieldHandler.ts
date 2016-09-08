@@ -1,73 +1,84 @@
 import {ISPObjectHandler} from "../interface/ObjectHandler/ispobjecthandler";
 import {Logger} from "sp-pnp-js/lib/utils/logging";
-import {IField} from "../interface/Types/IField";
-import {IList} from "../interface/Types/IList";
-import {ISite} from "../interface/Types/ISite";
+import {IField, IFieldInstance} from "../interface/Types/IField";
+import {IList, IListInstance} from "../interface/Types/IList";
+import {ISite, ISiteInstance} from "../interface/Types/ISite";
 import * as Types from "sp-pnp-js/lib/sharepoint/rest/types";
 import {Fields} from "sp-pnp-js/lib/sharepoint/rest/Fields";
 import {Web} from "sp-pnp-js/lib/sharepoint/rest/webs";
 import {RejectAndLog} from "../lib/Util/Util";
 import {FieldTypeKind} from "../lib/FieldTypeKind";
 
-export class FieldHandler implements ISPObjectHandler {
-    public execute(config: IField, url: string, parentConfig: ISite | IList) {
+export class FieldHandler {
+    execute(config: IField, url: string, parent: Promise<IListInstance | ISiteInstance>): Promise<IFieldInstance> {
         return new Promise<IField>((resolve, reject) => {
-            Logger.write("config " + JSON.stringify(config));
-            let parentObject = parentConfig as Object;
-            if (parentObject.hasOwnProperty("List")) {
-                switch (config.ControlOption) {
-                    case "Update":
-                        this.updateFieldOnSite(url, config).then(() => {
-                            resolve(config);
-                        }).catch((error) => {
-                            RejectAndLog(error, config.InternalName, reject);
-                        });
-                        break;
-                    case "Delete":
-                        this.deleteFieldOnSite(config, url).then(() => {
-                            resolve(config);
-                        }).catch((error) => {
-                            RejectAndLog(error, config.InternalName, reject);
-                        });
-                        break;
-                    default:
-                        this.addFieldSite(url, config).then(() => {
-                            resolve(config);
-                        }).catch((error) => {
-                            RejectAndLog(error, config.InternalName, reject);
-                        });
-                        break;
-                }
-            } else {
-                let parentElement = parentObject as IList;
-                switch (config.ControlOption) {
-                    case "Update":
-                        this.updateFieldOnList(url, config, parentElement).then(() => {
-                            resolve(config);
-                        }).catch((error) => {
-                            RejectAndLog(error, config.InternalName, reject);
-                        });
-                        break;
-                    case "Delete":
-                        this.deleteFieldOnList(config, url, parentElement).then(() => {
-                            resolve(config);
-                        }).catch((error) => {
-                            RejectAndLog(error, config.InternalName, reject);
-                        });
-                        break;
-                    default:
-                        this.addFieldOnList(url, config, parentElement).then((result) => {
-                            resolve(config);
-                        }).catch((error) => {
-                            RejectAndLog(error, config.InternalName, reject);
-                        });
-                        break;
-                }
+            parent.then((parentProperties) => {
+                Logger.write("enter Field execute", 0);
+                resolve(config);
+            });
 
-            };
         });
+
     }
 
+    /*   public execute(config: IField, url: string, parentConfig: ISite | IList) {
+           return new Promise<IField>((resolve, reject) => {
+               Logger.write("config " + JSON.stringify(config));
+               let parentObject = parentConfig as Object;
+               if (parentObject.hasOwnProperty("List")) {
+                   switch (config.ControlOption) {
+                       case "Update":
+                           this.updateFieldOnSite(url, config).then(() => {
+                               resolve(config);
+                           }).catch((error) => {
+                               RejectAndLog(error, config.InternalName, reject);
+                           });
+                           break;
+                       case "Delete":
+                           this.deleteFieldOnSite(config, url).then(() => {
+                               resolve(config);
+                           }).catch((error) => {
+                               RejectAndLog(error, config.InternalName, reject);
+                           });
+                           break;
+                       default:
+                           this.addFieldSite(url, config).then(() => {
+                               resolve(config);
+                           }).catch((error) => {
+                               RejectAndLog(error, config.InternalName, reject);
+                           });
+                           break;
+                   }
+               } else {
+                   let parentElement = parentObject as IList;
+                   switch (config.ControlOption) {
+                       case "Update":
+                           this.updateFieldOnList(url, config, parentElement).then(() => {
+                               resolve(config);
+                           }).catch((error) => {
+                               RejectAndLog(error, config.InternalName, reject);
+                           });
+                           break;
+                       case "Delete":
+                           this.deleteFieldOnList(config, url, parentElement).then(() => {
+                               resolve(config);
+                           }).catch((error) => {
+                               RejectAndLog(error, config.InternalName, reject);
+                           });
+                           break;
+                       default:
+                           this.addFieldOnList(url, config, parentElement).then((result) => {
+                               resolve(config);
+                           }).catch((error) => {
+                               RejectAndLog(error, config.InternalName, reject);
+                           });
+                           break;
+                   }
+   
+               };
+           });
+       }
+   */
     private updateFieldOnSite(url: string, pConfig: IField): Promise<any> {
         let spWeb = new Web(url);
         let element = pConfig;

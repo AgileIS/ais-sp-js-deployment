@@ -1,14 +1,8 @@
-export interface Global {
-    Headers: any;
-    Request: any;
-    fetch: any;
-}
-
 /**
  * HttpClient Class
  */
 export class HttpClient {
-        public static initAuth(url: string, username: string, password: string) {
+        public static initAuth(username: string, password: string) {
         // Fixed missing Header & Request in node
         let fetch = require('node-fetch');
         global["Headers"] = fetch.Headers;

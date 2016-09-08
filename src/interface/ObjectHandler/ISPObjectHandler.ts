@@ -1,3 +1,5 @@
+import { IInstance } from "../Types/IInstance";
+
 export interface ISPObjectHandler{
-    execute(config: any, url: string, parentConfig: any): Promise<any>;
+    execute(config: any, url: string, parent: Promise<IInstance>): Promise<IInstance>;
 }

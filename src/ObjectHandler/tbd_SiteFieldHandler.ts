@@ -8,7 +8,7 @@ import * as web from "sp-pnp-js/lib/sharepoint/rest/webs";
 import {RejectAndLog} from "../lib/Util/Util";
 import {FieldTypeKind} from "../lib/FieldTypeKind";
 
-export class SiteFieldHandler implements ISPObjectHandler {
+export class SiteFieldHandler  {
     public execute(config: IField, url: string, parentConfig: ISite) {
         switch (config.ControlOption) {
             case "":

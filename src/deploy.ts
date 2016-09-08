@@ -9,12 +9,8 @@ import {FieldHandler} from "./ObjectHandler/FieldHandler";
 import {ViewHandler} from "./ObjectHandler/ViewHandler";
 import {ViewFieldHandler} from "./ObjectHandler/ViewFieldHandler";
 import {HttpClient} from "./lib/initClient";
+import {MyConsoleLogger} from "./MyConsoleLogger";
 
-class MyConsoleLogger implements LogListener {
-    log(entry: LogEntry) {
-        console.log(entry.data + " - " + entry.level + " - " + entry.message);
-    }
-}
 
 
 
@@ -29,14 +25,15 @@ Logger.write(JSON.stringify(args), 0);
 if (args.f && args.p) {
     let config = JSON.parse(fs.readFileSync(args.f, "utf8"));
     if (config.Url && config.User) {
-        HttpClient.initAuth(config.Url, config.User, args.p);
+        HttpClient.initAuth(config.User, args.p);
         let siteUrl = config.Url;
         Logger.write(JSON.stringify(config), 0);
-        let promise = chooseAndUseHandler(config, siteUrl);
-        promise.then(() => {
+        Promise.all(chooseAndUseHandler(config, siteUrl, Promise.resolve())).then(() => {
             Logger.write("All Elements created", 1);
+            return;
         }).catch((error) => {
             Logger.write("Error occured while creating Elemets - " + error, 1);
+            return;
         });
     }
 }
@@ -51,8 +48,9 @@ function resolveObjectHandler(key: string): ISPObjectHandler {
             return new FieldHandler();
         case "View":
             return new ViewHandler();
-        case "ViewField":
-            return new ViewFieldHandler();
+        /* do we need this handler any more?
+    case "ViewField":
+        return new ViewFieldHandler();*/
         default:
             break;
     }
@@ -64,58 +62,29 @@ function promiseStatus(p) {
     );
 }
 
-function chooseAndUseHandler(config: any, siteUrl: string) {
-    return new Promise((resolve, reject) => {
-        let promiseArray = [];
-        Object.keys(config).forEach((value, index) => {
-            Logger.write("found config key " + value + " at index " + index, 0);
-            let handler = resolveObjectHandler(value);
-            if (typeof handler !== "undefined") {
-                if (config[value] instanceof Array) {
-                    let prom: Promise<any> = Promise.resolve();
-                    config[value].forEach(element => {
-                        promiseArray.push(new Promise((resolve, reject) => {
-                            prom = prom.then(() => {
-                                return handler.execute(element, siteUrl, config);
-                            }).then((resolvedPromise) => {
-                                chooseAndUseHandler(resolvedPromise, siteUrl).then(() => {
-                                    resolve();
-                                }).catch((error) => {
-                                    reject(error);
+function chooseAndUseHandler(config: any, siteUrl: string, parent: Promise<any>): Array<Promise<any>> {
+    let promises: Array<Promise<any>> = [];
 
-                                });
-                            }).catch((error) => {
-                                reject(error);
-
-                            });
-                        }));
-                    });
-                } else {
-                    promiseArray.push(new Promise((resolve, reject) => {
-                        handler.execute(config[value], siteUrl, config).then((resolvedPromise) => {
-                            Logger.write("Resolved Promise: " + JSON.stringify(resolvedPromise), 0);
-                            chooseAndUseHandler(resolvedPromise, siteUrl).then(() => {
-                                resolve();
-                            }).catch((error) => {
-                                reject(error);
-                            });
-                        }).catch((error) => {
-                            reject(error);
-                            Logger.write("Rejected: " + error, 0);
-                        });
-                    }));
-                }
+    Object.keys(config).forEach((value, index) => {
+        Logger.write("found config key " + value + " at index " + index, 0);
+        let handler = resolveObjectHandler(value);
+        if (typeof handler !== "undefined") {
+            Logger.write("found handler " + handler.constructor.name + " for config key " + value, 0);
+            if (config[value] instanceof Array) {
+                config[value].forEach(element => {
+                    Logger.write("call object handler "+ handler.constructor.name +" with element:" + JSON.stringify(element) + ", siteUrl:" + siteUrl, 0)
+                    let promise = handler.execute(element, siteUrl, parent);
+                    promises.push(promise);
+                    promises.concat(chooseAndUseHandler(element, siteUrl, promise));
+                });
             }
-        });
-        Promise.all(promiseArray.map(promiseStatus)).then((result) => {
-            for (let promise of result) {
-                if (promise.status === "rejected") {
-                    reject(promise.val);
-                    break;
-                }
+            else {
+                Logger.write("call object handler "+ handler.constructor.name +" with element:" + JSON.stringify(config[value]) + ", siteUrl:" + siteUrl, 0)
+                let promise = handler.execute(config[value], siteUrl, parent);
+                promises.push(promise);
+                promises.concat(chooseAndUseHandler(config[value], siteUrl, promise));
             }
-            resolve();
-        });
+        }
     });
+    return promises;
 }
-

@@ -1,22 +1,33 @@
 import {ISPObjectHandler} from "../interface/ObjectHandler/ispobjecthandler";
 import {Logger} from "sp-pnp-js/lib/utils/logging";
 import * as web from "sp-pnp-js/lib/sharepoint/rest/webs";
-import {IView} from "../interface/Types/IView";
-import {IList} from "../interface/Types/IList";
+import {IView, IViewInstance} from "../interface/Types/IView";
+import {IListInstance} from "../interface/Types/IList";
 import {RejectAndLog} from "../lib/Util/Util";
 
 
 export class ViewHandler implements ISPObjectHandler {
-    public execute(config: IView, url: string, parentConfig: IList): Promise<IView> {
-        switch (config.ControlOption) {
-            case "Update":
-                return this.UpdateView(config, url, parentConfig);
-            case "Delete":
-                return this.DeleteView(config, url, parentConfig);
-            default:
-                return this.AddView(config, url, parentConfig);
-        }
-    };
+
+    execute(config: IView, url: string, parent: Promise<IListInstance>):Promise<IViewInstance> {
+        return new Promise<IView>((resolve, reject) => {
+            parent.then((parentInstance) => {
+                Logger.write("enter View execute", 0);
+                resolve(config);
+            });
+
+        });
+
+    }
+    /*    public execute(config: IView, url: string, parentConfig: IList): Promise<IView> {
+            switch (config.ControlOption) {
+                case "Update":
+                    return this.UpdateView(config, url, parentConfig);
+                case "Delete":
+                    return this.DeleteView(config, url, parentConfig);
+                default:
+                    return this.AddView(config, url, parentConfig);
+            }
+        };*/
 
     private AddView(config: IView, url: string, parentConfig: IList): Promise<IView> {
         let spWeb = new web.Web(url);
