@@ -40,9 +40,9 @@ function resolveObjectHandler(key: string): ISPObjectHandler {
         case "List":
             return new ListHandler();
 /*        case "Field":
-            return new FieldHandler();
+            return new FieldHandler();*/
         case "View":
-            return new ViewHandler();*/
+            return new ViewHandler();
         /* do we need this handler any more?
     case "ViewField":
         return new ViewFieldHandler();*/

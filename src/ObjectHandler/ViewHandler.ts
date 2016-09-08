@@ -22,7 +22,7 @@ export class ViewHandler implements ISPObjectHandler {
             parentPromise.then((parentInstance) => {
                 Logger.write(`Adding View: '${viewConfig.Title}'`, Logger.LogLevel.Info);
                 let view = parentInstance.views.getByTitle(viewConfig.Title);
-                view.get().then((result) => {
+                parentInstance.views.filter(`Title eq '${viewConfig.Title}'`).select("Id").get().then((result) => {
                     if (result.length === 0) {
                         let properties = this.CreateProperties(viewConfig);
                         parentInstance.views.add(viewConfig.Title, viewConfig.PersonalView, properties).then((result) => {
@@ -43,7 +43,7 @@ export class ViewHandler implements ISPObjectHandler {
             parentPromise.then((parentInstance => {
                 Logger.write(`Updating View: '${viewConfig.Title}'`, Logger.LogLevel.Info);
                 let view = parentInstance.views.getByTitle(viewConfig.Title);
-                view.get().then((result) => {
+                parentInstance.views.filter(`Title eq '${viewConfig.Title}'`).select("Id").get().then((result) => {
                     if (result.length === 1) {
                         let properties = this.CreateProperties(viewConfig);
                         view.update(properties).then((result) => {
@@ -63,10 +63,10 @@ export class ViewHandler implements ISPObjectHandler {
             parentPromise.then((parentInstance) => {
                 Logger.write(`Deleting View '${viewConfig.Title}'`, Logger.LogLevel.Info);
                 let view = parentInstance.views.getByTitle(viewConfig.Title);
-                view.get().then((result) => {
+                parentInstance.views.filter(`Title eq '${viewConfig.Title}'`).select("Id").get().then((result) => {
                     if (result.length === 1) {
                         view.delete().then(() => {
-                            Resolve(resolve, `View '${viewConfig.Title}' removed`, viewConfig.Title, view);
+                            Resolve(resolve, `View '${viewConfig.Title}' deleted`, viewConfig.Title, view);
                         }).catch((error) => { Reject(reject, `Error while deleting view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
                     }
                     else if (result.length === 0) { Reject(reject, `View '${viewConfig.Title}' does not exist`, viewConfig.Title, view); }
