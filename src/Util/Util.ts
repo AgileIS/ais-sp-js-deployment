@@ -14,3 +14,15 @@ export function ViewFieldRetry(pSpWeb: Web, pListId: string, pParentTitle: strin
     }, pTimeout);
     return promise;
 }
+
+export function Resolve(pError: string, pElementName: string, value?) {
+    let errorMsg = `${pError}  - '${pElementName}'`;
+    Logger.write(errorMsg, Logger.LogLevel.Info);
+    this.resolve(value);
+}
+
+export function Reject(pError: string, pElementName: string, value?) {
+    let errorMsg = `${pError}  - '${pElementName}'`;
+    Logger.write(errorMsg, Logger.LogLevel.Info);
+    this.reject(value);
+}

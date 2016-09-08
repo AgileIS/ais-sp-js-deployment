@@ -1,161 +1,85 @@
-import {ISPObjectHandler} from "../interface/ObjectHandler/ispobjecthandler";
-import {Logger} from "sp-pnp-js/lib/utils/logging";
-import * as web from "sp-pnp-js/lib/sharepoint/rest/webs";
-import {IView} from "../interface/Types/IView";
-import {RejectAndLog} from "../Util/Util";
+import { Logger } from "sp-pnp-js/lib/utils/logging";
+import { List } from "sp-pnp-js/lib/sharepoint/rest/lists";
+import { View } from "sp-pnp-js/lib/sharepoint/rest/views";
+import { ISPObjectHandler } from "../interface/ObjectHandler/ispobjecthandler";
+import { IView } from "../interface/Types/IView";
+import { Reject, Resolve } from "../Util/Util";
 
+export class ViewHandler implements ISPObjectHandler {
+    public execute(viewConfig: IView, parentPromise: Promise<List>): Promise<View> {
+        switch (viewConfig.ControlOption) {
+            case "Update":
+                return this.UpdateView(viewConfig, parentPromise);
+            case "Delete":
+                return this.DeleteView(viewConfig, parentPromise);
+            default:
+                return this.AddView(viewConfig, parentPromise);
+        }
+    }
 
-export class ViewHandler /*implements ISPObjectHandler*/ {
-
-/*    execute(config: IView, url: string, parent: Promise<IListInstance>):Promise<IViewInstance> {
-        return new Promise<IView>((resolve, reject) => {
-            parent.then((parentInstance) => {
-                Logger.write("enter View execute", 0);
-                resolve(config);
-            });
-
-        });
-
-    }*/
-    /*    public execute(config: IView, url: string, parentConfig: IList): Promise<IView> {
-            switch (config.ControlOption) {
-                case "Update":
-                    return this.UpdateView(config, url, parentConfig);
-                case "Delete":
-                    return this.DeleteView(config, url, parentConfig);
-                default:
-                    return this.AddView(config, url, parentConfig);
-            }
-        };*/
-
-    private AddView(config: IView, url: string, parentConfig: any): Promise<IView> {
-        let spWeb = new web.Web(url);
-        let element = config;
-        let listName = parentConfig.InternalName;
-        return new Promise<IView>((resolve, reject) => {
-            spWeb.lists.filter(`RootFolder/Name eq '${listName}'`).select("Id").get().then((result) => {
-                if (result.length === 1) {
-                    let listId = result[0].Id;
-                    spWeb.lists.getById(listId).views.filter(`Title eq '${element.Title}'`).select("Id").get().then(
-                        (result) => {
-                            if (result.length === 1) {
-                                resolve(element);
-                                Logger.write(`View with Title '${element.Title}' already exists`, 1);
-                            }
-                            else if (result.length === 0) {
-                                let properties = this.CreateProperties(element);
-                                spWeb.lists.getById(listId).views.add(element.Title, element.PersonalView, properties).then(
-                                    (result) => {
-                                        result.view.fields.removeAll().then(() => {
-                                            let configForAddView = this.AddListNameProperty(element, listId);
-                                            resolve(configForAddView);
-                                        }).catch((error) => {
-                                            RejectAndLog(error, element.Title, reject);
-                                        });
-                                    }).catch((error) => {
-                                        RejectAndLog(error, element.Title, reject);
-                                    });
-                            }
-                            else {
-                                let error = `More than one Views wit Title '${element.Title}' found`;
-                                RejectAndLog(error, element.Title, reject);
-                            }
-                        }).catch((error) => {
-                            RejectAndLog(error, element.Title, reject);
-                        });
-                }
-                else {
-                    let error = `List with Internal Name '${listName}' does not exist`;
-                    RejectAndLog(error, element.Title, reject);
-                }
-            });
+    private AddView(viewConfig: IView, parentPromise: Promise<List>): Promise<View> {
+        return new Promise<View>((resolve, reject) => {
+            parentPromise.then((parentInstance) => {
+                Logger.write(`Adding View: '${viewConfig.Title}'`, Logger.LogLevel.Info);
+                let view = parentInstance.views.getByTitle(viewConfig.Title);
+                view.get().then((result) => {
+                    if (result.length === 0) {
+                        let properties = this.CreateProperties(viewConfig);
+                        parentInstance.views.add(viewConfig.Title, viewConfig.PersonalView, properties).then((result) => {
+                            result.view.fields.removeAll().then(() => {
+                                Resolve(`View '${viewConfig.Title}' added`, viewConfig.Title, view);
+                            }).catch((error) => { Reject(`Error while deleting all view fields '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
+                        }).catch((error) => { Reject(`Error while adding view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
+                    }
+                    else if (result.length === 1) { Reject(`View '${viewConfig.Title}' already exists`, viewConfig.Title, view); }
+                    else { Reject(`Found more than one view with the title '${viewConfig.Title}'`, viewConfig.Title, view); }
+                }).catch((error) => { Reject(`Error while requesting view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
+            }).catch((error) => { Reject(error, viewConfig.Title); });
         });
     }
 
-    private UpdateView(config: IView, url: string, parentConfig: any): Promise<IView> {
-        let spWeb = new web.Web(url);
-        let element = config;
-        let listName = parentConfig.InternalName;
-        return new Promise<IView>((resolve, reject) => {
-            spWeb.lists.filter(`RootFolder/Name eq '${listName}'`).select("Id").get().then((result) => {
-                if (result.length === 1) {
-                    let listId = result[0].Id;
-                    spWeb.lists.getById(listId).views.filter(`Title eq '${element.Title}'`).select("Id").get().then((result) => {
-                        if (result.length === 1) {
-                            let viewId = result[0].Id;
-                            let properties = this.CreateProperties(element);
-                            spWeb.lists.getById(listId).views.getById(viewId).update(properties).then(() => {
-                                spWeb.lists.getById(listId).views.getById(viewId).fields.removeAll().then(() => {
-                                    let configForAddView = this.AddListNameProperty(element, listId);
-                                    resolve(configForAddView);
-                                }).catch((error) => {
-                                    RejectAndLog(error, element.Title, reject);
-                                });
-                            });
-                        }
-                        else if (result.length === 0) {
-                            let error = `View with Title '${element.Title}' does not exist`;
-                            RejectAndLog(error, element.Title, reject);
-                        }
-                    });
-                }
-                else {
-                    let error = `List with Internal Name '${listName}' does not exist`;
-                    RejectAndLog(error, element.Title, reject);
-                }
-            }).catch((error) => {
-                RejectAndLog(error, element.Title, reject);
-            });
+    private UpdateView(viewConfig: IView, parentPromise: Promise<List>): Promise<View> {
+        return new Promise<View>((resolve, reject) => {
+            parentPromise.then((parentInstance => {
+                Logger.write(`Updating View: '${viewConfig.Title}'`, Logger.LogLevel.Info);
+                let view = parentInstance.views.getByTitle(viewConfig.Title);
+                view.get().then((result) => {
+                    if (result.length === 1) {
+                        let properties = this.CreateProperties(viewConfig);
+                        view.update(properties).then((result) => {
+                            view.fields.removeAll().then((result) => {
+                                Resolve(`View '${viewConfig.Title}' updated`, viewConfig.Title, view);
+                            }).catch((error) => { Reject(`Error while deleting all view fields '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
+                        }).catch((error) => { Reject(`Error while updating view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
+                    }
+                    else if (result.length === 0) { Reject(`View '${viewConfig.Title}' does not exists`, viewConfig.Title, view); }
+                }).catch((error) => { Reject(`Error while requesting view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
+            })).catch((error) => { Reject(error, viewConfig.Title); });
         });
     }
 
-
-    private DeleteView(config: IView, url: string, parentConfig: any): Promise<IView> {
-        let spWeb = new web.Web(url);
-        let element = config;
-        let listName = parentConfig.InternalName;
-        return new Promise<IView>((resolve, reject) => {
-            spWeb.lists.filter(`RootFolder/Name eq '${listName}'`).select("Id").get().then((result) => {
-                if (result.length === 1) {
-                    let listId = result[0].Id;
-                    spWeb.lists.getById(listId).views.filter(`Title eq '${element.Title}'`).select("Id").get().then((result) => {
-                        if (result.length === 1) {
-                            let viewId = result[0].Id;
-                            spWeb.lists.getById(listId).views.getById(viewId).delete().then(() => {
-                                let configForDelete = this.CreateProperties(element);
-                                resolve(configForDelete);
-                                Logger.write(`View with Title '${element.Title}' removed`, 1);
-                            });
-                        }
-                        else if (result.length === 0) {
-                            let error = `View with Title '${element.Title}' does not exist`;
-                            RejectAndLog(error, element.Title, reject);
-                        }
-                    });
-                }
-                else {
-                    let error = `List with Internal Name '${listName}' does not exist`;
-                    RejectAndLog(error, element.Title, reject);
-
-                }
-            });
+    private DeleteView(viewConfig: IView, parentPromise: Promise<List>): Promise<View> {
+        return new Promise<View>((resolve, reject) => {
+            parentPromise.then((parentInstance) => {
+                Logger.write(`Deleting View '${viewConfig.Title}'`, Logger.LogLevel.Info);
+                let view = parentInstance.views.getByTitle(viewConfig.Title);
+                view.get().then((result) => {
+                    if (result.length === 1) {
+                        view.delete().then(() => {
+                            Resolve(`View '${viewConfig.Title}' removed`, viewConfig.Title, view);
+                        }).catch((error) => { Reject(`Error while deleting view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
+                    }
+                    else if (result.length === 0) { Reject(`View '${viewConfig.Title}' does not exist`, viewConfig.Title, view); }
+                }).catch((error) => { Reject(`Error while requesting view '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
+            }).catch((error) => { Reject(error, viewConfig.Title); });
         });
     }
 
-
-
-    private CreateProperties(pElement: IView) {
-        let element = pElement;
+    private CreateProperties(viewConfig: IView) {
         let stringifiedObject: string;
-        stringifiedObject = JSON.stringify(element);
+        stringifiedObject = JSON.stringify(viewConfig);
         let parsedObject = JSON.parse(stringifiedObject);
-        switch (element.ControlOption) {
-            case "":
-                delete parsedObject.ControlOption;
-                delete parsedObject.Title;
-                delete parsedObject.PersonalView;
-                delete parsedObject.ViewField;
-                break;
+        switch (viewConfig.ControlOption) {
             case "Update":
                 delete parsedObject.ControlOption;
                 delete parsedObject.PersonalView;
@@ -167,20 +91,13 @@ export class ViewHandler /*implements ISPObjectHandler*/ {
                 delete parsedObject.ViewField;
                 break;
             default:
+                delete parsedObject.ControlOption;
+                delete parsedObject.Title;
+                delete parsedObject.PersonalView;
+                delete parsedObject.ViewField;
                 break;
         }
         stringifiedObject = JSON.stringify(parsedObject);
         return JSON.parse(stringifiedObject);
     }
-
-    private AddListNameProperty(pElement: IView, pParentListId: any): IView {
-        let element = pElement;
-        let stringifiedObject: string;
-        stringifiedObject = JSON.stringify(element);
-        let parsedObject = JSON.parse(stringifiedObject);
-        parsedObject.ParentListId = pParentListId;
-        stringifiedObject = JSON.stringify(parsedObject);
-        return JSON.parse(stringifiedObject);
-    }
-
 }
