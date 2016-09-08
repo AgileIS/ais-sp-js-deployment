@@ -1,18 +1,14 @@
 /// <reference path="../typings/index.d.ts" />
 
 import {Logger, LogListener, LogEntry} from "sp-pnp-js/lib/utils/logging";
-
 import {ISPObjectHandler} from "./interface/ObjectHandler/ispobjecthandler";
 import {SiteHandler} from "./ObjectHandler/SiteHandler";
 import {ListHandler} from "./ObjectHandler/ListHandler";
 import {FieldHandler} from "./ObjectHandler/FieldHandler";
 import {ViewHandler} from "./ObjectHandler/ViewHandler";
 import {ViewFieldHandler} from "./ObjectHandler/ViewFieldHandler";
-import {HttpClient} from "./lib/initClient";
-import {MyConsoleLogger} from "./MyConsoleLogger";
-
-
-
+import {HttpClient} from "./HttpClient/initClient";
+import {MyConsoleLogger} from "./Logger/MyConsoleLogger";
 
 Logger.subscribe(new MyConsoleLogger());
 Logger.activeLogLevel = Logger.LogLevel.Verbose;
