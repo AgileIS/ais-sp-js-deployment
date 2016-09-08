@@ -1,8 +1,8 @@
 import {ISPObjectHandler} from "../interface/ObjectHandler/ispobjecthandler";
 import {Logger} from "sp-pnp-js/lib/utils/logging";
-import {IField, IFieldInstance} from "../interface/Types/IField";
-import {IList, IListInstance} from "../interface/Types/IList";
-import {ISite, ISiteInstance} from "../interface/Types/ISite";
+import {IField}  from "../interface/Types/IField";
+import {IList} from "../interface/Types/IList";
+import {ISite} from "../interface/Types/ISite";
 import * as Types from "sp-pnp-js/lib/sharepoint/rest/types";
 import {Fields} from "sp-pnp-js/lib/sharepoint/rest/Fields";
 import {Web} from "sp-pnp-js/lib/sharepoint/rest/webs";
@@ -10,7 +10,7 @@ import {RejectAndLog} from "../lib/Util/Util";
 import {FieldTypeKind} from "../lib/FieldTypeKind";
 
 export class FieldHandler {
-    execute(config: IField, url: string, parent: Promise<IListInstance | ISiteInstance>): Promise<IFieldInstance> {
+    execute(config: IField, url: string, parent: Promise<any>): Promise<any> {
         return new Promise<IField>((resolve, reject) => {
             parent.then((parentProperties) => {
                 Logger.write("enter Field execute", 0);

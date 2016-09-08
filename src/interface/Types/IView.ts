@@ -1,4 +1,3 @@
-import {IInstance} from "./IInstance";
 
 export interface IView {
     Title: string;
@@ -12,8 +11,4 @@ export interface IView {
     ViewTypeKind: string;
     ControlOption: string;
     ParentListId: any;
-}
-
-export interface IViewInstance extends IView, IInstance{
-
 }

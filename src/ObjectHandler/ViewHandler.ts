@@ -1,14 +1,13 @@
 import {ISPObjectHandler} from "../interface/ObjectHandler/ispobjecthandler";
 import {Logger} from "sp-pnp-js/lib/utils/logging";
 import * as web from "sp-pnp-js/lib/sharepoint/rest/webs";
-import {IView, IViewInstance} from "../interface/Types/IView";
-import {IListInstance} from "../interface/Types/IList";
+import {IView} from "../interface/Types/IView";
 import {RejectAndLog} from "../lib/Util/Util";
 
 
-export class ViewHandler implements ISPObjectHandler {
+export class ViewHandler /*implements ISPObjectHandler*/ {
 
-    execute(config: IView, url: string, parent: Promise<IListInstance>):Promise<IViewInstance> {
+/*    execute(config: IView, url: string, parent: Promise<IListInstance>):Promise<IViewInstance> {
         return new Promise<IView>((resolve, reject) => {
             parent.then((parentInstance) => {
                 Logger.write("enter View execute", 0);
@@ -17,7 +16,7 @@ export class ViewHandler implements ISPObjectHandler {
 
         });
 
-    }
+    }*/
     /*    public execute(config: IView, url: string, parentConfig: IList): Promise<IView> {
             switch (config.ControlOption) {
                 case "Update":
@@ -29,7 +28,7 @@ export class ViewHandler implements ISPObjectHandler {
             }
         };*/
 
-    private AddView(config: IView, url: string, parentConfig: IList): Promise<IView> {
+    private AddView(config: IView, url: string, parentConfig: any): Promise<IView> {
         let spWeb = new web.Web(url);
         let element = config;
         let listName = parentConfig.InternalName;
@@ -73,7 +72,7 @@ export class ViewHandler implements ISPObjectHandler {
         });
     }
 
-    private UpdateView(config: IView, url: string, parentConfig: IList): Promise<IView> {
+    private UpdateView(config: IView, url: string, parentConfig: any): Promise<IView> {
         let spWeb = new web.Web(url);
         let element = config;
         let listName = parentConfig.InternalName;
@@ -111,7 +110,7 @@ export class ViewHandler implements ISPObjectHandler {
     }
 
 
-    private DeleteView(config: IView, url: string, parentConfig: IList): Promise<IView> {
+    private DeleteView(config: IView, url: string, parentConfig: any): Promise<IView> {
         let spWeb = new web.Web(url);
         let element = config;
         let listName = parentConfig.InternalName;

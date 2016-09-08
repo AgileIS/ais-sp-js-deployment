@@ -4,7 +4,6 @@ import { IField } from "./IField";
 import { IView } from "./IView";
 import { ISecurity } from "./ISecurity";
 import { IContentTypeBinding } from "./IContentTypeBinding";
-import { IInstance } from "./IInstance";
 
 export interface IList {
     Title: string;
@@ -38,7 +37,4 @@ export interface IList {
     InternalName: string;
     EnableContentTypes: boolean;
     ControlOption: string;
-}
-export interface IListInstance extends IList, IInstance {
-
 }

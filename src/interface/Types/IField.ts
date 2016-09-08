@@ -1,4 +1,4 @@
-import {IInstance} from "./IInstance";
+
 
 export interface IField {
     ShowInDisplayForm: boolean;
@@ -34,5 +34,3 @@ export interface IField {
     OutputType: string;
     ControlOption: string;
 }
-
-export interface IFieldInstance extends IField, IInstance{}

@@ -24,11 +24,10 @@ Logger.write(JSON.stringify(args), 0);
 
 if (args.f && args.p) {
     let config = JSON.parse(fs.readFileSync(args.f, "utf8"));
-    if (config.Url && config.User) {
+    if (config.User) {
         HttpClient.initAuth(config.User, args.p);
-        let siteUrl = config.Url;
         Logger.write(JSON.stringify(config), 0);
-        Promise.all(chooseAndUseHandler(config, siteUrl, Promise.resolve())).then(() => {
+        Promise.all(chooseAndUseHandler(config, null)).then(() => {
             Logger.write("All Elements created", 1);
             return;
         }).catch((error) => {
@@ -44,10 +43,10 @@ function resolveObjectHandler(key: string): ISPObjectHandler {
             return new SiteHandler();
         case "List":
             return new ListHandler();
-        case "Field":
+/*        case "Field":
             return new FieldHandler();
         case "View":
-            return new ViewHandler();
+            return new ViewHandler();*/
         /* do we need this handler any more?
     case "ViewField":
         return new ViewFieldHandler();*/
@@ -62,7 +61,7 @@ function promiseStatus(p) {
     );
 }
 
-function chooseAndUseHandler(config: any, siteUrl: string, parent: Promise<any>): Array<Promise<any>> {
+function chooseAndUseHandler(config: any, parent?: Promise<any>): Array<Promise<any>> {
     let promises: Array<Promise<any>> = [];
 
     Object.keys(config).forEach((value, index) => {
@@ -72,17 +71,17 @@ function chooseAndUseHandler(config: any, siteUrl: string, parent: Promise<any>)
             Logger.write("found handler " + handler.constructor.name + " for config key " + value, 0);
             if (config[value] instanceof Array) {
                 config[value].forEach(element => {
-                    Logger.write("call object handler "+ handler.constructor.name +" with element:" + JSON.stringify(element) + ", siteUrl:" + siteUrl, 0)
-                    let promise = handler.execute(element, siteUrl, parent);
+                    Logger.write("call object handler " + handler.constructor.name + " with element:" + JSON.stringify(element), 0);
+                    let promise = handler.execute(element, parent);
                     promises.push(promise);
-                    promises.concat(chooseAndUseHandler(element, siteUrl, promise));
+                    promises.concat(chooseAndUseHandler(element, promise));
                 });
             }
             else {
-                Logger.write("call object handler "+ handler.constructor.name +" with element:" + JSON.stringify(config[value]) + ", siteUrl:" + siteUrl, 0)
-                let promise = handler.execute(config[value], siteUrl, parent);
+                Logger.write("call object handler " + handler.constructor.name + " with element:" + JSON.stringify(config[value]), 0);
+                let promise = handler.execute(config[value], parent);
                 promises.push(promise);
-                promises.concat(chooseAndUseHandler(config[value], siteUrl, promise));
+                promises.concat(chooseAndUseHandler(config[value], promise));
             }
         }
     });

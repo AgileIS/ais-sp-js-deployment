@@ -5,7 +5,7 @@ import {IView} from "../interface/Types/IView";
 import {IViewField} from "../interface/Types/IViewField";
 import {RejectAndLog} from "../lib/Util/Util";
 
-export class ViewFieldHandler implements ISPObjectHandler {
+export class ViewFieldHandler /*implements ISPObjectHandler*/ {
     public execute(config: IViewField, url: string, parentConfig: IView) {
         let spWeb = new Web(url);
         let element = config;

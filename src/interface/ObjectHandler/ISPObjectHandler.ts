@@ -1,5 +1,5 @@
-import { IInstance } from "../Types/IInstance";
+import { Queryable } from "sp-pnp-js/lib/sharepoint/rest/queryable";
 
 export interface ISPObjectHandler{
-    execute(config: any, url: string, parent: Promise<IInstance>): Promise<IInstance>;
+    execute(config: any, parent?: Promise<Queryable>): Promise<Queryable>;
 }

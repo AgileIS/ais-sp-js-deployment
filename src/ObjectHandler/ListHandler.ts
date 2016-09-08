@@ -1,7 +1,6 @@
 import {ISPObjectHandler} from "../interface/ObjectHandler/ispobjecthandler";
 import {Logger} from "sp-pnp-js/lib/utils/logging";
-import {IList, IListInstance} from "../interface/Types/IList";
-import {ISiteInstance} from "../interface/Types/ISite";
+import {IList, } from "../interface/Types/IList";
 import {ListTemplates} from "../lib/ListTemplates";
 import * as Types from "sp-pnp-js/lib/sharepoint/rest/types";
 import {Web} from "sp-pnp-js/lib/sharepoint/rest/webs";
@@ -11,16 +10,15 @@ import {RejectAndLog} from "../lib/Util/Util";
 
 export class ListHandler implements ISPObjectHandler {
 
-    execute(config: IList, url: string, parent: Promise<ISiteInstance>):Promise<IListInstance> {
-        return new Promise<IList>((resolve, reject) => {
+    execute(config: IList, parent: Promise<Web>):Promise<List> {
+        return new Promise<List>((resolve, reject) => {
             parent.then((parentInstance) => {
                 Logger.write("enter List execute", 0);
                 // das hier geht noch nicht INstance eventuell überdenken!
-                let site = new Web(parentInstance.uri);
-                site.lists.get().then(lists =>{
-
+                let list = parentInstance.lists.getByTitle(config.Title);  
+               list.get().then(result => {
+                    resolve(list);
                 });
-                resolve(config);
             });
 
         });
