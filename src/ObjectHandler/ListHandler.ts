@@ -23,18 +23,18 @@ export class ListHandler implements ISPObjectHandler {
 
     private processingViewConfig(listConfig: IList, parentWeb: Web): Promise<List> {
         return new Promise<List>((resolve, reject) => {
-            Logger.write(`Processing ${listConfig.ControlOption === ControlOption.Add || listConfig.ControlOption === undefined ? "Add" : listConfig.ControlOption} list: '${listConfig.Title}'`, Logger.LogLevel.Info);
+            Logger.write(`Processing ${listConfig.ControlOption === ControlOption.ADD || listConfig.ControlOption === undefined ? "Add" : listConfig.ControlOption} list: '${listConfig.Title}'`, Logger.LogLevel.Info);
             parentWeb.lists.filter(`RootFolder/Name eq '${listConfig.InternalName}'`).select("Id").get().then((listRequestResults) => {
                 let processingPromise: Promise<List> = undefined;
 
                 if (listRequestResults && listRequestResults.length === 1) {
                     let list = parentWeb.lists.getById(listRequestResults[0].Id);
                     switch (listConfig.ControlOption) {
-                        case ControlOption.Update:
-                            processingPromise = this.updateList(listConfig, parentWeb, list);
+                        case ControlOption.UPDATE:
+                            processingPromise = this.updateList(listConfig, list);
                             break;
-                        case ControlOption.Delete:
-                            processingPromise = this.deleteList(listConfig, parentWeb, list);
+                        case ControlOption.DELETE:
+                            processingPromise = this.deleteList(listConfig, list);
                             break;
                         default:
                             Resolve(reject, `List with the title '${listConfig.Title}' already exists`, listConfig.Title, list);
@@ -42,8 +42,8 @@ export class ListHandler implements ISPObjectHandler {
                     }
                 } else {
                     switch (listConfig.ControlOption) {
-                        case ControlOption.Update:
-                        case ControlOption.Delete:
+                        case ControlOption.UPDATE:
+                        case ControlOption.DELETE:
                             Reject(reject, `List with internal name '${listConfig.InternalName}' does not exists`, listConfig.Title);
                             break;
                         default:
@@ -70,7 +70,7 @@ export class ListHandler implements ISPObjectHandler {
         });
     }
 
-    private updateList(listConfig: IList, parentWeb: Web, list: List): Promise<List> {
+    private updateList(listConfig: IList, list: List): Promise<List> {
         return new Promise<List>((resolve, reject) => {
             let properties = this.createProperties(listConfig);
             list.update(properties).then((listUpdateResult) => {
@@ -79,7 +79,7 @@ export class ListHandler implements ISPObjectHandler {
         });
     }
 
-    private deleteList(listConfig: IList, parentWeb: Web, list: List): Promise<List> {
+    private deleteList(listConfig: IList, list: List): Promise<List> {
         return new Promise<List>((resolve, reject) => {
             list.delete().then(() => {
                 Resolve(resolve, `Deleted List: '${listConfig.InternalName}'`, listConfig.Title);
@@ -92,7 +92,7 @@ export class ListHandler implements ISPObjectHandler {
         stringifiedObject = JSON.stringify(listConfig);
         let parsedObject = JSON.parse(stringifiedObject);
         switch (listConfig.ControlOption) {
-            case ControlOption.Update:
+            case ControlOption.UPDATE:
                 delete parsedObject.InternalName;
                 delete parsedObject.ControlOption;
                 delete parsedObject.Field;

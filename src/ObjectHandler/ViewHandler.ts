@@ -25,10 +25,10 @@ export class ViewHandler implements ISPObjectHandler {
                     let view = parentList.views.getByTitle(viewConfig.Title);
                     switch (viewConfig.ControlOption) {
                         case ControlOption.UPDATE:
-                            processingPromise = this.updateView(viewConfig, parentList, view);
+                            processingPromise = this.updateView(viewConfig, view);
                             break;
                         case ControlOption.DELETE:
-                            processingPromise = this.deleteView(viewConfig, parentList, view);
+                            processingPromise = this.deleteView(viewConfig, view);
                             break;
                         default:
                             Resolve(reject, `View with the title '${viewConfig.Title}' already exists`, viewConfig.Title, view);
@@ -64,7 +64,7 @@ export class ViewHandler implements ISPObjectHandler {
         });
     }
 
-    private updateView(viewConfig: IView, parentList: List, view: View): Promise<View> {
+    private updateView(viewConfig: IView, view: View): Promise<View> {
         return new Promise<View>((resolve, reject) => {
             let properties = this.createProperties(viewConfig);
             view.update(properties).then((viewUpdateResult) => {
@@ -75,7 +75,7 @@ export class ViewHandler implements ISPObjectHandler {
         });
     }
 
-    private deleteView(viewConfig: IView, parentList: List, view: View): Promise<View> {
+    private deleteView(viewConfig: IView, view: View): Promise<View> {
         return new Promise<View>((resolve, reject) => {
             view.delete().then(() => {
                 Resolve(resolve, `Deleted view: '${viewConfig.Title}'`, viewConfig.Title);
