@@ -10,25 +10,25 @@ export class ViewHandler implements ISPObjectHandler {
     public execute(viewConfig: IView, parentPromise: Promise<List>): Promise<View> {
         return new Promise<View>((resolve, reject) => {
             parentPromise.then((parentList) => {
-                this.ProcessingViewConfig(viewConfig, parentList).then((viewProsssingResult) => { resolve(viewProsssingResult); }).catch((error) => { reject(error); });
+                this.processingViewConfig(viewConfig, parentList).then((viewProsssingResult) => { resolve(viewProsssingResult); }).catch((error) => { reject(error); });
             });
         });
     }
 
-    private ProcessingViewConfig(viewConfig: IView, parentList: List): Promise<View> {
+    private processingViewConfig(viewConfig: IView, parentList: List): Promise<View> {
         return new Promise<View>((resolve, reject) => {
-            Logger.write(`Processing ${viewConfig.ControlOption === ControlOption.Add || viewConfig.ControlOption === undefined ? "Add" : viewConfig.ControlOption} view: '${viewConfig.Title}'`, Logger.LogLevel.Info);
+            Logger.write(`Processing ${viewConfig.ControlOption === ControlOption.ADD || viewConfig.ControlOption === undefined ? "Add" : viewConfig.ControlOption} view: '${viewConfig.Title}'`, Logger.LogLevel.Info);
             parentList.views.filter(`Title eq '${viewConfig.Title}'`).select("Id").get().then((viewRequestResults) => {
                 let processingPromise: Promise<View> = undefined;
 
                 if (viewRequestResults && viewRequestResults.length === 1) {
                     let view = parentList.views.getByTitle(viewConfig.Title);
                     switch (viewConfig.ControlOption) {
-                        case ControlOption.Update:
-                            processingPromise = this.UpdateView(viewConfig, parentList, view);
+                        case ControlOption.UPDATE:
+                            processingPromise = this.updateView(viewConfig, parentList, view);
                             break;
-                        case ControlOption.Delete:
-                            processingPromise = this.DeleteView(viewConfig, parentList, view);
+                        case ControlOption.DELETE:
+                            processingPromise = this.deleteView(viewConfig, parentList, view);
                             break;
                         default:
                             Resolve(reject, `View with the title '${viewConfig.Title}' already exists`, viewConfig.Title, view);
@@ -36,12 +36,12 @@ export class ViewHandler implements ISPObjectHandler {
                     }
                 } else {
                     switch (viewConfig.ControlOption) {
-                        case ControlOption.Update:
-                        case ControlOption.Delete:
+                        case ControlOption.UPDATE:
+                        case ControlOption.DELETE:
                             Reject(reject, `View with title '${viewConfig.Title}' does not exists`, viewConfig.Title);
                             break;
                         default:
-                            processingPromise = this.AddView(viewConfig, parentList);
+                            processingPromise = this.addView(viewConfig, parentList);
                             break;
                     }
                 }
@@ -53,9 +53,9 @@ export class ViewHandler implements ISPObjectHandler {
         });
     }
 
-    private AddView(viewConfig: IView, parentList: List): Promise<View> {
+    private addView(viewConfig: IView, parentList: List): Promise<View> {
         return new Promise<View>((resolve, reject) => {
-            let properties = this.CreateProperties(viewConfig);
+            let properties = this.createProperties(viewConfig);
             parentList.views.add(viewConfig.Title, viewConfig.PersonalView, properties).then((viewAddResult) => {
                 viewAddResult.view.fields.removeAll().then(() => {
                     Resolve(resolve, `Added view: '${viewConfig.Title}'`, viewConfig.Title, viewAddResult.view);
@@ -64,9 +64,9 @@ export class ViewHandler implements ISPObjectHandler {
         });
     }
 
-    private UpdateView(viewConfig: IView, parentList: List, view: View): Promise<View> {
+    private updateView(viewConfig: IView, parentList: List, view: View): Promise<View> {
         return new Promise<View>((resolve, reject) => {
-            let properties = this.CreateProperties(viewConfig);
+            let properties = this.createProperties(viewConfig);
             view.update(properties).then((viewUpdateResult) => {
                 viewUpdateResult.view.fields.removeAll().then(() => {
                     Resolve(resolve, `Updated view: '${viewConfig.Title}'`, viewConfig.Title, viewUpdateResult.view);
@@ -75,7 +75,7 @@ export class ViewHandler implements ISPObjectHandler {
         });
     }
 
-    private DeleteView(viewConfig: IView, parentList: List, view: View): Promise<View> {
+    private deleteView(viewConfig: IView, parentList: List, view: View): Promise<View> {
         return new Promise<View>((resolve, reject) => {
             view.delete().then(() => {
                 Resolve(resolve, `Deleted view: '${viewConfig.Title}'`, viewConfig.Title);
@@ -83,12 +83,12 @@ export class ViewHandler implements ISPObjectHandler {
         });
     }
 
-    private CreateProperties(viewConfig: IView) {
+    private createProperties(viewConfig: IView) {
         let stringifiedObject: string;
         stringifiedObject = JSON.stringify(viewConfig);
         let parsedObject = JSON.parse(stringifiedObject);
         switch (viewConfig.ControlOption) {
-            case ControlOption.Update:
+            case ControlOption.UPDATE:
                 delete parsedObject.ControlOption;
                 delete parsedObject.PersonalView;
                 delete parsedObject.ViewField;

@@ -10,12 +10,12 @@ export class ViewFieldHandler implements ISPObjectHandler {
     public execute(viewFieldConfig: IViewField, parentPromise: Promise<View>): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             parentPromise.then((parentView) => {
-                this.ProcessingViewFieldConfig(viewFieldConfig, parentView).then(() => { resolve(); }).catch((error) => { reject(error); });
+                this.processingViewFieldConfig(viewFieldConfig, parentView).then(() => { resolve(); }).catch((error) => { reject(error); });
             });
         });
     }
 
-    private ProcessingViewFieldConfig(viewFieldConfig: IViewField, parentView: View): Promise<void> {
+    private processingViewFieldConfig(viewFieldConfig: IViewField, parentView: View): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             Logger.write(`Processing Add view field: '${viewFieldConfig.InternalFieldName}'`, Logger.LogLevel.Info);
             parentView.fields.add(viewFieldConfig.InternalFieldName).then(() => {
