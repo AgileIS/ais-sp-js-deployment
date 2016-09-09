@@ -49,7 +49,7 @@ export class ViewHandler implements ISPObjectHandler {
                 if (processingPromise) {
                     processingPromise.then(() => { resolve(view); }).catch((error) => { reject(error); });
                 }
-            }).catch((error) => { Reject(reject, `Error while requesting view with the title '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
+            }).catch((error) => { Reject(reject, `Error while requesting view with the title '${viewConfig.Title}': ` + error, viewConfig.Title); });
         });
     }
 
@@ -79,7 +79,7 @@ export class ViewHandler implements ISPObjectHandler {
         return new Promise<View>((resolve, reject) => {
             view.delete().then(() => {
                 Resolve(resolve, `Deleted view: '${viewConfig.Title}'`, viewConfig.Title, view);
-            }).catch((error) => { Reject(reject, `Error while deleting view with the title '${viewConfig.Title}': ` + error, viewConfig.Title, view); });
+            }).catch((error) => { Reject(reject, `Error while deleting view with the title '${viewConfig.Title}': ` + error, viewConfig.Title); });
         });
     }
 

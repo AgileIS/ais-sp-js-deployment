@@ -1,18 +1,18 @@
-import {ISPObjectHandler} from "../interface/ObjectHandler/ispobjecthandler";
-import {Logger} from "sp-pnp-js/lib/utils/logging";
-import {Web} from "sp-pnp-js/lib/sharepoint/rest/webs";
-import {ISite} from "../interface/Types/ISite";
-import {Resolve, Reject} from "../Util/Util";
+import { Logger } from "sp-pnp-js/lib/utils/logging";
+import { Web } from "sp-pnp-js/lib/sharepoint/rest/webs";
 import { Queryable } from "sp-pnp-js/lib/sharepoint/rest/queryable";
+import { ISPObjectHandler } from "../interface/ObjectHandler/ispobjecthandler";
+import { ISite } from "../interface/Types/ISite";
+import { Resolve, Reject } from "../Util/Util";
 
 export class SiteHandler implements ISPObjectHandler {
-    public execute(config: ISite, parent?: Promise<Queryable>): Promise<Web> {
+    public execute(siteConfig: ISite, parentPromise?: Promise<Queryable>): Promise<Web> {
         return new Promise<Web>((resolve, reject) => {
-            let spWeb = new Web(config.Url);
-            spWeb.get().then((result) => {
+            let web = new Web(siteConfig.Url);
+            web.get().then((result) => {
                 //TODO: implement logic for Site CRUD
-                Resolve(resolve, "Web exists", "spWeb", spWeb);
-            }).catch(reject);
+                Resolve(reject, `Web '${siteConfig.Url}' already exists`, siteConfig.Url, web);
+            }).catch((error) => { Reject(reject, `Error while requesting web with the url '${siteConfig.Url}': ` + error, siteConfig.Url); });
         });
     };
 }
