@@ -9,26 +9,26 @@ import { Reject, Resolve } from "../Util/Util";
 export class ViewHandler implements ISPObjectHandler {
     public execute(viewConfig: IView, parentPromise: Promise<List>): Promise<View> {
         return new Promise<View>((resolve, reject) => {
-            parentPromise.then((parentInstance) => {
-                this.ProcessingViewConfig(viewConfig, parentInstance).then((viewProsssingResult) => { resolve(viewProsssingResult); }).catch((error) => { reject(error); });
+            parentPromise.then((parentList) => {
+                this.ProcessingViewConfig(viewConfig, parentList).then((viewProsssingResult) => { resolve(viewProsssingResult); }).catch((error) => { reject(error); });
             });
         });
     }
 
-    private ProcessingViewConfig(viewConfig: IView, parentInstance: List): Promise<View> {
+    private ProcessingViewConfig(viewConfig: IView, parentList: List): Promise<View> {
         return new Promise<View>((resolve, reject) => {
             Logger.write(`Processing ${viewConfig.ControlOption === ControlOption.Add || viewConfig.ControlOption === undefined ? "Add" : viewConfig.ControlOption} view: '${viewConfig.Title}'`, Logger.LogLevel.Info);
-            parentInstance.views.filter(`Title eq '${viewConfig.Title}'`).select("Id").get().then((viewRequestResults) => {
+            parentList.views.filter(`Title eq '${viewConfig.Title}'`).select("Id").get().then((viewRequestResults) => {
                 let processingPromise: Promise<View> = undefined;
 
                 if (viewRequestResults && viewRequestResults.length === 1) {
-                    let view = parentInstance.views.getByTitle(viewConfig.Title);
+                    let view = parentList.views.getByTitle(viewConfig.Title);
                     switch (viewConfig.ControlOption) {
                         case ControlOption.Update:
-                            processingPromise = this.UpdateView(viewConfig, parentInstance, view);
+                            processingPromise = this.UpdateView(viewConfig, parentList, view);
                             break;
                         case ControlOption.Delete:
-                            processingPromise = this.DeleteView(viewConfig, parentInstance, view);
+                            processingPromise = this.DeleteView(viewConfig, parentList, view);
                             break;
                         default:
                             Resolve(reject, `View with the title '${viewConfig.Title}' already exists`, viewConfig.Title, view);
@@ -41,7 +41,7 @@ export class ViewHandler implements ISPObjectHandler {
                             Reject(reject, `View with title '${viewConfig.Title}' does not exists`, viewConfig.Title);
                             break;
                         default:
-                            processingPromise = this.AddView(viewConfig, parentInstance);
+                            processingPromise = this.AddView(viewConfig, parentList);
                             break;
                     }
                 }
@@ -53,10 +53,10 @@ export class ViewHandler implements ISPObjectHandler {
         });
     }
 
-    private AddView(viewConfig: IView, parentInstance: List): Promise<View> {
+    private AddView(viewConfig: IView, parentList: List): Promise<View> {
         return new Promise<View>((resolve, reject) => {
             let properties = this.CreateProperties(viewConfig);
-            parentInstance.views.add(viewConfig.Title, viewConfig.PersonalView, properties).then((viewAddResult) => {
+            parentList.views.add(viewConfig.Title, viewConfig.PersonalView, properties).then((viewAddResult) => {
                 viewAddResult.view.fields.removeAll().then(() => {
                     Resolve(resolve, `Added view: '${viewConfig.Title}'`, viewConfig.Title, viewAddResult.view);
                 }).catch((error) => { Reject(reject, `Error while deleting all fields in the view with the title '${viewConfig.Title}': ` + error, viewConfig.Title); });
@@ -64,7 +64,7 @@ export class ViewHandler implements ISPObjectHandler {
         });
     }
 
-    private UpdateView(viewConfig: IView, parentInstance: List, view: View): Promise<View> {
+    private UpdateView(viewConfig: IView, parentList: List, view: View): Promise<View> {
         return new Promise<View>((resolve, reject) => {
             let properties = this.CreateProperties(viewConfig);
             view.update(properties).then((viewUpdateResult) => {
@@ -75,7 +75,7 @@ export class ViewHandler implements ISPObjectHandler {
         });
     }
 
-    private DeleteView(viewConfig: IView, parentInstance: List, view: View): Promise<View> {
+    private DeleteView(viewConfig: IView, parentList: List, view: View): Promise<View> {
         return new Promise<View>((resolve, reject) => {
             view.delete().then(() => {
                 Resolve(resolve, `Deleted view: '${viewConfig.Title}'`, viewConfig.Title);
