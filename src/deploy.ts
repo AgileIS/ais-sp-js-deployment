@@ -32,7 +32,7 @@ if (args.f && args.p) {
         });
     }
 }
-
+//todo: Factory auslagern mit execute und parentPromise.then => execute Handler ???
 function resolveObjectHandler(key: string): ISPObjectHandler {
     switch (key) {
         case "Site":
