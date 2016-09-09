@@ -13,10 +13,7 @@ export class ListHandler implements ISPObjectHandler {
     public execute(listConfig: IList, parentPromise: Promise<Web>): Promise<List> {
         return new Promise<List>((resolve, reject) => {
             parentPromise.then(parentWeb => {
-                if (listConfig.TemplateType) {
-                    this.processingViewConfig(listConfig, parentWeb).then((listProsssingResult) => { resolve(listProsssingResult); }).catch((error) => { reject(error); });
-                }
-                else { Reject(reject, `List template type could not be resolved for the list with the internal name ${listConfig.InternalName}`, listConfig.Title); }
+                this.processingViewConfig(listConfig, parentWeb).then((listProsssingResult) => { resolve(listProsssingResult); }).catch((error) => { reject(error); });
             });
         });
     }
@@ -61,12 +58,15 @@ export class ListHandler implements ISPObjectHandler {
 
     private addList(listConfig: IList, parentWeb: Web): Promise<List> {
         return new Promise<List>((resolve, reject) => {
-            let properties = this.createProperties(listConfig);
-            parentWeb.lists.add(listConfig.InternalName, listConfig.Description, listConfig.TemplateType, listConfig.EnableContentTypes, properties).then((listAddResult) => {
-                listAddResult.list.update({ Title: listConfig.Title }).then((listUpdateResult) => {
-                    Resolve(resolve, `Added list: '${listConfig.Title}'`, listConfig.Title, listUpdateResult.list);
-                }).catch((error) => { Reject(reject, `Error while updating list title with the internal name '${listConfig.InternalName}': ` + error, listConfig.Title); });
-            }).catch((error) => { Reject(reject, `Error while adding list with the internal name '${listConfig.InternalName}': ` + error, listConfig.Title); });
+            if (listConfig.TemplateType) {
+                let properties = this.createProperties(listConfig);
+                parentWeb.lists.add(listConfig.InternalName, listConfig.Description, listConfig.TemplateType, listConfig.EnableContentTypes, properties).then((listAddResult) => {
+                    listAddResult.list.update({ Title: listConfig.Title }).then((listUpdateResult) => {
+                        Resolve(resolve, `Added list: '${listConfig.Title}'`, listConfig.Title, listUpdateResult.list);
+                    }).catch((error) => { Reject(reject, `Error while updating list title with the internal name '${listConfig.InternalName}': ` + error, listConfig.Title); });
+                }).catch((error) => { Reject(reject, `Error while adding list with the internal name '${listConfig.InternalName}': ` + error, listConfig.Title); });
+            }
+            else { Reject(reject, `List template type could not be resolved for the list with the internal name ${listConfig.InternalName}`, listConfig.Title); }
         });
     }
 
