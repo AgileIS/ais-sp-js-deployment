@@ -20,17 +20,17 @@ export class ListHandler implements ISPObjectHandler {
 
     private processingViewConfig(listConfig: IList, parentWeb: Web): Promise<List> {
         return new Promise<List>((resolve, reject) => {
-            Logger.write(`Processing ${listConfig.ControlOption === ControlOption.ADD || listConfig.ControlOption === undefined ? "Add" : listConfig.ControlOption} list: '${listConfig.Title}'`, Logger.LogLevel.Info);
+            Logger.write(`Processing ${listConfig.ControlOption === ControlOption.Add || listConfig.ControlOption === undefined ? "Add" : listConfig.ControlOption} list: '${listConfig.Title}'`, Logger.LogLevel.Info);
             parentWeb.lists.filter(`RootFolder/Name eq '${listConfig.InternalName}'`).select("Id").get().then((listRequestResults) => {
                 let processingPromise: Promise<List> = undefined;
 
                 if (listRequestResults && listRequestResults.length === 1) {
                     let list = parentWeb.lists.getById(listRequestResults[0].Id);
                     switch (listConfig.ControlOption) {
-                        case ControlOption.UPDATE:
+                        case ControlOption.Update:
                             processingPromise = this.updateList(listConfig, list);
                             break;
-                        case ControlOption.DELETE:
+                        case ControlOption.Delete:
                             processingPromise = this.deleteList(listConfig, list);
                             break;
                         default:
@@ -39,8 +39,8 @@ export class ListHandler implements ISPObjectHandler {
                     }
                 } else {
                     switch (listConfig.ControlOption) {
-                        case ControlOption.UPDATE:
-                        case ControlOption.DELETE:
+                        case ControlOption.Update:
+                        case ControlOption.Delete:
                             Reject(reject, `List with internal name '${listConfig.InternalName}' does not exists`, listConfig.Title);
                             break;
                         default:
@@ -92,7 +92,7 @@ export class ListHandler implements ISPObjectHandler {
         stringifiedObject = JSON.stringify(listConfig);
         let parsedObject = JSON.parse(stringifiedObject);
         switch (listConfig.ControlOption) {
-            case ControlOption.UPDATE:
+            case ControlOption.Update:
                 delete parsedObject.InternalName;
                 delete parsedObject.ControlOption;
                 delete parsedObject.Field;

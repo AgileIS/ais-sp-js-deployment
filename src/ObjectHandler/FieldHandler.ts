@@ -24,17 +24,17 @@ export class FieldHandler {
 
     private ProcessingViewConfig(fieldConfig: IField, parentFields: Fields): Promise<Field> {
         return new Promise<Field>((resolve, reject) => {
-            Logger.write(`Processing ${fieldConfig.ControlOption === ControlOption.ADD || fieldConfig.ControlOption === undefined ? "Add" : fieldConfig.ControlOption} field: '${fieldConfig.Title}'`, Logger.LogLevel.Info);
+            Logger.write(`Processing ${fieldConfig.ControlOption === ControlOption.Add || fieldConfig.ControlOption === undefined ? "Add" : fieldConfig.ControlOption} field: '${fieldConfig.Title}'`, Logger.LogLevel.Info);
             parentFields.filter(`InternalName eq '${fieldConfig.InternalName}'`).select("Id").get().then((fieldRequestResults) => {
             let processingPromise: Promise<Field> = undefined;
 
                 if (fieldRequestResults && fieldRequestResults.length === 1) {
                     let field = parentFields.getById(fieldRequestResults[0].Id);
                     switch (fieldConfig.ControlOption) {
-                        case ControlOption.UPDATE:
+                        case ControlOption.Update:
                             processingPromise = this.updateField(fieldConfig, field);
                             break;
-                        case ControlOption.DELETE:
+                        case ControlOption.Delete:
                             processingPromise = this.deleteField(fieldConfig, field);
                             break;
                         default:
@@ -43,8 +43,8 @@ export class FieldHandler {
                     }
                 } else {
                     switch (fieldConfig.ControlOption) {
-                        case ControlOption.UPDATE:
-                        case ControlOption.DELETE:
+                        case ControlOption.Update:
+                        case ControlOption.Delete:
                             Reject(reject, `field with internal name '${fieldConfig.InternalName}' does not exists`, fieldConfig.Title);
                             break;
                         default:
@@ -137,7 +137,7 @@ export class FieldHandler {
         stringifiedObject = JSON.stringify(fieldConfig);
         let parsedObject = JSON.parse(stringifiedObject);
         switch (fieldConfig.ControlOption) {
-            case ControlOption.UPDATE:
+            case ControlOption.Update:
                 delete parsedObject.ControlOption;
                 delete parsedObject.InternalName;
                 delete parsedObject.FieldTypeKind;

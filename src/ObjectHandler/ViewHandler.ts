@@ -17,17 +17,17 @@ export class ViewHandler implements ISPObjectHandler {
 
     private processingViewConfig(viewConfig: IView, parentList: List): Promise<View> {
         return new Promise<View>((resolve, reject) => {
-            Logger.write(`Processing ${viewConfig.ControlOption === ControlOption.ADD || viewConfig.ControlOption === undefined ? "Add" : viewConfig.ControlOption} view: '${viewConfig.Title}'`, Logger.LogLevel.Info);
+            Logger.write(`Processing ${viewConfig.ControlOption === ControlOption.Add || viewConfig.ControlOption === undefined ? "Add" : viewConfig.ControlOption} view: '${viewConfig.Title}'`, Logger.LogLevel.Info);
             parentList.views.filter(`Title eq '${viewConfig.Title}'`).select("Id").get().then((viewRequestResults) => {
                 let processingPromise: Promise<View> = undefined;
 
                 if (viewRequestResults && viewRequestResults.length === 1) {
                     let view = parentList.views.getByTitle(viewConfig.Title);
                     switch (viewConfig.ControlOption) {
-                        case ControlOption.UPDATE:
+                        case ControlOption.Update:
                             processingPromise = this.updateView(viewConfig, view);
                             break;
-                        case ControlOption.DELETE:
+                        case ControlOption.Delete:
                             processingPromise = this.deleteView(viewConfig, view);
                             break;
                         default:
@@ -36,8 +36,8 @@ export class ViewHandler implements ISPObjectHandler {
                     }
                 } else {
                     switch (viewConfig.ControlOption) {
-                        case ControlOption.UPDATE:
-                        case ControlOption.DELETE:
+                        case ControlOption.Update:
+                        case ControlOption.Delete:
                             Reject(reject, `View with title '${viewConfig.Title}' does not exists`, viewConfig.Title);
                             break;
                         default:
@@ -88,7 +88,7 @@ export class ViewHandler implements ISPObjectHandler {
         stringifiedObject = JSON.stringify(viewConfig);
         let parsedObject = JSON.parse(stringifiedObject);
         switch (viewConfig.ControlOption) {
-            case ControlOption.UPDATE:
+            case ControlOption.Update:
                 delete parsedObject.ControlOption;
                 delete parsedObject.PersonalView;
                 delete parsedObject.ViewField;
