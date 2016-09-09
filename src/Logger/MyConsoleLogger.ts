@@ -3,6 +3,12 @@ import {Logger, LogListener, LogEntry} from "sp-pnp-js/lib/utils/logging";
 
 export class MyConsoleLogger implements LogListener {
     log(entry: LogEntry) {
-        console.log(entry.data + " - " + entry.level + " - " + entry.message);
+        let log = entry.level + " - " + entry.message;
+
+        if (entry.data) {
+            log += " - " + entry.data;
+        }
+
+        console.log(log);
     }
 }

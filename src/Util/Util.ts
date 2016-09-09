@@ -9,14 +9,24 @@ export function ViewFieldRetry(pSpWeb: Web, pListId: string, pParentTitle: strin
     return promise;
 }
 
-export function Resolve(resolve: any, error: string, configElementName: string, value?: any) {
-    let errorMsg = `${error} - '${configElementName}'`;
+export function Resolve(resolve: any, msg: string, configElementName: string, value?: any) {
+    let errorMsg = `'${configElementName}' - ${msg}`;
     Logger.write(errorMsg, Logger.LogLevel.Info);
-    resolve(value);
+
+    let resolveValue = msg;
+    if (value) {
+        resolveValue = value;
+    }
+    resolve(resolveValue);
 }
 
-export function Reject(reject: any, error: string, configElementName: string, value?: any) {
-    let errorMsg = `${error} - '${configElementName}'`;
+export function Reject(reject: any, msg: string, configElementName: string, value?: any) {
+    let errorMsg = `'${configElementName}' - ${msg}`;
     Logger.write(errorMsg, Logger.LogLevel.Info);
-    reject(value);
+
+    let rejectValue = msg;
+    if (value) {
+        rejectValue = value;
+    }
+    reject(rejectValue);
 }
