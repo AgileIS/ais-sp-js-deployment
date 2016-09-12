@@ -11,7 +11,7 @@ export class SiteHandler implements ISPObjectHandler {
             let web = new Web(siteConfig.Url);
             web.get().then((result) => {
                 //TODO: implement logic for Site CRUD
-                Resolve(reject, `Web '${siteConfig.Url}' already exists`, siteConfig.Url, web);
+                Resolve(resolve, `Web '${siteConfig.Url}' already exists`, siteConfig.Url, web);
             }).catch((error) => { Reject(reject, `Error while requesting web with the url '${siteConfig.Url}': ` + error, siteConfig.Url); });
         });
     };
