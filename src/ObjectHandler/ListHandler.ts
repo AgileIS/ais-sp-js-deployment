@@ -63,7 +63,7 @@ export class ListHandler implements ISPObjectHandler {
                 parentWeb.lists.add(listConfig.InternalName, listConfig.Description, listConfig.TemplateType, listConfig.EnableContentTypes, properties).then((listAddResult) => {
                     listAddResult.list.update({ Title: listConfig.Title }).then((listUpdateResult) => {
                         Resolve(resolve, `Added list: '${listConfig.Title}'`, listConfig.Title, listUpdateResult.list);
-                    }).catch((error) => { Reject(reject, `Error while updating list title with the internal name '${listConfig.InternalName}': ` + error, listConfig.Title); });
+                    }).catch((error) => { Reject(reject, `Error while adding and updating list title with the internal name '${listConfig.InternalName}': ` + error, listConfig.Title); });
                 }).catch((error) => { Reject(reject, `Error while adding list with the internal name '${listConfig.InternalName}': ` + error, listConfig.Title); });
             }
             else { Reject(reject, `List template type could not be resolved for the list with the internal name ${listConfig.InternalName}`, listConfig.Title); }
