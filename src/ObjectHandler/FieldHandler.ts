@@ -38,7 +38,7 @@ export class FieldHandler {
                             processingPromise = this.deleteField(fieldConfig, field);
                             break;
                         default:
-                            Resolve(reject, `Field with the internal name '${fieldConfig.InternalName}' already exists`, fieldConfig.Title, field);
+                            Resolve(resolve, `Field with the internal name '${fieldConfig.InternalName}' already exists`, fieldConfig.Title, field);
                             break;
                     }
                 } else {
@@ -82,11 +82,7 @@ export class FieldHandler {
             }
 
             if (processingPromise) {
-                processingPromise.then((fieldProcessingResult) => {
-                    //todo: this.updateField(fieldConfig, parentInstance)
-                    resolve(fieldProcessingResult);
-
-                }).catch((error) => { reject(error); });
+                processingPromise.then((fieldProcessingResult) => { resolve(fieldProcessingResult); }).catch((error) => { reject(error); });
             }
         });
     }
@@ -95,7 +91,9 @@ export class FieldHandler {
         return new Promise<Field>((resolve, reject) => {
             let propertyHash = this.createProperties(fieldConfig);
             parentFields.add(fieldConfig.InternalName, "SP.Field", propertyHash).then((fieldAddResult) => {
-                Resolve(resolve, `Added field: '${fieldConfig.InternalName}'`, fieldConfig.Title, fieldAddResult.field);
+                this.updateField(fieldConfig, fieldAddResult.field).then((fieldUpdateResult) => {
+                    Resolve(resolve, `Added field: '${fieldConfig.InternalName}'`, fieldConfig.Title, fieldUpdateResult);
+                }).catch((error) => { Reject(reject, `Error while adding and updating field with the internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });
             }).catch((error) => { Reject(reject, `Error while adding field with the internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });
         });
     }
