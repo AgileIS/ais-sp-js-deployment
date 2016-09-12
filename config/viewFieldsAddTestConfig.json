@@ -1,0 +1,230 @@
+{
+    "User": "dev\\tuser",
+    "Site": {
+        "Url": "http://dev2013vm3/sites/deploymentjs",
+        "List": [
+            {
+                "Title": "GenericList",
+                "Description": "Template GenericList",
+                "ControlOption": "",
+                "TemplateType": 100,
+                "InternalName": "AIS_GenericList",
+                "EnableContentTypes": true,
+                "View": [
+                    {
+                        "Title": "All Items",
+                        "ControlOption": "Update",
+                        "PersonalView": false,
+                        "ViewFields": [
+                            {
+                                "InternalFieldName": "Title"
+                            },
+                            {
+                                "InternalFieldName": "Author"
+                            },
+                            {
+                                "InternalFieldName": "Created"
+                            }
+                        ]
+                    },
+                    
+                    {
+                        "Title": "View GenericList 1",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View GenericList 2",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View GenericList 3",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View GenericList 4",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View GenericList 5",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View GenericList 6",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View GenericList 7",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View GenericList 8",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View GenericList 9",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View GenericList 10",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View GenericList 11",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    }
+                ]
+            },
+            {
+                "Title": "DocumentLibrary",
+                "Description": "Template DocumentLibrary",
+                "ControlOption": "",
+                "TemplateType": 101,
+                "InternalName": "AIS_DocumentLibrary",
+                "EnableContentTypes": true,
+                "View": [
+                    {
+                        "Title": "All Items",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View DocumentLibrary 1",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View DocumentLibrary 2",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View DocumentLibrary 3",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View DocumentLibrary 4",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View DocumentLibrary 5",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View DocumentLibrary 6",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View DocumentLibrary 7",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View DocumentLibrary 8",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View DocumentLibrary 9",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View DocumentLibrary 10",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View DocumentLibrary 11",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    }
+                ]
+            },
+            {
+                "Title": "Links",
+                "Description": "Template Links",
+                "ControlOption": "",
+                "TemplateType": 103,
+                "InternalName": "AIS_Links",
+                "EnableContentTypes": true,
+                "View": [
+                    {
+                        "Title": "All Items",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View Links 1",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View Links 2",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View Links 3",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View Links 4",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View Links 5",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View Links 6",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View Links 7",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View Links 8",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View Links 9",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View Links 10",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    },
+                    {
+                        "Title": "View Links 11",
+                        "ControlOption": "",
+                        "PersonalView": false
+                    }
+                ]
+            }
+        ]
+    }
+}
