@@ -44,7 +44,7 @@
                         "Title": "All Items",
                         "ControlOption": "Update",
                         "PersonalView": false,
-                        "ViewField": [
+                        "ViewFields": [
                             {
                                 "InternalFieldName": "Title"
                             },
@@ -72,7 +72,7 @@
                         "Title": "TestView1",
                         "ControlOption": "",
                         "PersonalView": false,
-                        "ViewField": [
+                        "ViewFields": [
                             {
                                 "InternalFieldName": "Title"
                             },
@@ -118,7 +118,7 @@
                         "Title": "All Items",
                         "ControlOption": "Update",
                         "PersonalView": false,
-                        "ViewField": [
+                        "ViewFields": [
                             {
                                 "InternalFieldName": "Title"
                             },

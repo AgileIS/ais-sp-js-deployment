@@ -5,7 +5,19 @@
   "main": "dist/deploy.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "runapp" :"node run .\\dist\\deploy.js -f .\\config\\democonfig.json"
+    "runapp" :"node run .\\dist\\deploy.js -f .\\config\\democonfig.json",
+    "siteColumAddTest": "node .\\dist\\deploy.js -f .\\config\\siteColumnsAddTestConfig.json -p Start@123",
+    "siteColumUpdateTest": "node .\\dist\\deploy.js -f .\\config\\siteColumnsUpdateTestConfig.json -p Start@123",
+    "siteColumDeleteTest": "node .\\dist\\deploy.js -f .\\config\\siteColumnsDeleteTestConfig.json -p Start@123",
+    "listAddTest" :"node .\\dist\\deploy.js -f .\\config\\listAddTestConfig.json -p Start@123",
+    "listDeleteTest" :"node .\\dist\\deploy.js -f .\\config\\listDeleteTestConfig.json -p Start@123",
+    "listUpdateTest" :"node .\\dist\\deploy.js -f .\\config\\listUpdateTestConfig.json -p Start@123",
+    "viewAddTest" :"node .\\dist\\deploy.js -f .\\config\\viewAddTestConfig.json -p Start@123",
+    "viewDeleteTest" :"node .\\dist\\deploy.js -f .\\config\\viewDeleteTestConfig.json -p Start@123",
+    "viewUpdateTest" :"node .\\dist\\deploy.js -f .\\config\\viewUpdateTestConfig.json -p Start@123",
+    "viewFieldsAddTest" :"node .\\dist\\deploy.js -f .\\config\\viewFieldsAddTestConfig.json -p Start@123",
+    "viewFieldsDeleteTest" :"node .\\dist\\deploy.js -f .\\config\\viewFieldsDeleteTestConfig.json -p Start@123",
+    "viewFieldsUpdateTest" :"node .\\dist\\deploy.js -f .\\config\\viewFieldsUpdateTestConfig.json -p Start@123"
   },
   "keywords": [
     "SharePoint",
