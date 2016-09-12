@@ -1,0 +1,23 @@
+{   
+    "Site": {
+        "List": [
+            {
+                "Title": "TestListe2 1.1",
+                "InternalName": "AIS_TestList2",
+                "View": [
+                    {
+                        "Title": "All Items",
+                        "ControlOption": "Update",
+                        "PersonalView": false,
+                        "ViewField": [
+                            "ID",
+                            "Title",
+                            "Author",
+                            "Created" 
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

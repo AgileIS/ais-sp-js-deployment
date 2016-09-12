@@ -5,7 +5,7 @@
   "main": "dist/deploy.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "runapp" :"node run .\\dist\\deploy.js -f .\\config\\democonfig.json"
+    "runapp": "node run .\\dist\\deploy.js -f .\\config\\democonfig.json"
   },
   "keywords": [
     "SharePoint",
@@ -22,6 +22,10 @@
     "typings": "^1.3.2"
   },
   "devDependencies": {
-    "gulp": "^3.9.1"
+    "gulp": "^3.9.1",
+    "gulp-foreach": "^0.1.0",
+    "gulp-json-format": "^1.0.0",
+    "gulp-jsoncombine": "^1.0.3",
+    "merge-stream": "^1.0.0"
   }
 }

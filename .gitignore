@@ -3,3 +3,4 @@ node_modules
 typings
 dist
 deleteElements.ps1
+config/config_*
