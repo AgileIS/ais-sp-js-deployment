@@ -31,7 +31,7 @@ export class ViewHandler implements ISPObjectHandler {
                             processingPromise = this.deleteView(viewConfig, view);
                             break;
                         default:
-                            Resolve(reject, `View with the title '${viewConfig.Title}' already exists`, viewConfig.Title, view);
+                            Resolve(resolve, `View with the title '${viewConfig.Title}' already exists`, viewConfig.Title, view);
                             break;
                     }
                 } else {
