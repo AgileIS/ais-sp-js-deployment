@@ -34,7 +34,7 @@ export class ListHandler implements ISPObjectHandler {
                             processingPromise = this.deleteList(listConfig, list);
                             break;
                         default:
-                            Resolve(reject, `List with the title '${listConfig.Title}' already exists`, listConfig.Title, list);
+                            Resolve(resolve, `List with the title '${listConfig.Title}' already exists`, listConfig.Title, list);
                             break;
                     }
                 } else {
