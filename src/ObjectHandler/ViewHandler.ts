@@ -86,18 +86,18 @@ export class ViewHandler implements ISPObjectHandler {
     private createProperties(viewConfig: IView) {
         let stringifiedObject: string;
         stringifiedObject = JSON.stringify(viewConfig);
-        let parsedObject = JSON.parse(stringifiedObject);
+        let parsedObject: IView = JSON.parse(stringifiedObject);
         switch (viewConfig.ControlOption) {
             case ControlOption.Update:
                 delete parsedObject.ControlOption;
                 delete parsedObject.PersonalView;
-                delete parsedObject.ViewField;
+                delete parsedObject.ViewFields;
                 break;
             default:
                 delete parsedObject.ControlOption;
                 delete parsedObject.Title;
                 delete parsedObject.PersonalView;
-                delete parsedObject.ViewField;
+                delete parsedObject.ViewFields;
                 break;
         }
         stringifiedObject = JSON.stringify(parsedObject);

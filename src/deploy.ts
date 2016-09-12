@@ -43,9 +43,9 @@ function resolveObjectHandler(key: string): ISPObjectHandler {
             return new FieldHandler();
         case "View":
             return new ViewHandler();
-        /* do we need this handler any more?
-    case "ViewField":
-        return new ViewFieldHandler();*/
+        /* do we need this handler any more?*/
+        case "ViewFields":
+            return new ViewFieldHandler();
         default:
             break;
     }
