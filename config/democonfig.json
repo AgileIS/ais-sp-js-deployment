@@ -1,8 +1,7 @@
 {
-    
     "User": "dev\\tuser",
     "Site": {
-        "Url": "http://dev2013vm4.dev.local.agile-is.de/sites/demo",
+        "Url": "http://dev2013vm3/sites/deploymentjs",
         "List": [
             {
                 "Title": "TestListe1",
@@ -46,13 +45,27 @@
                         "ControlOption": "Update",
                         "PersonalView": false,
                         "ViewField": [
-                            "Title",
-                            "Author",
-                            "Created",
-                            "AIS_TestList1Field4",
-                            "AIS_TestList1Field3",
-                            "AIS_TestList1Field2",
-                            "AIS_TestList1Field1"
+                            {
+                                "InternalFieldName": "Title"
+                            },
+                            {
+                                "InternalFieldName": "Author"
+                            },
+                            {
+                                "InternalFieldName": "Created"
+                            },
+                            {
+                                "InternalFieldName": "AIS_TestList1Field4"
+                            },
+                            {
+                                "InternalFieldName": "AIS_TestList1Field3"
+                            },
+                            {
+                                "InternalFieldName": "AIS_TestList1Field2"
+                            },
+                            {
+                                "InternalFieldName": "AIS_TestList1Field1"
+                            }
                         ]
                     },
                     {
@@ -60,9 +73,15 @@
                         "ControlOption": "",
                         "PersonalView": false,
                         "ViewField": [
-                            "Title",
-                            "Author",
-                            "AIS_TestList1Field3"
+                            {
+                                "InternalFieldName": "Title"
+                            },
+                            {
+                                "InternalFieldName": "Author"
+                            },
+                            {
+                                "InternalFieldName": "AIS_TestList1Field3"
+                            }
                         ]
                     }
                 ]
@@ -100,10 +119,18 @@
                         "ControlOption": "Update",
                         "PersonalView": false,
                         "ViewField": [
-                            "Title",
-                            "Author",
-                            "Created",
-                            "ID"
+                            {
+                                "InternalFieldName": "Title"
+                            },
+                            {
+                                "InternalFieldName": "Author"
+                            },
+                            {
+                                "InternalFieldName": "Created"
+                            },
+                            {
+                                "InternalFieldName": "ID"
+                            }
                         ]
                     }
                 ]
