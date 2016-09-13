@@ -1,0 +1,16 @@
+{
+    "User": "dev\\tuser",
+    "Site": {
+        "Url": "http://dev2013vm3/sites/deploymentjs2",
+        "ContentTypes": [
+            {
+                "Name": "Video"
+            },
+            {
+                "Description": "Test123",
+                "Group": "Test CT Group",
+                "Name": "TestCT4"
+            }
+        ]
+    }
+}
