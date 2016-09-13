@@ -7,6 +7,7 @@ import {ListHandler} from "./ObjectHandler/ListHandler";
 import {FieldHandler} from "./ObjectHandler/FieldHandler";
 import {ViewHandler} from "./ObjectHandler/ViewHandler";
 import {ViewFieldHandler} from "./ObjectHandler/ViewFieldHandler";
+import { ContentTypeHandler } from "./ObjectHandler/ContentTypeHandler";
 import {HttpClient} from "./HttpClient/initClient";
 import {MyConsoleLogger} from "./Logger/MyConsoleLogger";
 
@@ -46,6 +47,8 @@ function resolveObjectHandler(key: string): ISPObjectHandler {
         /* do we need this handler any more?*/
         case "ViewFields":
             return new ViewFieldHandler();
+        case "ContentTypes":
+            return new ContentTypeHandler();
         default:
             break;
     }

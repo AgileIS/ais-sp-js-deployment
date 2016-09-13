@@ -6,9 +6,11 @@ import { IField } from "./IField";
 import { INavigation } from "./INavigation";
 import { IComposedLook } from "./IComposedlook";
 import { IWebSettings } from "./IWebsettings";
+import { IContentType } from "./IContentType"
 
 export interface ISite {
     Url: string;
+    ContentTypes: Array<IContentType>;
     Lists: Array<IList>;
     Files: Array<IFile>;
     Fields: Array<IField>;
