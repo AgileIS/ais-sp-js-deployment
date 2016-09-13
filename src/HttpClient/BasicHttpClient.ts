@@ -1,9 +1,9 @@
-import {HttpClient, FetchOptions} from "sp-pnp-js/lib/net/HttpClient"
-import {DigestCache} from "sp-pnp-js/lib/net/DigestCache"
-import * as Util from "sp-pnp-js/lib/utils/util"
+import {HttpClient, FetchOptions} from "sp-pnp-js/lib/net/HttpClient";
+import {DigestCache} from "sp-pnp-js/lib/net/DigestCache";
+import * as Util from "sp-pnp-js/lib/utils/util";
 
 class BasicHttpClientOptions {
-    username : string;
+    username: string;
     password: string;
 }
 
@@ -11,7 +11,7 @@ class BasicHttpClient extends HttpClient {
     private authKey: string = "Authorization";
     private authValue: string;
 
-    constructor(){
+    constructor() {
         super();
         this.authValue = `Basic ${new Buffer(`${_options.username}:${_options.password}`).toString('base64')}`
     }
@@ -20,19 +20,20 @@ class BasicHttpClient extends HttpClient {
         let newHeader = new Headers();
         newHeader.append(this.authKey, this.authValue);
         this._mergeHeaders(newHeader, options.headers);
-        
+
         let extendedOptions = Util.Util.extend(options, { headers: newHeader }, false);
+        extendedOptions = Util.Util.extend(extendedOptions, { agent: _agent ? _agent : false }, false);
         return super.fetchRaw(url, extendedOptions);
     }
 
     private _mergeHeaders(target: Headers, source: any): void {
         if (typeof source !== "undefined" && source !== null) {
             let temp = <any>new Request("", { headers: source });
-            temp.headers.forEach((value :string, name: string) => {
-                if(name.toLowerCase() == "accept" && value.toLowerCase() == "application/json"){
-                    target.append(name, "application/json;odata=verbose");   
+            temp.headers.forEach((value:string, name: string) => {
+                if(name.toLowerCase() === "accept" && value.toLowerCase() === "application/json"){
+                    target.append(name, "application/json;odata=verbose");
                 }else{
-                target.append(name, value);   
+                target.append(name, value);
                 }
             });
         }
@@ -40,6 +41,7 @@ class BasicHttpClient extends HttpClient {
 }
 
 let _options = new BasicHttpClientOptions();
+let _agent = require("proxying-agent").create("http://127.0.0.1:8888", "http");
 
 export let options = _options;
 export let client = BasicHttpClient;

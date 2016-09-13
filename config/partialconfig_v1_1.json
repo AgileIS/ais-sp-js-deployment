@@ -9,11 +9,19 @@
                         "Title": "All Items",
                         "ControlOption": "Update",
                         "PersonalView": false,
-                        "ViewField": [
-                            "ID",
-                            "Title",
-                            "Author",
-                            "Created" 
+                        "ViewFields": [
+                            {
+                                "InternalFieldName": "Title"
+                            },
+                            {
+                                "InternalFieldName": "Author"
+                            },
+                            {
+                                "InternalFieldName": "Created"
+                            },
+                            {
+                                "InternalFieldName": "ID"
+                            }
                         ]
                     }
                 ]
