@@ -11,6 +11,39 @@ import { ContentTypeHandler } from "./ObjectHandler/ContentTypeHandler";
 import {HttpClient} from "./HttpClient/initClient";
 import {MyConsoleLogger} from "./Logger/MyConsoleLogger";
 
+var http = require("http");
+http.globalAgent.keepAlive = true;
+var url = require("url");
+var proxy = {
+    protocol: "http:",
+    hostname: "127.0.0.1",
+    port: 8888,
+}
+
+var saveRequestObj = http.request;
+http.request = function(options){
+      if (typeof options === "string") { // options can be URL string.
+            options = url.parse(options);
+        }
+        if (!options.host && !options.hostname) {
+            throw new Error("host or hostname must have value.");
+        }
+        options.path = url.format(options.url);
+        options.headers = options.headers || {};
+        options.headers.Host = options.host || url.format({
+            hostname: options.hostname,
+            port: options.port
+        });
+        options.protocol = proxy.protocol;
+        options.hostname = proxy.hostname;
+        options.port = proxy.port;
+        options.href = null;
+        options.host = null;
+        options.agent = http.globalAgent;
+        return saveRequestObj(options);
+};
+
+
 Logger.subscribe(new MyConsoleLogger());
 Logger.activeLogLevel = Logger.LogLevel.Verbose;
 
