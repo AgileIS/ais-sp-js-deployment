@@ -11,16 +11,15 @@ import { ContentTypeHandler } from "./ObjectHandler/ContentTypeHandler";
 import {HttpClient} from "./HttpClient/initClient";
 import {MyConsoleLogger} from "./Logger/MyConsoleLogger";
 
-var http = require("http");
-http.globalAgent.keepAlive = true;
-var url = require("url");
-var proxy = {
+let http = require("http");
+let url = require("url");
+let proxy = {
     protocol: "http:",
     hostname: "127.0.0.1",
     port: 8888,
-}
+};
 
-var saveRequestObj = http.request;
+let saveRequestObj = http.request;
 http.request = function(options){
       if (typeof options === "string") { // options can be URL string.
             options = url.parse(options);
@@ -39,7 +38,6 @@ http.request = function(options){
         options.port = proxy.port;
         options.href = null;
         options.host = null;
-        options.agent = http.globalAgent;
         return saveRequestObj(options);
 };
 
@@ -66,7 +64,7 @@ if (args.f && args.p) {
         });
     }
 }
-//todo: Factory auslagern mit execute und parentPromise.then => execute Handler ???
+// todo: Factory auslagern mit execute und parentPromise.then => execute Handler ???
 function resolveObjectHandler(key: string): ISPObjectHandler {
     switch (key) {
         case "Site":

@@ -13,26 +13,25 @@ class BasicHttpClient extends HttpClient {
 
     constructor() {
         super();
-        this.authValue = `Basic ${new Buffer(`${_options.username}:${_options.password}`).toString('base64')}`
+        this.authValue = `Basic ${new Buffer(`${_options.username}:${_options.password}`).toString("base64")}`;
     }
 
-    fetchRaw(url: string, options?: FetchOptions): Promise<Response>{
+    fetchRaw(url: string, options?: FetchOptions): Promise<Response> {
         let newHeader = new Headers();
         newHeader.append(this.authKey, this.authValue);
         this._mergeHeaders(newHeader, options.headers);
 
         let extendedOptions = Util.Util.extend(options, { headers: newHeader }, false);
-        extendedOptions = Util.Util.extend(extendedOptions, { agent: _agent ? _agent : false }, false);
         return super.fetchRaw(url, extendedOptions);
     }
 
     private _mergeHeaders(target: Headers, source: any): void {
         if (typeof source !== "undefined" && source !== null) {
             let temp = <any>new Request("", { headers: source });
-            temp.headers.forEach((value:string, name: string) => {
-                if(name.toLowerCase() === "accept" && value.toLowerCase() === "application/json"){
+            temp.headers.forEach((value: string, name: string) => {
+                if (name.toLowerCase() === "accept" && value.toLowerCase() === "application/json") {
                     target.append(name, "application/json;odata=verbose");
-                }else{
+                }else {
                 target.append(name, value);
                 }
             });
@@ -41,7 +40,6 @@ class BasicHttpClient extends HttpClient {
 }
 
 let _options = new BasicHttpClientOptions();
-let _agent = require("proxying-agent").create("http://127.0.0.1:8888", "http");
 
 export let options = _options;
 export let client = BasicHttpClient;

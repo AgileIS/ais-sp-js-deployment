@@ -17,13 +17,14 @@ export class HttpClient {
         httpNTLMClient.options.domain = userAndDommain[0];
         httpNTLMClient.options.workstation = "";
 
+        // httpNTLMClient.agent.useGlobal = true;
+
         let httpBasicClient = require("./BasicHttpClient");
         httpBasicClient.options.username = userAndDommain[0] + "\\" + userAndDommain[1];
         httpBasicClient.options.password = password;
 
         let httpClient = require("sp-pnp-js/lib/net/HttpClient");
-        httpClient.HttpClient = httpBasicClient.client;
-        // httpClient.HttpClient = httpNTLMClient.client;
+        // httpClient.HttpClient = httpBasicClient.client;
+        httpClient.HttpClient = httpNTLMClient.client;
     }
 }
-
