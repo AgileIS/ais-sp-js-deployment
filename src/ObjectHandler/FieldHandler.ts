@@ -4,59 +4,64 @@ import { Fields } from "sp-pnp-js/lib/sharepoint/rest/Fields";
 import { Web } from "sp-pnp-js/lib/sharepoint/rest/webs";
 import { Field } from "sp-pnp-js/lib/sharepoint/rest/fields";
 import { List } from "sp-pnp-js/lib/sharepoint/rest/Lists";
-import { ISPObjectHandler } from "../interface/ObjectHandler/ispobjecthandler";
 import { IField }  from "../interface/Types/IField";
-import { IList } from "../interface/Types/IList";
-import { ISite } from "../interface/Types/ISite";
 import { FieldTypeKind } from "../Constants/FieldTypeKind";
 import { ControlOption } from "../Constants/ControlOption";
 import { Reject, Resolve } from "../Util/Util";
 
 
 export class FieldHandler {
-    execute(fieldConfig: IField, parentPromise: Promise<List | Web>): Promise<Field> {
+    public execute(fieldConfig: IField, parentPromise: Promise<List | Web>): Promise<Field> {
         return new Promise<Field>((resolve, reject) => {
             parentPromise.then((parentInstance) => {
-                this.ProcessingViewConfig(fieldConfig, parentInstance.fields).then((viewProsssingResult) => { resolve(viewProsssingResult); }).catch((error) => { reject(error); });
+                this.ProcessingViewConfig(fieldConfig, parentInstance.fields)
+                    .then((viewProsssingResult) => { resolve(viewProsssingResult); })
+                    .catch((error) => { reject(error); });
             });
         });
     }
 
     private ProcessingViewConfig(fieldConfig: IField, parentFields: Fields): Promise<Field> {
         return new Promise<Field>((resolve, reject) => {
-            Logger.write(`Processing ${fieldConfig.ControlOption === ControlOption.Add || fieldConfig.ControlOption === undefined ? "Add" : fieldConfig.ControlOption} field: '${fieldConfig.Title}'`, Logger.LogLevel.Info);
-            parentFields.filter(`InternalName eq '${fieldConfig.InternalName}'`).select("Id").get().then((fieldRequestResults) => {
-            let processingPromise: Promise<Field> = undefined;
+            Logger.write(`Processing ${fieldConfig.ControlOption === ControlOption.Add || fieldConfig.ControlOption === undefined
+                ? "Add" : fieldConfig.ControlOption} field: '${fieldConfig.Title}'`, Logger.LogLevel.Info);
 
-                if (fieldRequestResults && fieldRequestResults.length === 1) {
-                    let field = parentFields.getById(fieldRequestResults[0].Id);
-                    switch (fieldConfig.ControlOption) {
-                        case ControlOption.Update:
-                            processingPromise = this.updateField(fieldConfig, field);
-                            break;
-                        case ControlOption.Delete:
-                            processingPromise = this.deleteField(fieldConfig, field);
-                            break;
-                        default:
-                            Resolve(resolve, `Field with the internal name '${fieldConfig.InternalName}' already exists`, fieldConfig.Title, field);
-                            break;
-                    }
-                } else {
-                    switch (fieldConfig.ControlOption) {
-                        case ControlOption.Update:
-                        case ControlOption.Delete:
-                            Reject(reject, `field with internal name '${fieldConfig.InternalName}' does not exists`, fieldConfig.Title);
-                            break;
-                        default:
-                            processingPromise = this.addField(fieldConfig, parentFields);
-                            break;
-                    }
-                }
+            parentFields.filter(`InternalName eq '${fieldConfig.InternalName}'`).select("Id").get()
+                .then((fieldRequestResults) => {
+                    let processingPromise: Promise<Field> = undefined;
 
-                if (processingPromise) {
-                    processingPromise.then((fieldProcessingResult) => { resolve(fieldProcessingResult); }).catch((error) => { reject(error); });
-                }
-            }).catch((error) => { Reject(reject, `Error while requesting field with the internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });
+                    if (fieldRequestResults && fieldRequestResults.length === 1) {
+                        let field = parentFields.getById(fieldRequestResults[0].Id);
+                        switch (fieldConfig.ControlOption) {
+                            case ControlOption.Update:
+                                processingPromise = this.updateField(fieldConfig, field);
+                                break;
+                            case ControlOption.Delete:
+                                processingPromise = this.deleteField(fieldConfig, field);
+                                break;
+                            default:
+                                Resolve(resolve, `Field with the internal name '${fieldConfig.InternalName}' already exists`, fieldConfig.Title, field);
+                                break;
+                        }
+                    } else {
+                        switch (fieldConfig.ControlOption) {
+                            case ControlOption.Update:
+                            case ControlOption.Delete:
+                                Reject(reject, `field with internal name '${fieldConfig.InternalName}' does not exists`, fieldConfig.Title);
+                                break;
+                            default:
+                                processingPromise = this.addField(fieldConfig, parentFields);
+                                break;
+                        }
+                    }
+
+                    if (processingPromise) {
+                        processingPromise
+                            .then((fieldProcessingResult) => { resolve(fieldProcessingResult); })
+                            .catch((error) => { reject(error); });
+                    }
+                })
+                .catch((error) => { Reject(reject, `Error while requesting field with the internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });
         });
     }
 
@@ -82,7 +87,9 @@ export class FieldHandler {
             }
 
             if (processingPromise) {
-                processingPromise.then((fieldProcessingResult) => { resolve(fieldProcessingResult); }).catch((error) => { reject(error); });
+                processingPromise
+                    .then((fieldProcessingResult) => { resolve(fieldProcessingResult); })
+                    .catch((error) => { reject(error); });
             }
         });
     }
@@ -90,20 +97,22 @@ export class FieldHandler {
     private addDefaultField(fieldConfig: IField, parentFields: Fields) {
         return new Promise<Field>((resolve, reject) => {
             let propertyHash = this.createProperties(fieldConfig);
-            parentFields.add(fieldConfig.InternalName, "SP.Field", propertyHash).then((fieldAddResult) => {
-                this.updateField(fieldConfig, fieldAddResult.field).then((fieldUpdateResult) => {
-                    Resolve(resolve, `Added field: '${fieldConfig.InternalName}'`, fieldConfig.Title, fieldUpdateResult);
-                }).catch((error) => { Reject(reject, `Error while adding and updating field with the internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });
-            }).catch((error) => { Reject(reject, `Error while adding field with the internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });
+            parentFields.add(fieldConfig.InternalName, "SP.Field", propertyHash)
+                .then((fieldAddResult) => {
+                    this.updateField(fieldConfig, fieldAddResult.field)
+                        .then((fieldUpdateResult) => { Resolve(resolve, `Added field: '${fieldConfig.InternalName}'`, fieldConfig.Title, fieldUpdateResult); })
+                        .catch((error) => { Reject(reject, `Error while adding and updating field with the internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });
+                })
+                .catch((error) => { Reject(reject, `Error while adding field with the internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });
         });
     }
 
     private addCalculatedField(fieldConfig: IField, parentFields: Fields) {
         return new Promise<Field>((resolve, reject) => {
             let propertyHash = this.createProperties(fieldConfig);
-            parentFields.addCalculated(fieldConfig.InternalName, fieldConfig.Formula, Types.DateTimeFieldFormatType[fieldConfig.DateFormat], Types.FieldTypes[fieldConfig.OutputType], propertyHash).then((fieldAddResult) => {
-                Resolve(resolve, `Added field: '${fieldConfig.InternalName}'`, fieldConfig.Title, fieldAddResult.field);
-            }).catch((error) => { Reject(reject, `Error while adding field with the internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });
+            parentFields.addCalculated(fieldConfig.InternalName, fieldConfig.Formula, Types.DateTimeFieldFormatType[fieldConfig.DateFormat], Types.FieldTypes[fieldConfig.OutputType], propertyHash)
+                .then((fieldAddResult) => { Resolve(resolve, `Added field: '${fieldConfig.InternalName}'`, fieldConfig.Title, fieldAddResult.field); })
+                .catch((error) => { Reject(reject, `Error while adding field with the internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });
         });
     }
 
@@ -116,17 +125,17 @@ export class FieldHandler {
     private updateField(fieldConfig: IField, field: Field): Promise<Field> {
         return new Promise<Field>((resolve, reject) => {
             let properties = this.createProperties(fieldConfig);
-            field.update(properties).then((fieldUpdateResult) => {
-                Resolve(resolve, `Updated field: '${fieldConfig.InternalName}'`, fieldConfig.Title, fieldUpdateResult.field);
-            }).catch((error) => { Reject(reject, `Error while updating field with internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });
+            field.update(properties)
+                .then((fieldUpdateResult) => { Resolve(resolve, `Updated field: '${fieldConfig.InternalName}'`, fieldConfig.Title, fieldUpdateResult.field); })
+                .catch((error) => { Reject(reject, `Error while updating field with internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });
         });
     }
 
     private deleteField(fieldConfig: IField, field: Field): Promise<Field> {
         return new Promise<Field>((resolve, reject) => {
-            field.delete().then(() => {
-                Resolve(resolve, `Deleted field: '${fieldConfig.InternalName}'`, fieldConfig.Title);
-            }).catch((error) => { Reject(reject, `Error while deleting field with internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });
+            field.delete()
+                .then(() => { Resolve(resolve, `Deleted field: '${fieldConfig.InternalName}'`, fieldConfig.Title); })
+                .catch((error) => { Reject(reject, `Error while deleting field with internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });
         });
     }
 

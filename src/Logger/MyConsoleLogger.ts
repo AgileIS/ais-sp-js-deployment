@@ -1,8 +1,8 @@
 
-import {Logger, LogListener, LogEntry} from "sp-pnp-js/lib/utils/logging";
+import { LogListener, LogEntry } from "sp-pnp-js/lib/utils/logging";
 
 export class MyConsoleLogger implements LogListener {
-    log(entry: LogEntry) {
+    public log(entry: LogEntry) {
         let log = entry.level + " - " + entry.message;
 
         if (entry.data) {
