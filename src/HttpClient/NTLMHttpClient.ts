@@ -1,26 +1,25 @@
 import {HttpClient, FetchOptions, HttpClientImpl} from "sp-pnp-js/lib/net/HttpClient";
-import {DigestCache} from "sp-pnp-js/lib/net/DigestCache";
 import { Util } from "sp-pnp-js/lib/utils/util";
-import * as NTLM from "./ntlm";
-import {Agent, AgentOptions} from "http";
+import { NTLM } from "sp-pnp-js/lib/net/ntlm";
+import {Agent} from "http";
 
 class NTLMHttpClientOptions {
-    username: string;
-    password: string;
-    workstation: string;
-    domain: string;
+    public username: string;
+    public password: string;
+    public workstation: string;
+    public domain: string;
 }
 
 class NTLMGlobalAgent {
     private agent: Agent;
-    useGlobal: boolean;
+    public useGlobal: boolean;
 
     constructor() {
         this.agent = new Agent({keepAlive: true, maxSockets: 1});
         this.useGlobal = false;
     }
 
-    getAgent(): Agent {
+    public getAgent(): Agent {
         return this.agent;
     }
 }
@@ -38,7 +37,7 @@ class NTLMHttpClient extends HttpClient {
         this.keepAliveAgent = _agent.useGlobal ? _agent.getAgent() : new Agent({keepAlive: true, maxSockets: 1});
     }
 
-    fetchRaw(url: string, options?: FetchOptions): Promise<Response> {
+    public fetchRaw(url: string, options?: FetchOptions): Promise<Response> {
         let newHeader = new Headers();
         newHeader.append("Connection", "keep-alive");
         this._mergeHeaders(newHeader, options.headers);
@@ -50,7 +49,7 @@ class NTLMHttpClient extends HttpClient {
             extendedOptions.headers.set("Authorization", NTLM.createType1Message(_options));
             this.impl.fetch(url, extendedOptions).then((response) => {
                 if (response.status === 401) {
-                    let type2msg = NTLM.parseType2Message(response.headers.get("www-authenticate"), (error: Error) => {});
+                    let type2msg = NTLM.parseType2Message(response.headers.get("www-authenticate"), (error: Error) => { console.log(error); });
                     this.authValue = NTLM.createType3Message(type2msg, _options);
                     extendedOptions.headers.set("Authorization", this.authValue);
                     retry(ctx);
@@ -67,8 +66,7 @@ class NTLMHttpClient extends HttpClient {
                     if (response.status === 401 && !this.tryedToAuth) {
                         handshake(ctx);
                         this.tryedToAuth = true;
-                    }
-                    else {
+                    } else {
                         ctx.resolve(response);
                     }
                 }).catch((response) => {
