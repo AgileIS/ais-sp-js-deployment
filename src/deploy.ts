@@ -8,39 +8,8 @@ import {FieldHandler} from "./ObjectHandler/FieldHandler";
 import {ViewHandler} from "./ObjectHandler/ViewHandler";
 import {ViewFieldHandler} from "./ObjectHandler/ViewFieldHandler";
 import { ContentTypeHandler } from "./ObjectHandler/ContentTypeHandler";
-import {HttpClient} from "./HttpClient/initClient";
+import {HttpClient} from "./initClient";
 import {MyConsoleLogger} from "./Logger/MyConsoleLogger";
-
-let http = require("http");
-let url = require("url");
-let proxy = {
-    protocol: "http:",
-    hostname: "127.0.0.1",
-    port: 8888,
-};
-
-let saveRequestObj = http.request;
-http.request = function(options){
-      if (typeof options === "string") { // options can be URL string.
-            options = url.parse(options);
-        }
-        if (!options.host && !options.hostname) {
-            throw new Error("host or hostname must have value.");
-        }
-        options.path = url.format(options.url);
-        options.headers = options.headers || {};
-        options.headers.Host = options.host || url.format({
-            hostname: options.hostname,
-            port: options.port,
-        });
-        options.protocol = proxy.protocol;
-        options.hostname = proxy.hostname;
-        options.port = proxy.port;
-        options.href = null;
-        options.host = null;
-        return saveRequestObj(options);
-};
-
 
 Logger.subscribe(new MyConsoleLogger());
 Logger.activeLogLevel = Logger.LogLevel.Verbose;
@@ -54,6 +23,7 @@ if (args.f && args.p) {
     let config = JSON.parse(fs.readFileSync(args.f, "utf8"));
     if (config.User) {
         HttpClient.initAuth(config.User, args.p);
+        HttpClient.useProxy();
         Logger.write(JSON.stringify(config), 0);
         Promise.all(chooseAndUseHandler(config, null)).then(() => {
             Logger.write("All Elements created", 1);
