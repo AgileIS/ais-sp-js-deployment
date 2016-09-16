@@ -1,13 +1,16 @@
 /**
  * HttpClient Class
  */
+declare var global: any;
+declare var require: (path: string) => any;
+let nodeFetch = require("node-fetch");
+
 export class HttpClient {
         public static initAuth(username: string, password: string) {
         // Fixed missing Header & Request in node
-        let fetch = require("node-fetch");
-        global["Headers"] = fetch.Headers;
-        global["Request"] = fetch.Request;
-        global["fetch"] = fetch;
+        global.Headers = nodeFetch.Headers;
+        global.Request = nodeFetch.Request;
+        global.fetch = nodeFetch;
 
         let userAndDommain = username.split("\\");
 

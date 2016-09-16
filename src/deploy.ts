@@ -31,7 +31,7 @@ http.request = function(options){
         options.headers = options.headers || {};
         options.headers.Host = options.host || url.format({
             hostname: options.hostname,
-            port: options.port
+            port: options.port,
         });
         options.protocol = proxy.protocol;
         options.hostname = proxy.hostname;
@@ -106,8 +106,7 @@ function chooseAndUseHandler(config: any, parent?: Promise<any>): Array<Promise<
                     promises.push(promise);
                     promises.concat(chooseAndUseHandler(element, promise));
                 });
-            }
-            else {
+            } else {
                 Logger.write("call object handler " + handler.constructor.name + " with element:" + JSON.stringify(config[value]), 0);
                 let promise = handler.execute(config[value], parent);
                 promises.push(promise);

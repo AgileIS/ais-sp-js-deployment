@@ -1,10 +1,11 @@
 import {HttpClient, FetchOptions} from "sp-pnp-js/lib/net/HttpClient";
-import {DigestCache} from "sp-pnp-js/lib/net/DigestCache";
 import * as Util from "sp-pnp-js/lib/utils/util";
 
+let _options: BasicHttpClientOptions;
+
 class BasicHttpClientOptions {
-    username: string;
-    password: string;
+    public username: string;
+    public password: string;
 }
 
 class BasicHttpClient extends HttpClient {
@@ -16,7 +17,7 @@ class BasicHttpClient extends HttpClient {
         this.authValue = `Basic ${new Buffer(`${_options.username}:${_options.password}`).toString("base64")}`;
     }
 
-    fetchRaw(url: string, options?: FetchOptions): Promise<Response> {
+    public fetchRaw(url: string, options?: FetchOptions): Promise<Response> {
         let newHeader = new Headers();
         newHeader.append(this.authKey, this.authValue);
         this._mergeHeaders(newHeader, options.headers);
@@ -39,7 +40,7 @@ class BasicHttpClient extends HttpClient {
     }
 }
 
-let _options = new BasicHttpClientOptions();
+_options = new BasicHttpClientOptions();
 
 export let options = _options;
 export let client = BasicHttpClient;

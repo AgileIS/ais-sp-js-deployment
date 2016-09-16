@@ -3,6 +3,9 @@ import { Util } from "sp-pnp-js/lib/utils/util";
 import { NTLM } from "sp-pnp-js/lib/net/ntlm";
 import {Agent} from "http";
 
+let _options: NTLMHttpClientOptions;
+let _agent: NTLMGlobalAgent;
+
 class NTLMHttpClientOptions {
     public username: string;
     public password: string;
@@ -11,8 +14,8 @@ class NTLMHttpClientOptions {
 }
 
 class NTLMGlobalAgent {
-    private agent: Agent;
     public useGlobal: boolean;
+    private agent: Agent;
 
     constructor() {
         this.agent = new Agent({keepAlive: true, maxSockets: 1});
@@ -52,7 +55,7 @@ class NTLMHttpClient extends HttpClient {
                     let type2msg = NTLM.parseType2Message(response.headers.get("www-authenticate"), (error: Error) => { console.log(error); });
                     this.authValue = NTLM.createType3Message(type2msg, _options);
                     extendedOptions.headers.set("Authorization", this.authValue);
-                    retry(ctx);
+                    retry(ctx); // tslint:disable-line
                 }
             }).catch((response) => {
                 console.log(response);
@@ -118,8 +121,8 @@ class NTLMHttpClient extends HttpClient {
     }
 }
 
-let _options = new NTLMHttpClientOptions();
-let _agent = new NTLMGlobalAgent();
+_options = new NTLMHttpClientOptions();
+_agent = new NTLMGlobalAgent();
 
 export let options = _options;
 export let agent = _agent;

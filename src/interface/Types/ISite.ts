@@ -6,7 +6,7 @@ import { IField } from "./IField";
 import { INavigation } from "./INavigation";
 import { IComposedLook } from "./IComposedlook";
 import { IWebSettings } from "./IWebsettings";
-import { IContentType } from "./IContentType"
+import { IContentType } from "./IContentType";
 
 export interface ISite {
     Url: string;
