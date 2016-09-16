@@ -16,13 +16,13 @@ const assignments = {
 
 function merge(target, source) {
   for (let prop in source) {
-    if ( source[prop].constructor === Object ) {
+    if (source[prop].constructor === Object) {
       target[prop] = merge(target[prop] ? target[prop] : {}, source[prop]);
-    } else if ( source[prop].constructor === Array ) {
-      if(!target.hasOwnProperty(prop)) target[prop] = [];
+    } else if (source[prop].constructor === Array) {
+      if (!target.hasOwnProperty(prop)) target[prop] = [];
       source[prop].forEach((item) => {
         let result = target[prop].filter((searchItem) => { return searchItem[assignments[prop]] === item[assignments[prop]] });
-        if(result.length === 1) result[0] = merge(result[0], item);
+        if (result.length === 1) result[0] = merge(result[0], item);
         else target[prop].push(item);
       });
     } else {
@@ -35,7 +35,7 @@ function merge(target, source) {
 function combine(userConfigName) {
 
   return gulp.src([userConfigName, partialConfigPrefix])
-    .pipe(jsoncombine(configPrefix + userConfigName.split('_')[1],(configs) => {
+    .pipe(jsoncombine(configPrefix + userConfigName.split('_')[1], (configs) => {
       let configNames = Object.getOwnPropertyNames(configs);
       let resultConfig = {};
 
