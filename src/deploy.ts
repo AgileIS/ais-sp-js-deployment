@@ -23,7 +23,9 @@ if (args.f && args.p) {
     let config = JSON.parse(fs.readFileSync(args.f, "utf8"));
     if (config.User) {
         HttpClient.initAuth(config.User, args.p);
-        HttpClient.useProxy();
+        if (args.x) {
+            HttpClient.useProxy();
+        }
         Logger.write(JSON.stringify(config), 0);
         Promise.all(chooseAndUseHandler(config, null)).then(() => {
             Logger.write("All Elements created", 1);
