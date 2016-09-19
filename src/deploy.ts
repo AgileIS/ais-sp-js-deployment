@@ -1,6 +1,6 @@
 /// <reference path="../typings/index.d.ts" />
 
-import {Logger, LogListener, LogEntry} from "sp-pnp-js/lib/utils/logging";
+import {Logger, LogListener, LogEntry} from "@agileis/sp-pnp-js/lib/utils/logging";
 import {ISPObjectHandler} from "./interface/ObjectHandler/ispobjecthandler";
 import {SiteHandler} from "./ObjectHandler/SiteHandler";
 import {ListHandler} from "./ObjectHandler/ListHandler";

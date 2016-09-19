@@ -1,5 +1,5 @@
-import { Web } from "sp-pnp-js/lib/sharepoint/rest/webs";
-import { Queryable } from "sp-pnp-js/lib/sharepoint/rest/queryable";
+import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
+import { Queryable } from "@agileis/sp-pnp-js/lib/sharepoint/rest/queryable";
 import { ISPObjectHandler } from "../interface/ObjectHandler/ispobjecthandler";
 import { ISite } from "../interface/Types/ISite";
 import { Resolve, Reject } from "../Util/Util";

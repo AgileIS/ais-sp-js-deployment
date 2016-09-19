@@ -1,5 +1,5 @@
-import {Logger} from "sp-pnp-js/lib/utils/logging";
-import {Web} from "sp-pnp-js/lib/sharepoint/rest/webs";
+import {Logger} from "@agileis/sp-pnp-js/lib/utils/logging";
+import {Web} from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
 
 export function ViewFieldRetry(pSpWeb: Web, pListId: string, pParentTitle: string, pElementName: string, pTimeout: number): Promise<void> {
      let promise: Promise<void>;

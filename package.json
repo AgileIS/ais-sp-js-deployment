@@ -29,10 +29,10 @@
   "author": "Boris Hofmann <bhofmann@agile-is.de> (http://www.agile-is.de)",
   "license": "MIT",
   "dependencies": {
+    "@agileis/sp-pnp-js": "^1.0.4",
     "minimist": "^1.2.0",
     "node-fetch": "^1.6.0",
     "proxying-agent": "^2.1.0",
-    "sp-pnp-js": "^1.0.3",
     "typings": "^1.3.2"
   },
   "devDependencies": {

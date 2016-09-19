@@ -1,5 +1,5 @@
-import { Logger } from "sp-pnp-js/lib/utils/logging";
-import { View } from "sp-pnp-js/lib/sharepoint/rest/views";
+import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
+import { View } from "@agileis/sp-pnp-js/lib/sharepoint/rest/views";
 import { ISPObjectHandler } from "../interface/ObjectHandler/ispobjecthandler";
 import { IViewField } from "../interface/Types/IViewField";
 import { Reject, Resolve } from "../Util/Util";

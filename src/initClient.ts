@@ -23,7 +23,7 @@ export class HttpClient {
 
         let userAndDommain = username.split("\\");
 
-        let pnpConfig =  require("sp-pnp-js/lib/configuration/pnplibconfig");
+        let pnpConfig =  require("@agileis/sp-pnp-js/lib/configuration/pnplibconfig");
         pnpConfig.setRuntimeConfig({
             nodeHttpNtlmClientOptions: {
                 username: userAndDommain[1],

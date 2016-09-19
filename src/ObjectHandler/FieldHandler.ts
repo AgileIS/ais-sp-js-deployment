@@ -1,9 +1,9 @@
-import * as Types from "sp-pnp-js/lib/sharepoint/rest/types";
-import { Logger } from "sp-pnp-js/lib/utils/logging";
-import { Fields } from "sp-pnp-js/lib/sharepoint/rest/Fields";
-import { Web } from "sp-pnp-js/lib/sharepoint/rest/webs";
-import { Field } from "sp-pnp-js/lib/sharepoint/rest/fields";
-import { List } from "sp-pnp-js/lib/sharepoint/rest/Lists";
+import * as Types from "@agileis/sp-pnp-js/lib/sharepoint/rest/types";
+import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
+import { Fields } from "@agileis/sp-pnp-js/lib/sharepoint/rest/Fields";
+import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
+import { Field } from "@agileis/sp-pnp-js/lib/sharepoint/rest/fields";
+import { List } from "@agileis/sp-pnp-js/lib/sharepoint/rest/Lists";
 import { IField }  from "../interface/Types/IField";
 import { FieldTypeKind } from "../Constants/FieldTypeKind";
 import { ControlOption } from "../Constants/ControlOption";
