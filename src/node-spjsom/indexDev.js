@@ -1,6 +1,6 @@
 /// <reference path="../../typings/index.d.ts" />
 
-exports.LoadJsom = function (global, serverAbsoluteUrl) {
+exports.LoadJsom = function (serverAbsoluteUrl) {
     var window = global;
 
     window.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
