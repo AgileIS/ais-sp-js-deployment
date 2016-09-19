@@ -36,6 +36,7 @@
     "typings": "^1.3.2"
   },
   "devDependencies": {
+    "@agileis/sp-pnp-js": "^1.0.4",
     "gulp": "^3.9.1",
     "gulp-foreach": "^0.1.0",
     "gulp-json-format": "^1.0.0",
