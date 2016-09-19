@@ -24,7 +24,7 @@ if (args.f && args.p) {
     if (config.User) {
         HttpClient.initAuth(config.User, args.p);
         if (args.x) {
-            HttpClient.useProxy();
+            HttpClient.useProxy = true;
         }
         Logger.write(JSON.stringify(config), 0);
         Promise.all(chooseAndUseHandler(config, null)).then(() => {
