@@ -4,3 +4,4 @@ typings
 dist
 deleteElements.ps1
 config/config_*
+src/&node-spjsom/index.js
