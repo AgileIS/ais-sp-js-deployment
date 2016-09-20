@@ -8,11 +8,16 @@ import {FieldHandler} from "./ObjectHandler/FieldHandler";
 import {ViewHandler} from "./ObjectHandler/ViewHandler";
 import {ViewFieldHandler} from "./ObjectHandler/ViewFieldHandler";
 import { ContentTypeHandler } from "./ObjectHandler/ContentTypeHandler";
-import {HttpClient} from "./initClient";
+import { NodeHttpProxy } from "./NodeHttpProxy";
 import {MyConsoleLogger} from "./Logger/MyConsoleLogger";
+import * as url from "url";
 
 Logger.subscribe(new MyConsoleLogger());
 Logger.activeLogLevel = Logger.LogLevel.Verbose;
+
+
+NodeHttpProxy.url = url.parse("http://127.0.0.1:8888");
+NodeHttpProxy.activate();
 
 let fs = require("fs");
 let args = require("minimist")(process.argv.slice(2));
@@ -22,10 +27,19 @@ Logger.write(JSON.stringify(args), 0);
 if (args.f && args.p) {
     let config = JSON.parse(fs.readFileSync(args.f, "utf8"));
     if (config.User) {
-        HttpClient.initAuth(config.User, args.p);
-        if (args.x) {
-            HttpClient.useProxy = true;
-        }
+
+        let userAndDommain = config.User.split("\\");
+        let pnpConfig = require("@agileis/sp-pnp-js/lib/configuration/pnplibconfig");
+        pnpConfig.setRuntimeConfig({
+            nodeHttpNtlmClientOptions: {
+                domain: userAndDommain[0],
+                password: args.p,
+                siteUrl: "",
+                username: userAndDommain[1],
+                workstation: "",
+            },
+        });
+
         Logger.write(JSON.stringify(config), 0);
         Promise.all(chooseAndUseHandler(config, null)).then(() => {
             Logger.write("All Elements created", 1);
