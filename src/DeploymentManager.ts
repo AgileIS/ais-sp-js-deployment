@@ -13,6 +13,8 @@ import { ContentTypeHandler } from "./ObjectHandler/ContentTypeHandler";
 import { AuthenticationType } from "./Constants/AuthenticationType";
 import { NodeHttpProxy } from "./NodeHttpProxy";
 import * as url from "url";
+import { NTLM } from "./ntlm";
+import { SPJSOM } from "./node-spjsom";
 
 class DeploymentManager {
     private _deploymentConfig: DeploymentConfig;
@@ -78,7 +80,7 @@ class DeploymentManager {
         });
     }
 
-    private setupProxy() {
+    private setupProxy(): void {
         if (this._deploymentConfig.userConfig.proxyUrl) {
             NodeHttpProxy.url = url.parse("http://127.0.0.1:8888");
             NodeHttpProxy.activate();
