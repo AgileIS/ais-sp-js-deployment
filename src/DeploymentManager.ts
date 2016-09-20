@@ -2,6 +2,7 @@ import * as PNP from "@agileis/sp-pnp-js";
 import { LibraryConfiguration } from "@agileis/sp-pnp-js/lib/configuration/pnplibconfig";
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { DeploymentConfig } from "./interface/Config/DeploymentConfig";
+import { SiteCollectionConfig } from "./interface/Config/SiteCollectionConfig";
 import { ISPObjectHandler } from "./interface/ObjectHandler/ispobjecthandler";
 import { SiteHandler } from "./ObjectHandler/SiteHandler";
 import { ListHandler } from "./ObjectHandler/ListHandler";
@@ -32,36 +33,47 @@ class DeploymentManager {
         return new Promise<void>((resolve, reject) => {
             let processingPromises: Array<Promise<any>> = [];
 
+            this._deploymentConfig.siteCollectionConfigs.forEach((siteCollectionConfig) => {
+                processingPromises.push(this.processSiteCollection(siteCollectionConfig));
+            });
 
-            Object.keys(this._deploymentConfig).forEach((value, index) => {
-                Logger.write("found config key " + value + " at index " + index, 0);
-                let handler = resolveObjectHandler(value);
-                if (typeof handler !== "undefined") {
-                    Logger.write("found handler " + handler.constructor.name + " for config key " + value, 0);
-                    if (config[value] instanceof Array) {
-                        config[value].forEach(element => {
+            Promise.all(processingPromises)
+                .then(() => {
+                    Logger.write("All site collection processed", Logger.LogLevel.Info);
+                    resolve();
+                })
+                .catch((error) => {
+                    Logger.write("Error occured while processing site collections - " + error, Logger.LogLevel.Info);
+                    reject(error);
+                });
+        });
+    }
+
+    private processSiteCollection(siteCollectionConfig: SiteCollectionConfig): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            let processingPromises: Array<Promise<any>> = [];
+            
+            Object.keys(siteCollectionConfig).forEach((nodeKey, nodeIndex) => {
+                Logger.write("Processing node " + nodeKey + " at index " + nodeIndex, 0);
+                let handler = this._objectHandlers[nodeKey];
+                if (handler) {
+                    Logger.write(`Found handler ${handler.constructor.name} for node ${nodeKey}`, Logger.LogLevel.Verbose);
+                    if (siteCollectionConfig[nodeKey] instanceof Array) {
+                        siteCollectionConfig[nodeKey].forEach(element => {
                             Logger.write("call object handler " + handler.constructor.name + " with element:" + JSON.stringify(element), 0);
                             let promise = handler.execute(element, parent);
                             processingPromises.push(promise);
                             processingPromises.concat(chooseAndUseHandler(element, promise));
                         });
                     } else {
-                        Logger.write("call object handler " + handler.constructor.name + " with element:" + JSON.stringify(config[value]), 0);
-                        let promise = handler.execute(config[value], parent);
+                        Logger.write("call object handler " + handler.constructor.name + " with element:" + JSON.stringify(config[nodeKey]), 0);
+                        let promise = handler.execute(config[nodeKey], parent);
                         processingPromises.push(promise);
-                        processingPromises.concat(chooseAndUseHandler(config[value], promise));
+                        processingPromises.concat(chooseAndUseHandler(config[nodeKey], promise));
                     }
+                } else {
+                    Logger.write(`Handler for node ${nodeKey} not available`, Logger.LogLevel.Warning);
                 }
-            });
-
-            Promise.all(processingPromises)
-            .then(() => {
-                Logger.write("All Elements created", Logger.LogLevel.Info);
-                resolve();
-            })
-            .catch((error) => {
-                Logger.write("Error occured while creating Elemets - " + error, Logger.LogLevel.Info);
-                reject();
             });
         });
     }
