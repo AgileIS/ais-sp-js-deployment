@@ -1,104 +1,42 @@
 /// <reference path="../typings/index.d.ts" />
 
-import {Logger, LogListener, LogEntry} from "@agileis/sp-pnp-js/lib/utils/logging";
-import {ISPObjectHandler} from "./interface/ObjectHandler/ispobjecthandler";
-import {SiteHandler} from "./ObjectHandler/SiteHandler";
-import {ListHandler} from "./ObjectHandler/ListHandler";
-import {FieldHandler} from "./ObjectHandler/FieldHandler";
-import {ViewHandler} from "./ObjectHandler/ViewHandler";
-import {ViewFieldHandler} from "./ObjectHandler/ViewFieldHandler";
-import { ContentTypeHandler } from "./ObjectHandler/ContentTypeHandler";
-import { NodeHttpProxy } from "./NodeHttpProxy";
-import {MyConsoleLogger} from "./Logger/MyConsoleLogger";
-import * as url from "url";
+import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
+import { MyConsoleLogger } from "./Logger/MyConsoleLogger";
+import { DeploymentConfig } from "./interface/Config/DeploymentConfig";
+import * as FileSystem from "fs";
+import * as minimist from "minimist";
+
+interface ConsoleArguments {
+    deploymentConfigPath: string;
+    userPassword: string;
+    logLevel: Logger.LogLevel;
+}
+
+let clArgs: ConsoleArguments = <any> minimist(global.process.argv.slice(2), {
+    alias: {
+        f: "deploymentConfigPath",
+        l: "logLevel",
+        p: "userPassword",
+    },
+    default: {
+        l: Logger.LogLevel.Verbose
+    },
+    string: ["f", "p", "l"]
+});
 
 Logger.subscribe(new MyConsoleLogger());
-Logger.activeLogLevel = Logger.LogLevel.Verbose;
+Logger.activeLogLevel = clArgs.logLevel;
 
+Logger.write("Start deployment", Logger.LogLevel.Info);
+Logger.write(`Console arguments: ${JSON.stringify(clArgs)}`, 0);
 
-NodeHttpProxy.url = url.parse("http://127.0.0.1:8888");
-NodeHttpProxy.activate();
+if (clArgs.deploymentConfigPath && clArgs.userPassword) {
+    let deploymentConfig: DeploymentConfig = JSON.parse(FileSystem.readFileSync(clArgs.deploymentConfigPath, "utf8"));
+    if (deploymentConfig) {
+        Logger.write(`Loaded deployment config: ${clArgs.deploymentConfigPath} `);
+        Logger.write(JSON.stringify(deploymentConfig), 0);
 
-let fs = require("fs");
-let args = require("minimist")(process.argv.slice(2));
-Logger.write("start deployment script", Logger.LogLevel.Info);
-Logger.write(JSON.stringify(args), 0);
-
-if (args.f && args.p) {
-    let config = JSON.parse(fs.readFileSync(args.f, "utf8"));
-    if (config.User) {
-
-        let userAndDommain = config.User.split("\\");
-        let pnpConfig = require("@agileis/sp-pnp-js/lib/configuration/pnplibconfig");
-        pnpConfig.setRuntimeConfig({
-            nodeHttpNtlmClientOptions: {
-                domain: userAndDommain[0],
-                password: args.p,
-                siteUrl: "",
-                username: userAndDommain[1],
-                workstation: "",
-            },
-        });
-
-        Logger.write(JSON.stringify(config), 0);
-        Promise.all(chooseAndUseHandler(config, null)).then(() => {
-            Logger.write("All Elements created", 1);
-            return;
-        }).catch((error) => {
-            Logger.write("Error occured while creating Elemets - " + error, 1);
-            return;
-        });
     }
-}
-// todo: Factory auslagern mit execute und parentPromise.then => execute Handler ???
-function resolveObjectHandler(key: string): ISPObjectHandler {
-    switch (key) {
-        case "Site":
-            return new SiteHandler();
-        case "List":
-            return new ListHandler();
-        case "Field":
-            return new FieldHandler();
-        case "View":
-            return new ViewHandler();
-        /* do we need this handler any more?*/
-        case "ViewFields":
-            return new ViewFieldHandler();
-        case "ContentTypes":
-            return new ContentTypeHandler();
-        default:
-            break;
-    }
-}
-
-function promiseStatus(p) {
-    return p.then(function (val) { return { status: "resolved", val: val }; },
-        function (val) { return { status: "rejected", val: val }; }
-    );
-}
-
-function chooseAndUseHandler(config: any, parent?: Promise<any>): Array<Promise<any>> {
-    let promises: Array<Promise<any>> = [];
-
-    Object.keys(config).forEach((value, index) => {
-        Logger.write("found config key " + value + " at index " + index, 0);
-        let handler = resolveObjectHandler(value);
-        if (typeof handler !== "undefined") {
-            Logger.write("found handler " + handler.constructor.name + " for config key " + value, 0);
-            if (config[value] instanceof Array) {
-                config[value].forEach(element => {
-                    Logger.write("call object handler " + handler.constructor.name + " with element:" + JSON.stringify(element), 0);
-                    let promise = handler.execute(element, parent);
-                    promises.push(promise);
-                    promises.concat(chooseAndUseHandler(element, promise));
-                });
-            } else {
-                Logger.write("call object handler " + handler.constructor.name + " with element:" + JSON.stringify(config[value]), 0);
-                let promise = handler.execute(config[value], parent);
-                promises.push(promise);
-                promises.concat(chooseAndUseHandler(config[value], promise));
-            }
-        }
-    });
-    return promises;
+} else {
+    Logger.write("Required deploy paramater are not available!", Logger.LogLevel.Error);
 }
