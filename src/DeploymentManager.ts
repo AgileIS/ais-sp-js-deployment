@@ -16,10 +16,10 @@ import * as url from "url";
 import { NTLM } from "./ntlm";
 import { SPJSOM } from "./node-spjsom";
 
-class DeploymentManager {
+export class DeploymentManager {
     private _deploymentConfig: DeploymentConfig;
     private _objectHandlers: { [id: string]: ISPObjectHandler } = {
-        Site: new SiteHandler(),
+        Sites: new SiteHandler(),
         ContentTypes: new ContentTypeHandler(),
         List: new ListHandler(),
         Field: new FieldHandler(),
@@ -29,17 +29,13 @@ class DeploymentManager {
 
     constructor(deploymentConfig: DeploymentConfig) {
         this._deploymentConfig = deploymentConfig;
+        this.setupProxy();
+        this.setupPnPJs();
     }
 
     public deploy(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            let processingPromises: Array<Promise<any>> = [];
-
-            this._deploymentConfig.siteCollectionConfigs.forEach((siteCollectionConfig) => {
-                processingPromises.push(this.processSiteCollection(siteCollectionConfig));
-            });
-
-            Promise.all(processingPromises)
+            this.processConfig(this._deploymentConfig)
                 .then(() => {
                     Logger.write("All site collection processed", Logger.LogLevel.Info);
                     resolve();
@@ -51,60 +47,70 @@ class DeploymentManager {
         });
     }
 
-    private processSiteCollection(siteCollectionConfig: SiteCollectionConfig): Promise<void> {
+    private processConfig(config: any, parentPromise?: Promise<any>): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             let processingPromises: Array<Promise<any>> = [];
-            
-            Object.keys(siteCollectionConfig).forEach((nodeKey, nodeIndex) => {
+
+            Object.keys(config).forEach((nodeKey, nodeIndex) => {
                 Logger.write("Processing node " + nodeKey + " at index " + nodeIndex, 0);
                 let handler = this._objectHandlers[nodeKey];
                 if (handler) {
                     Logger.write(`Found handler ${handler.constructor.name} for node ${nodeKey}`, Logger.LogLevel.Verbose);
-                    if (siteCollectionConfig[nodeKey] instanceof Array) {
-                        siteCollectionConfig[nodeKey].forEach(element => {
-                            Logger.write("call object handler " + handler.constructor.name + " with element:" + JSON.stringify(element), 0);
-                            let promise = handler.execute(element, parent);
-                            processingPromises.push(promise);
-                            processingPromises.concat(chooseAndUseHandler(element, promise));
+                    if (config[nodeKey] instanceof Array) {
+                        config[nodeKey].forEach(subNode => {
+                            Logger.write("Call the handler " + handler.constructor.name + " for the node:" + JSON.stringify(subNode), Logger.LogLevel.Verbose);
+                            let handlerPromise = handler.execute(subNode, parentPromise);
+                            processingPromises.push(handlerPromise);
+                            processingPromises = processingPromises.concat(this.processConfig(subNode, handlerPromise));
                         });
                     } else {
-                        Logger.write("call object handler " + handler.constructor.name + " with element:" + JSON.stringify(config[nodeKey]), 0);
-                        let promise = handler.execute(config[nodeKey], parent);
-                        processingPromises.push(promise);
-                        processingPromises.concat(chooseAndUseHandler(config[nodeKey], promise));
+                        Logger.write("Call the handler " + handler.constructor.name + " for the node:" + JSON.stringify(config[nodeKey]), Logger.LogLevel.Verbose);
+                        let handlerPromise = handler.execute(config[nodeKey], parentPromise);
+                        processingPromises.push(handlerPromise);
+                        processingPromises = processingPromises.concat(this.processConfig(config[nodeKey], handlerPromise));
                     }
-                } else {
-                    Logger.write(`Handler for node ${nodeKey} not available`, Logger.LogLevel.Warning);
                 }
             });
+
+            Promise.all(processingPromises)
+                .then(() => {
+                    resolve();
+                })
+                .catch((error) => {
+                    reject(error);
+                });
         });
     }
 
     private setupProxy(): void {
-        if (this._deploymentConfig.userConfig.proxyUrl) {
-            NodeHttpProxy.url = url.parse("http://127.0.0.1:8888");
+        if (this._deploymentConfig.User.proxyUrl) {
+            NodeHttpProxy.url = url.parse(this._deploymentConfig.User.proxyUrl);
             NodeHttpProxy.activate();
         }
     }
 
     private setupSpJsom(): void {
-
+        
     }
 
     private setupPnPJs(): void {
-        let userConfig = this._deploymentConfig.userConfig;
+        let userConfig = this._deploymentConfig.User;
         Logger.write("Setup pnp-core-js", Logger.LogLevel.Info);
         Logger.write(`pno-core-js authentication type: ${userConfig.authtype}`, Logger.LogLevel.Info);
 
         let pnpConfig: LibraryConfiguration;
         if (String(userConfig.authtype).toLowerCase() === AuthenticationType.Ntlm.toLowerCase()) {
             let userAndDommain = userConfig.username.split("\\");
+            if (!userConfig.workstation) {
+                userConfig.workstation = "";
+            }
+
             pnpConfig = {
                 nodeHttpNtlmClientOptions: {
                     domain: userAndDommain[0],
                     password: userConfig.password,
                     siteUrl: "",
-                    username: userConfig.username,
+                    username: userAndDommain[1],
                     workstation: userConfig.workstation,
                 },
             };
@@ -112,18 +118,16 @@ class DeploymentManager {
             pnpConfig = {
                 nodeHttpBasicClientOptions: {
                     password: userConfig.password,
-                    username: userConfig.username,
                     siteUrl: "",
+                    username: userConfig.username,
                 },
             };
         } else {
-            throw new Error(`Unsupported authentication type. Use ${AuthenticationType.Ntlm} or ${AuthenticationType.Basic} `)
+            throw new Error(`Unsupported authentication type. Use ${AuthenticationType.Ntlm} or ${AuthenticationType.Basic} `);
         }
 
         if (pnpConfig) {
             PNP.setup(pnpConfig);
         }
     }
-
-
 }

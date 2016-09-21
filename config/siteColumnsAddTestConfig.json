@@ -1,86 +1,92 @@
 {
-    
-    "User": "dev\\tuser",
-    "Site": {
-        "Url": "http://dev2013vm3/sites/deploymentjs",
-        "Field": [
-            {
-                "Title": "Single line of text",
-                "InternalName": "AIS_SingleLineOfText",
-                "FieldTypeKind": 2,
-                "Group": "AISGroup",
-                "ControlOption": ""
-            },
-            {
-                "Title": "Multiple lines of text",
-                "InternalName": "AIS_MultiLineOfText",
-                "FieldTypeKind": 3,
-                "Group": "AISGroup",
-                "ControlOption": ""
-            },
-            {
-                "Title": "Choice",
-                "InternalName": "AIS_Choice",
-                "FieldTypeKind": 6,
-                "Group": "AISGroup",
-                "ControlOption": ""
-            },
-            {
-                "Title": "Number",
-                "InternalName": "AIS_Number",
-                "FieldTypeKind": 9,
-                "Group": "AISGroup",
-                "ControlOption": ""
-            },
-            {
-                "Title": "Date and Time",
-                "InternalName": "AIS_DateTime",
-                "FieldTypeKind": 4,
-                "Group": "AISGroup",
-                "ControlOption": ""
-            },
-            {
-                "Title": "Lookup",
-                "InternalName": "AIS_Lookup",
-                "FieldTypeKind": 7,
-                "Group": "AISGroup",
-                "ControlOption": ""
-            },
-            {
-                "Title": "Yes No",
-                "InternalName": "AIS_YesNo",
-                "FieldTypeKind": 8,
-                "Group": "AISGroup",
-                "ControlOption": ""
-            },
-            {
-                "Title": "Person or Group",
-                "InternalName": "AIS_PersonOrGroup",
-                "FieldTypeKind": 20,
-                "Group": "AISGroup",
-                "ControlOption": ""
-            },
-            {
-                "Title": "Hyperlink or Picture",
-                "InternalName": "AIS_HyperLinkOrPicture",
-                "FieldTypeKind": 9,
-                "Group": "AISGroup",
-                "ControlOption": ""
-            },
-            {
-                "Title": "Calculated",
-                "InternalName": "AIS_Calculated",
-                "FieldTypeKind": 17,
-                "Group": "AISGroup",
-                "ControlOption": ""
-            },
-            {
-                "Title": "Task Outcome",
-                "InternalName": "AIS_TaskOutcome",
-                "FieldTypeKind": 9,
-                "Group": "AISGroup",
-                "ControlOption": ""
-            }
-        ]
-    }
+    "User": {
+        "username": "dev\\tuser",
+        "authtype": "Ntlm",
+        "password": "Start@123",
+        "proxyUrl": "http://127.0.0.1:8888"
+    },
+    "Sites": [
+        {
+            "Url": "http://dev2013vm3/sites/deploymentjs",
+            "Field": [
+                {
+                    "Title": "Single line of text",
+                    "InternalName": "AIS_SingleLineOfText",
+                    "FieldTypeKind": 2,
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Multiple lines of text",
+                    "InternalName": "AIS_MultiLineOfText",
+                    "FieldTypeKind": 3,
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Choice",
+                    "InternalName": "AIS_Choice",
+                    "FieldTypeKind": 6,
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Number",
+                    "InternalName": "AIS_Number",
+                    "FieldTypeKind": 9,
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Date and Time",
+                    "InternalName": "AIS_DateTime",
+                    "FieldTypeKind": 4,
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Lookup",
+                    "InternalName": "AIS_Lookup",
+                    "FieldTypeKind": 7,
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Yes No",
+                    "InternalName": "AIS_YesNo",
+                    "FieldTypeKind": 8,
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Person or Group",
+                    "InternalName": "AIS_PersonOrGroup",
+                    "FieldTypeKind": 20,
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Hyperlink or Picture",
+                    "InternalName": "AIS_HyperLinkOrPicture",
+                    "FieldTypeKind": 9,
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Calculated",
+                    "InternalName": "AIS_Calculated",
+                    "FieldTypeKind": 17,
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Task Outcome",
+                    "InternalName": "AIS_TaskOutcome",
+                    "FieldTypeKind": 9,
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                }
+            ]
+        }
+    ]
 }
