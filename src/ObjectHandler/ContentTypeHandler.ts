@@ -1,3 +1,5 @@
+/// <reference path="../../typings/index.d.ts" />
+
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
 import { ContentType } from "@agileis/sp-pnp-js/lib/sharepoint/rest/ContentTypes";
