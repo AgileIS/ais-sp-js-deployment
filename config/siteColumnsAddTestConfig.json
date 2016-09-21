@@ -2,8 +2,7 @@
     "User": {
         "username": "dev\\tuser",
         "authtype": "Ntlm",
-        "password": "Start@123",
-        "proxyUrl": "http://127.0.0.1:8888"
+        "password": "Start@123"
     },
     "Sites": [
         {

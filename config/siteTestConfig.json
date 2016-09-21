@@ -1,7 +1,12 @@
 {
-    
-    "User": "dev\\tuser",
-    "Site": {
-        "Url": "http://dev2013vm3/sites/deploymentjs"
-    }
+    "User": {
+        "username": "dev\\tuser",
+        "authtype": "Ntlm",
+        "password": "Start@123"
+    },
+    "Sites": [
+        {
+            "Url": "http://dev2013vm3/sites/deploymentjs"
+        }
+    ]
 }

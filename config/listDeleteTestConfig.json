@@ -1,135 +1,158 @@
 {
-    "User": "dev\\tuser",
-    "Site": {
-        "Url": "http://dev2013vm3/sites/deploymentjs",
-        "List": [
-            {
-                "Title": "GenericList",
-                "Description": "Template GenericList",
-                "ControlOption": "Delete",
-                "TemplateType": 100,
-                "InternalName": "AIS_GenericList",
-                "EnableContentTypes": true
-            },{
-                "Title": "DocumentLibrary",
-                "Description": "Template DocumentLibrary",
-                "ControlOption": "Delete",
-                "TemplateType": 101,
-                "InternalName": "AIS_DocumentLibrary",
-                "EnableContentTypes": true
-            },{
-                "Title": "Survey",
-                "Description": "Template Survey",
-                "ControlOption": "Delete",
-                "TemplateType": 102,
-                "InternalName": "AIS_Survey",
-                "EnableContentTypes": true
-            },{
-                "Title": "Links",
-                "Description": "Template Links",
-                "ControlOption": "Delete",
-                "TemplateType": 103,
-                "InternalName": "AIS_Links",
-                "EnableContentTypes": true
-            },{
-                "Title": "Announcements",
-                "Description": "Template Announcements",
-                "ControlOption": "Delete",
-                "TemplateType": 104,
-                "InternalName": "AIS_Announcements",
-                "EnableContentTypes": true
-            },{
-                "Title": "Contacts",
-                "Description": "Template Contacts",
-                "ControlOption": "Delete",
-                "TemplateType": 105,
-                "InternalName": "AIS_Contacts",
-                "EnableContentTypes": true
-            },{
-                "Title": "Events",
-                "Description": "Template Events",
-                "ControlOption": "Delete",
-                "TemplateType": 106,
-                "InternalName": "AIS_Events",
-                "EnableContentTypes": true
-            },{
-                "Title": "Tasks",
-                "Description": "Template Tasks",
-                "ControlOption": "Delete",
-                "TemplateType": 107,
-                "InternalName": "AIS_Tasks",
-                "EnableContentTypes": true
-            },{
-                "Title": "DiscussionBoard",
-                "Description": "Template DiscussionBoard",
-                "ControlOption": "Delete",
-                "TemplateType": 108,
-                "InternalName": "AIS_DiscussionBoard",
-                "EnableContentTypes": true
-            },{
-                "Title": "PictureLibrary",
-                "Description": "Template PictureLibrary",
-                "ControlOption": "Delete",
-                "TemplateType": 109,
-                "InternalName": "AIS_PictureLibrary",
-                "EnableContentTypes": true
-            },{
-                "Title": "XMLForm",
-                "Description": "Template XMLForm",
-                "ControlOption": "Delete",
-                "TemplateType": 115,
-                "InternalName": "AIS_XMLForm",
-                "EnableContentTypes": true
-            },{
-                "Title": "WebPageLibrary",
-                "Description": "Template WebPageLibrary",
-                "ControlOption": "Delete",
-                "TemplateType": 119,
-                "InternalName": "AIS_WebPageLibrary",
-                "EnableContentTypes": true
-            },{
-                "Title": "CustomGrid",
-                "Description": "Template CustomGrid",
-                "ControlOption": "Delete",
-                "TemplateType": 120,
-                "InternalName": "AIS_CustomGrid",
-                "EnableContentTypes": true
-            },{
-                "Title": "DataConnectionLibrary",
-                "Description": "Template DataConnectionLibrary",
-                "ControlOption": "Delete",
-                "TemplateType": 130,
-                "InternalName": "AIS_DataConnectionLibrary",
-                "EnableContentTypes": true
-            },{
-                "Title": "WorkflowHistory",
-                "Description": "Template WorkflowHistory",
-                "ControlOption": "Delete",
-                "TemplateType": 140,
-                "InternalName": "AIS_WorkflowHistory",
-                "EnableContentTypes": true
-            },{
-                "Title": "GanttTasks",
-                "Description": "Template GanttTasks",
-                "ControlOption": "Delete",
-                "TemplateType": 150,
-                "InternalName": "AIS_GanttTasks",
-                "EnableContentTypes": true
-            },{
-                "Title": "TasksWithTimelineAndHierarchy",
-                "Description": "Template TasksWithTimelineAndHierarchy",
-                "ControlOption": "Delete",
-                "TemplateType": 171,
-                "InternalName": "AIS_TasksWithTimelineAndHierarchy",
-                "EnableContentTypes": true
-            },{
-                "Title": "AdminTasks",
-                "Description": "Template AdminTasks",
-                "ControlOption": "Delete",
-                "TemplateType": 1100,
-                "InternalName": "AIS_AdminTasks",
-                "EnableContentTypes": true
-            }
-        ]
-    }
+    "User": {
+        "username": "dev\\tuser",
+        "authtype": "Ntlm",
+        "password": "Start@123"
+    },
+    "Sites": [
+        {
+            "Url": "http://dev2013vm3/sites/deploymentjs",
+            "List": [
+                {
+                    "Title": "GenericList",
+                    "Description": "Template GenericList",
+                    "ControlOption": "Delete",
+                    "TemplateType": 100,
+                    "InternalName": "AIS_GenericList",
+                    "EnableContentTypes": true
+                },
+                {
+                    "Title": "DocumentLibrary",
+                    "Description": "Template DocumentLibrary",
+                    "ControlOption": "Delete",
+                    "TemplateType": 101,
+                    "InternalName": "AIS_DocumentLibrary",
+                    "EnableContentTypes": true
+                },
+                {
+                    "Title": "Survey",
+                    "Description": "Template Survey",
+                    "ControlOption": "Delete",
+                    "TemplateType": 102,
+                    "InternalName": "AIS_Survey",
+                    "EnableContentTypes": true
+                },
+                {
+                    "Title": "Links",
+                    "Description": "Template Links",
+                    "ControlOption": "Delete",
+                    "TemplateType": 103,
+                    "InternalName": "AIS_Links",
+                    "EnableContentTypes": true
+                },
+                {
+                    "Title": "Announcements",
+                    "Description": "Template Announcements",
+                    "ControlOption": "Delete",
+                    "TemplateType": 104,
+                    "InternalName": "AIS_Announcements",
+                    "EnableContentTypes": true
+                },
+                {
+                    "Title": "Contacts",
+                    "Description": "Template Contacts",
+                    "ControlOption": "Delete",
+                    "TemplateType": 105,
+                    "InternalName": "AIS_Contacts",
+                    "EnableContentTypes": true
+                },
+                {
+                    "Title": "Events",
+                    "Description": "Template Events",
+                    "ControlOption": "Delete",
+                    "TemplateType": 106,
+                    "InternalName": "AIS_Events",
+                    "EnableContentTypes": true
+                },
+                {
+                    "Title": "Tasks",
+                    "Description": "Template Tasks",
+                    "ControlOption": "Delete",
+                    "TemplateType": 107,
+                    "InternalName": "AIS_Tasks",
+                    "EnableContentTypes": true
+                },
+                {
+                    "Title": "DiscussionBoard",
+                    "Description": "Template DiscussionBoard",
+                    "ControlOption": "Delete",
+                    "TemplateType": 108,
+                    "InternalName": "AIS_DiscussionBoard",
+                    "EnableContentTypes": true
+                },
+                {
+                    "Title": "PictureLibrary",
+                    "Description": "Template PictureLibrary",
+                    "ControlOption": "Delete",
+                    "TemplateType": 109,
+                    "InternalName": "AIS_PictureLibrary",
+                    "EnableContentTypes": true
+                },
+                {
+                    "Title": "XMLForm",
+                    "Description": "Template XMLForm",
+                    "ControlOption": "Delete",
+                    "TemplateType": 115,
+                    "InternalName": "AIS_XMLForm",
+                    "EnableContentTypes": true
+                },
+                {
+                    "Title": "WebPageLibrary",
+                    "Description": "Template WebPageLibrary",
+                    "ControlOption": "Delete",
+                    "TemplateType": 119,
+                    "InternalName": "AIS_WebPageLibrary",
+                    "EnableContentTypes": true
+                },
+                {
+                    "Title": "CustomGrid",
+                    "Description": "Template CustomGrid",
+                    "ControlOption": "Delete",
+                    "TemplateType": 120,
+                    "InternalName": "AIS_CustomGrid",
+                    "EnableContentTypes": true
+                },
+                {
+                    "Title": "DataConnectionLibrary",
+                    "Description": "Template DataConnectionLibrary",
+                    "ControlOption": "Delete",
+                    "TemplateType": 130,
+                    "InternalName": "AIS_DataConnectionLibrary",
+                    "EnableContentTypes": true
+                },
+                {
+                    "Title": "WorkflowHistory",
+                    "Description": "Template WorkflowHistory",
+                    "ControlOption": "Delete",
+                    "TemplateType": 140,
+                    "InternalName": "AIS_WorkflowHistory",
+                    "EnableContentTypes": true
+                },
+                {
+                    "Title": "GanttTasks",
+                    "Description": "Template GanttTasks",
+                    "ControlOption": "Delete",
+                    "TemplateType": 150,
+                    "InternalName": "AIS_GanttTasks",
+                    "EnableContentTypes": true
+                },
+                {
+                    "Title": "TasksWithTimelineAndHierarchy",
+                    "Description": "Template TasksWithTimelineAndHierarchy",
+                    "ControlOption": "Delete",
+                    "TemplateType": 171,
+                    "InternalName": "AIS_TasksWithTimelineAndHierarchy",
+                    "EnableContentTypes": true
+                },
+                {
+                    "Title": "AdminTasks",
+                    "Description": "Template AdminTasks",
+                    "ControlOption": "Delete",
+                    "TemplateType": 1100,
+                    "InternalName": "AIS_AdminTasks",
+                    "EnableContentTypes": true
+                }
+            ]
+        }
+    ]
 }

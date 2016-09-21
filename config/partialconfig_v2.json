@@ -1,20 +1,22 @@
-{   
-    "Site": {
-        "Field": [
-            {
-                "Title": "TestField2",
-                "InternalName": "AIS_TestField2",
-                "FieldTypeKind": 9,
-                "Group": "AISGroup",
-                "ControlOption": "Update"
-            },
-            {
-                "Title": "TestField1-v2",
-                "InternalName": "AIS_TestField1",
-                "FieldTypeKind": 9,
-                "Group": "AISGroup",
-                "ControlOption": "Update"
-            }
-        ]
-    }
+{
+    "Sites": [
+        {
+            "Field": [
+                {
+                    "Title": "TestField2",
+                    "InternalName": "AIS_TestField2",
+                    "FieldTypeKind": 9,
+                    "Group": "AISGroup",
+                    "ControlOption": "Update"
+                },
+                {
+                    "Title": "TestField1-v2",
+                    "InternalName": "AIS_TestField1",
+                    "FieldTypeKind": 9,
+                    "Group": "AISGroup",
+                    "ControlOption": "Update"
+                }
+            ]
+        }
+    ]
 }
