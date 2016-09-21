@@ -22,8 +22,10 @@ export class ContentTypeHandler implements ISPObjectHandler {
 
     private processingContentTypeConfig(contentTypeConfig: IContentType, parentWeb: Web): Promise<ContentType> {
         return new Promise<ContentType>((resolve, reject) => {
-            Logger.write(`Processing ${contentTypeConfig.ControlOption === ControlOption.Add || contentTypeConfig.ControlOption === undefined ? "Add"
-                : contentTypeConfig.ControlOption} content type: '${contentTypeConfig.Name}'`, Logger.LogLevel.Info);
+            let processingText = contentTypeConfig.ControlOption === ControlOption.Add || contentTypeConfig.ControlOption === undefined || contentTypeConfig.ControlOption === ""
+                ? "Add" : contentTypeConfig.ControlOption;
+            Logger.write(`Processing ${processingText} content type: '${contentTypeConfig.Name}'`, Logger.LogLevel.Info);
+
             parentWeb.contentTypes.filter(`Name eq '${contentTypeConfig.Name}'`).get().then((contentTypeRequestResults) => {
                 let processingPromise: Promise<ContentType> = undefined;
 
