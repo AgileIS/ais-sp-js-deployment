@@ -13,19 +13,19 @@ import { ViewFieldHandler } from "./ObjectHandler/ViewFieldHandler";
 import { ContentTypeHandler } from "./ObjectHandler/ContentTypeHandler";
 import { AuthenticationType } from "./Constants/AuthenticationType";
 import { NodeHttpProxy } from "./NodeHttpProxy";
-import * as url from "url";
 import { NodeJsomHandler } from "./NodeJsomHandler";
+import * as url from "url";
 
 export class DeploymentManager {
     private _deploymentConfig: DeploymentConfig;
     private _objectHandlers: { [id: string]: ISPObjectHandler } = {
         Features: new FeatureHandler(),
         Sites: new SiteHandler(),
-        ContentTypes: new ContentTypeHandler(),
+/*        ContentTypes: new ContentTypeHandler(),
         Lists: new ListHandler(),
         Fields: new FieldHandler(),
         Views: new ViewHandler(),
-        ViewFields: new ViewFieldHandler(),
+        ViewFields: new ViewFieldHandler(),*/
     };
     private _deployDependencies: Promise<void>;
 

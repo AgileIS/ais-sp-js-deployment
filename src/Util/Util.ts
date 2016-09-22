@@ -30,3 +30,16 @@ export function Reject(reject: any, msg: string, configElementName: string, valu
     }
     reject(rejectValue);
 }
+
+export function UrlJoin(urlParts: Array<string>): string {
+    let normalizedUrl = urlParts.join("/");
+    let parts = normalizedUrl.split("/");
+    parts[0] = parts[0].concat(":").replace("::", ":");
+    normalizedUrl = parts.join("/").replace("//", "/");
+    normalizedUrl = normalizedUrl.replace(/:\//g, "://");
+    normalizedUrl = normalizedUrl.replace(/\/$/, "");
+    // normalizedUrl = normalizedUrl.replace(/\/(\?|&|#[^!])/g, "$1");
+    // normalizedUrl = normalizedUrl.replace(/(\?.+)\?/g, "$1&");
+
+    return normalizedUrl;
+}

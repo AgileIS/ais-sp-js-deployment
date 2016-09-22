@@ -7,6 +7,7 @@ import * as url from "url";
 import * as vm from "vm";
 import { DeploymentConfig } from "./interface/Config/DeploymentConfig";
 import { AuthenticationType } from "./Constants/AuthenticationType";
+import { UrlJoin } from "./Util/Util";
 
 declare var hash: any;
 declare var global: NodeJS.Global;
@@ -30,32 +31,45 @@ interface NtlmOptions {
 class NodeJsomHandlerImpl implements NodeJsomHandler {
     public static instance: NodeJsomHandlerImpl;
     private static _agents: { [id: string]: http.Agent } = {};
+    private static _authType: AuthenticationType;
+    private static _authOptions: string | NtlmOptions;
 
     private _httpSavedRequest = undefined;
     private _httpsSavedRequest = undefined;
-    private _authType: AuthenticationType;
-    private _authOptions: string | NtlmOptions;
 
     public static httpRequest(options: http.RequestOptions, callback?: (res: http.IncomingMessage) => void): http.ClientRequest {
+        if (typeof options !== "string" && !options.protocol) {
+            options.protocol = "http";
+        }
         return NodeJsomHandlerImpl.instance._httpSavedRequest(NodeJsomHandlerImpl.setRequiredOptions(options), callback);
     }
 
     public static httpsRequest(options: http.RequestOptions, callback?: (res: http.IncomingMessage) => void): http.ClientRequest {
+        if (typeof options !== "string" && !options.protocol) {
+            options.protocol = "https";
+        }
         return NodeJsomHandlerImpl.instance._httpsSavedRequest(NodeJsomHandlerImpl.setRequiredOptions(options), callback);
     }
 
     private static setRequiredOptions(options: http.RequestOptions): http.RequestOptions {
         let requestOptions = undefined;
-        if (typeof options === "string") {
-            requestOptions = url.parse(options as string);
-            requestOptions.url = options;
+        if (typeof options !== "string") {
+            requestOptions = options;
+            if (options.headers["User-Agent"] === "node-XMLHttpRequest" || options.headers["X-Request-With"] === "XMLHttpRequest") {
+                requestOptions.headers = options.headers || {};
+                requestOptions.headers.connection = "keep-alive";
+                if (!requestOptions.url) {
+                    requestOptions.url = UrlJoin([options.protocol, options.host, options.path]);
+                }
+                if (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) { 
+                    requestOptions.agent = NodeJsomHandlerImpl._agents[requestOptions.url.split("/_api")[0]];
+                } else {
+                    requestOptions.headers.Authorization = NodeJsomHandlerImpl._authOptions;
+                }
+            }
         } else {
             requestOptions = options;
         }
-
-        requestOptions.headers = options.headers || {};
-        requestOptions.headers.connection = "keep-alive";
-        // requestOptions.agent = new http.Agent({ keepAlive: true, maxSockets: 1});
 
         return requestOptions;
     }
@@ -71,10 +85,10 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
         https.request = NodeJsomHandlerImpl.httpsRequest;
 
         let promises = new Array<Promise<void>>();
-        this._authType = config.User.authtype;
+        NodeJsomHandlerImpl._authType = config.User.authtype;
 
-        if (this._authType === AuthenticationType.Ntlm) {
-            this._authOptions = {
+        if (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) {
+            NodeJsomHandlerImpl._authOptions = {
                 domain: config.User.username.split("\\")[0],
                 password: config.User.password,
                 username: config.User.username.split("\\")[1],
@@ -84,7 +98,7 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                 promises.push(this.setupSiteContext(site.Url));
             });
         } else {
-            this._authOptions = `Basic ${new Buffer(`${config.User.username}:${config.User.password}`).toString("base64")}`;
+            NodeJsomHandlerImpl._authOptions = `Basic ${new Buffer(`${config.User.username}:${config.User.password}`).toString("base64")}`;
         }
 
         return new Promise<void>((resolve, reject) => {
@@ -100,11 +114,11 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
 
     private setupSiteContext(siteUrl: string): Promise<void> {
         const lib = siteUrl.indexOf("https") > -1 ? https : http;
-        let reqUrl = siteUrl.split("/").concat("_api/web/title".split("/")).join("/");
+        let reqUrl = UrlJoin([siteUrl, "_api/web/title"])
         let parsedUrl = url.parse(reqUrl as string);
-        let authValue = this._authOptions;
-        if (this._authType === AuthenticationType.Ntlm) {
-            authValue = NTLM.createType1Message(this._authOptions);
+        let authValue = NodeJsomHandlerImpl._authOptions;
+        if (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) {
+            authValue = NTLM.createType1Message(NodeJsomHandlerImpl._authOptions);
             NodeJsomHandlerImpl._agents[siteUrl] = new lib.Agent({ keepAlive: true, maxSockets: 1 });
         }
         let options = {
@@ -114,7 +128,6 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
             method: "GET",
             headers: {
                 connection: "keep-alive",
-                "content-type": "application/json;odata=verbose;charset=utf-8",
                 "Authorization": authValue,
             },
             agent: NodeJsomHandlerImpl._agents[siteUrl],
@@ -127,7 +140,7 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                     let type2msg = NTLM.parseType2Message(firstResponse.headers["www-authenticate"], error => {
                         reject(error);
                     });
-                    let type3msg = NTLM.createType3Message(type2msg, this._authOptions);
+                    let type3msg = NTLM.createType3Message(type2msg, NodeJsomHandlerImpl._authOptions);
                     options.headers.Authorization = type3msg;
                     http.get(options, secondResponse => {
                         firstResponse.socket.emit("free");
@@ -205,8 +218,7 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                     }
                     return new Promise((res, rej) => {
                         const lib = siteUrl.indexOf("https") > -1 ? https : http;
-                        let combUrl = siteUrl.split("/").concat(currentValue.split("/")).join("/");
-                        const request = lib.get(combUrl, response => {
+                        const request = lib.get(UrlJoin([siteUrl, currentValue]), response => {
                             const body = [];
                             response.on("data", (chunk) => body.push(chunk));
                             response.on("end", () => res(body.join("")));

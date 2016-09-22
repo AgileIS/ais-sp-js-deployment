@@ -23,7 +23,7 @@ export class FeatureHandler implements ISPObjectHandler {
                     ? featureConfig.ControlOption : "Active";
             Logger.write(`Processing ${processingCrlOption} feature: '${featureConfig.ID}'`, Logger.LogLevel.Info);
 
-            let context = new SP.ClientContext(parentWeb.toUrl());
+            let context = new SP.ClientContext(parentWeb.toUrl().split("_api")[0]);
             let featureCollection = context.get_web().get_features();
             let feature = featureCollection.getById(new SP.Guid(featureConfig.ID));
             context.load(feature);
