@@ -19,8 +19,9 @@ export class ViewHandler implements ISPObjectHandler {
 
     private processingViewConfig(viewConfig: IView, parentList: List): Promise<View> {
         return new Promise<View>((resolve, reject) => {
-            Logger.write(`Processing ${viewConfig.ControlOption === ControlOption.Add || viewConfig.ControlOption === undefined
-                ? "Add" : viewConfig.ControlOption} view: '${viewConfig.Title}'`, Logger.LogLevel.Info);
+            let processingText = viewConfig.ControlOption === ControlOption.Add || viewConfig.ControlOption === undefined || viewConfig.ControlOption === ""
+                ? "Add" : viewConfig.ControlOption;
+            Logger.write(`Processing '${processingText}' view: '${viewConfig.Title}`, Logger.LogLevel.Info);
 
             parentList.views.filter(`Title eq '${viewConfig.Title}'`).select("Id").get()
                 .then((viewRequestResults) => {

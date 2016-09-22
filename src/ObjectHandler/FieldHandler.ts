@@ -23,8 +23,9 @@ export class FieldHandler {
 
     private ProcessingViewConfig(fieldConfig: IField, parentFields: Fields): Promise<Field> {
         return new Promise<Field>((resolve, reject) => {
-            Logger.write(`Processing ${fieldConfig.ControlOption === ControlOption.Add || fieldConfig.ControlOption === undefined
-                ? "Add" : fieldConfig.ControlOption} field: '${fieldConfig.Title}'`, Logger.LogLevel.Info);
+            let processingText = fieldConfig.ControlOption === ControlOption.Add || fieldConfig.ControlOption === undefined || fieldConfig.ControlOption === ""
+                ? "Add" : fieldConfig.ControlOption;
+            Logger.write(`Processing ${processingText} field: '${fieldConfig.Title}'`, Logger.LogLevel.Info);
 
             parentFields.filter(`InternalName eq '${fieldConfig.InternalName}'`).select("Id").get()
                 .then((fieldRequestResults) => {

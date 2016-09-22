@@ -19,8 +19,9 @@ export class ListHandler implements ISPObjectHandler {
 
     private processingViewConfig(listConfig: IList, parentWeb: Web): Promise<List> {
         return new Promise<List>((resolve, reject) => {
-            Logger.write(`Processing ${listConfig.ControlOption === ControlOption.Add || listConfig.ControlOption === undefined
-                ? "Add" : listConfig.ControlOption} list: '${listConfig.Title}'`, Logger.LogLevel.Info);
+            let processingText = listConfig.ControlOption === ControlOption.Add || listConfig.ControlOption === undefined || listConfig.ControlOption === ""
+                ? "Add" : listConfig.ControlOption;
+            Logger.write(`Processing ${processingText} list: '${listConfig.Title}'`, Logger.LogLevel.Info);
 
             parentWeb.lists.filter(`RootFolder/Name eq '${listConfig.InternalName}'`).select("Id").get()
                 .then((listRequestResults) => {

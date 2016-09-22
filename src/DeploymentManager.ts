@@ -8,6 +8,7 @@ import { SiteHandler } from "./ObjectHandler/SiteHandler";
 import { ListHandler } from "./ObjectHandler/ListHandler";
 import { FieldHandler } from "./ObjectHandler/FieldHandler";
 import { ViewHandler } from "./ObjectHandler/ViewHandler";
+import { FeatureHandler } from "./ObjectHandler/FeatureHandler";
 import { ViewFieldHandler } from "./ObjectHandler/ViewFieldHandler";
 import { ContentTypeHandler } from "./ObjectHandler/ContentTypeHandler";
 import { AuthenticationType } from "./Constants/AuthenticationType";
@@ -18,6 +19,7 @@ import { NodeJsomHandler } from "./NodeJsomHandler";
 export class DeploymentManager {
     private _deploymentConfig: DeploymentConfig;
     private _objectHandlers: { [id: string]: ISPObjectHandler } = {
+        Features: new FeatureHandler(),
         Sites: new SiteHandler(),
         ContentTypes: new ContentTypeHandler(),
         Lists: new ListHandler(),
