@@ -46,6 +46,7 @@
     "gulp-json-format": "^1.0.0",
     "gulp-jsoncombine": "^1.0.3",
     "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.5.4",
     "merge-stream": "^1.0.0"
   }
 }

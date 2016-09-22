@@ -13,10 +13,10 @@ const userConfigPrefix = 'config/userconfig_*.json';
 const partialConfigPrefix = 'config/partialconfig_*.json';
 const configPrefix = 'config_';
 const assignments = {
-  List: 'InternalName',
-  Field: 'InternalName',
-  View: 'Title',
-  Site: 'Url'
+  Lists: 'InternalName',
+  Fields: 'InternalName',
+  Views: 'Title',
+  Sites: 'RelativeUrl'
 };
 
 function merge(target, source) {

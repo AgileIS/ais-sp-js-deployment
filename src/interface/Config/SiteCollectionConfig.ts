@@ -1,3 +1,3 @@
-export interface SiteCollectionConfig{
-    
+export interface SiteCollectionConfig {
+    Url: string;
 }

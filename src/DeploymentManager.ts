@@ -13,35 +13,42 @@ import { ContentTypeHandler } from "./ObjectHandler/ContentTypeHandler";
 import { AuthenticationType } from "./Constants/AuthenticationType";
 import { NodeHttpProxy } from "./NodeHttpProxy";
 import * as url from "url";
-import { NTLM } from "./ntlm";
-import { SPJSOM } from "./node-spjsom";
+import { NodeJsomHandler } from "./NodeJsomHandler";
 
 export class DeploymentManager {
     private _deploymentConfig: DeploymentConfig;
     private _objectHandlers: { [id: string]: ISPObjectHandler } = {
         Sites: new SiteHandler(),
         ContentTypes: new ContentTypeHandler(),
-        List: new ListHandler(),
-        Field: new FieldHandler(),
-        View: new ViewHandler(),
+        Lists: new ListHandler(),
+        Fields: new FieldHandler(),
+        Views: new ViewHandler(),
         ViewFields: new ViewFieldHandler(),
     };
+    private _deployDependencies: Promise<void>;
 
     constructor(deploymentConfig: DeploymentConfig) {
         this._deploymentConfig = deploymentConfig;
         this.setupProxy();
         this.setupPnPJs();
+        this._deployDependencies = NodeJsomHandler.initialize(deploymentConfig);
     }
 
     public deploy(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            this.processConfig(this._deploymentConfig)
-                .then(() => {
-                    Logger.write("All site collection processed", Logger.LogLevel.Info);
-                    resolve();
+            this._deployDependencies
+                .then( response => {
+                    this.processConfig(this._deploymentConfig)
+                        .then(() => {
+                            Logger.write("All site collection processed", Logger.LogLevel.Info);
+                            resolve();
+                        })
+                        .catch((error) => {
+                            Logger.write("Error occured while processing site collections - " + error, Logger.LogLevel.Info);
+                            reject(error);
+                        });
                 })
-                .catch((error) => {
-                    Logger.write("Error occured while processing site collections - " + error, Logger.LogLevel.Info);
+                .catch(error => {
                     reject(error);
                 });
         });
@@ -87,10 +94,6 @@ export class DeploymentManager {
             NodeHttpProxy.url = url.parse(this._deploymentConfig.User.proxyUrl);
             NodeHttpProxy.activate();
         }
-    }
-
-    private setupSpJsom(): void {
-        
     }
 
     private setupPnPJs(): void {

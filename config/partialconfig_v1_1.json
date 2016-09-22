@@ -1,11 +1,12 @@
 {
     "Sites": [
         {
-            "List": [
+            "RelativeUrl": "demo",
+            "Lists": [
                 {
                     "Title": "TestListe2 1.1",
                     "InternalName": "AIS_TestList2",
-                    "View": [
+                    "Views": [
                         {
                             "Title": "All Items",
                             "ControlOption": "Update",

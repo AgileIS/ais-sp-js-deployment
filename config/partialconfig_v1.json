@@ -1,7 +1,8 @@
 {
     "Sites": [
         {
-            "List": [
+            "RelativeUrl": "demo",
+            "Lists": [
                 {
                     "Title": "TestListe1",
                     "Description": "",
@@ -9,7 +10,7 @@
                     "TemplateType": 100,
                     "InternalName": "AIS_TestList1",
                     "EnableContentTypes": true,
-                    "Field": [
+                    "Fields": [
                         {
                             "Title": "TestList1Field1",
                             "InternalName": "AIS_TestList1Field1",
@@ -38,7 +39,7 @@
                             "ControlOption": ""
                         }
                     ],
-                    "View": [
+                    "Views": [
                         {
                             "Title": "All Items",
                             "ControlOption": "Update",
@@ -92,7 +93,7 @@
                     "TemplateType": 100,
                     "InternalName": "AIS_TestList2",
                     "EnableContentTypes": true,
-                    "Field": [
+                    "Fields": [
                         {
                             "Title": "TestList2Field1",
                             "InternalName": "AIS_TestList2Field1",
@@ -112,7 +113,7 @@
                             "ControlOption": ""
                         }
                     ],
-                    "View": [
+                    "Views": [
                         {
                             "Title": "All Items",
                             "ControlOption": "Update",
@@ -135,7 +136,7 @@
                     ]
                 }
             ],
-            "Field": [
+            "Fields": [
                 {
                     "Title": "TestField1",
                     "InternalName": "AIS_TestField1",

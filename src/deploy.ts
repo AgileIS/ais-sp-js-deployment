@@ -22,7 +22,7 @@ let clArgs: ConsoleArguments = <any>minimist(global.process.argv.slice(2), {
     default: {
         l: Logger.LogLevel.Verbose,
     },
-    string: ["f", "l"]
+    string: ["f", "l"],
 });
 
 Logger.subscribe(new MyConsoleLogger());

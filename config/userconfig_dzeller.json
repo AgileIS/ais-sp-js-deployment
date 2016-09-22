@@ -6,7 +6,8 @@
     },
     "Sites": [
         {
-            "Url": "http://dev2013vm4.dev.local.agile-is.de/sites/demo"
+            "Url": "http://dev2013vm4.dev.local.agile-is.de/sites/demo",
+            "RelativeUrl": "demo"
         }
     ]
 }

@@ -2,11 +2,13 @@
     "User": {
         "username": "dev\\tuser",
         "authtype": "Ntlm",
-        "password": "Start@123"
+        "password": "Start@123",
+        "proxyUrl": "http://localhost:8888"
     },
     "Sites": [
         {
-            "Url": "http://dev2013vm5.dev.local.agile-is.de/sites/demo"
+            "Url": "http://dev2013vm5.dev.local.agile-is.de/sites/demo",
+            "RelativeUrl": "demo"
         }
     ]
 }

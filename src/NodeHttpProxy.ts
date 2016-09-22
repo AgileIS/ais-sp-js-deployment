@@ -21,43 +21,41 @@ class NodeHttpProxyImpl implements NodeHttpProxy {
     private _isActive: boolean = false;
 
     public static httpRequest(options: http.RequestOptions, callback?: (res: http.IncomingMessage) => void): http.ClientRequest {
-        NodeHttpProxyImpl.setupProxy(options);
-        return NodeHttpProxyImpl.instance._httpSavedRequest(options, callback);
+        return NodeHttpProxyImpl.instance._httpSavedRequest(NodeHttpProxyImpl.setupProxy(options), callback);
     }
 
     public static httpsRequest(options: http.RequestOptions, callback?: (res: http.IncomingMessage) => void): http.ClientRequest {
-        NodeHttpProxyImpl.setupProxy(options);
-        return NodeHttpProxyImpl.instance._httpsSavedRequest(options, callback);
+        return NodeHttpProxyImpl.instance._httpsSavedRequest(NodeHttpProxyImpl.setupProxy(options), callback);
     }
 
-    public static setupProxy(options: http.RequestOptions): void {
+    public static setupProxy(options: http.RequestOptions): http.RequestOptions {
         if (NodeHttpProxyImpl.instance.isActive) {
             let requestOptions = undefined;
 
             if (typeof options === "string") {
-                url.parse(options as string, true);
+                requestOptions = url.parse(options as string, true);
+                requestOptions.url = options;
             } else {
                 requestOptions = options;
             }
 
-            if (!options.host && !options.hostname) {
+            if (!requestOptions.host && !requestOptions.hostname) {
                 throw new Error("host or hostname must have value.");
             }
 
-            options.path = url.format(requestOptions.url);
-            options.headers = options.headers || {};
+            requestOptions.path = url.format(requestOptions.url);
+            requestOptions.headers = options.headers || {};
 
-            requestOptions.headers.Host = requestOptions.host || url.format({
-                hostname: requestOptions.hostname,
-                port: requestOptions.port,
-            });
+            requestOptions.headers.Host = requestOptions.host || requestOptions.hostname;
 
             requestOptions.protocol = NodeHttpProxyImpl.instance.url.protocol;
             requestOptions.hostname = NodeHttpProxyImpl.instance.url.hostname;
             requestOptions.port = Number(NodeHttpProxyImpl.instance.url.port);
             requestOptions.href = null;
             requestOptions.host = null;
+            return requestOptions;
         }
+        return options;
     }
 
     public constructor() {
