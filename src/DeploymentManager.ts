@@ -6,6 +6,7 @@ import { SiteCollectionConfig } from "./interface/Config/SiteCollectionConfig";
 import { ISPObjectHandler } from "./interface/ObjectHandler/ispobjecthandler";
 import { SiteHandler } from "./ObjectHandler/SiteHandler";
 import { ListHandler } from "./ObjectHandler/ListHandler";
+import { ItemHandler } from "./ObjectHandler/ItemHandler";
 import { FieldHandler } from "./ObjectHandler/FieldHandler";
 import { ViewHandler } from "./ObjectHandler/ViewHandler";
 import { FeatureHandler } from "./ObjectHandler/FeatureHandler";
@@ -21,11 +22,13 @@ export class DeploymentManager {
     private _objectHandlers: { [id: string]: ISPObjectHandler } = {
         Features: new FeatureHandler(),
         Sites: new SiteHandler(),
-/*        ContentTypes: new ContentTypeHandler(),
+/*      ContentTypes: new ContentTypeHandler(),
         Lists: new ListHandler(),
         Fields: new FieldHandler(),
         Views: new ViewHandler(),
-        ViewFields: new ViewFieldHandler(),*/
+        ViewFields: new ViewFieldHandler(),
+        Items: new ItemHandler(),
+*/
     };
     private _deployDependencies: Promise<void>;
 
