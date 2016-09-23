@@ -75,7 +75,7 @@ export class FeatureHandler implements ISPObjectHandler {
             let scope = featureConfig.Scope ? SP.FeatureDefinitionScope[featureConfig.Scope] : SP.FeatureDefinitionScope.none;
             scope = scope === SP.FeatureDefinitionScope.web ? SP.FeatureDefinitionScope.none : scope;
             scope = scope === SP.FeatureDefinitionScope.site ? SP.FeatureDefinitionScope.farm : scope;
-            featureCollection.add(new SP.Guid(featureConfig.ID), true, scope as SP.FeatureDefinitionScope);
+            featureCollection.add(new SP.Guid(featureConfig.ID), false, scope as SP.FeatureDefinitionScope);
             featureCollection.get_context().executeQueryAsync(
                 (sender, args) => {
                     Resolve(resolve, `Activated feature: '${featureConfig.ID}'`, featureConfig.ID);
