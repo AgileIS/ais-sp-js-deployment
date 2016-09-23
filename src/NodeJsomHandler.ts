@@ -5,9 +5,9 @@ import * as http from "http";
 import * as https from "https";
 import * as url from "url";
 import * as vm from "vm";
-import { DeploymentConfig } from "./interface/Config/DeploymentConfig";
-import { AuthenticationType } from "./Constants/AuthenticationType";
-import { UrlJoin } from "./Util/Util";
+import { DeploymentConfig } from "./interface/config/deploymentconfig";
+import { AuthenticationType } from "./constants/authenticationtype";
+import { UrlJoin } from "./util/util";
 
 declare var hash: any;
 declare var global: NodeJS.Global;
@@ -61,8 +61,8 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                 if (!requestOptions.url) {
                     requestOptions.url = UrlJoin([options.protocol, options.host, options.path]);
                 }
-                if (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) { 
-                    requestOptions.agent = NodeJsomHandlerImpl._agents[requestOptions.url.split("/_api")[0]];
+                if (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) {
+                    requestOptions.agent = NodeJsomHandlerImpl._agents[requestOptions.url.split("/_")[0]];
                 } else {
                     requestOptions.headers.Authorization = NodeJsomHandlerImpl._authOptions;
                 }
@@ -114,12 +114,12 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
 
     private setupSiteContext(siteUrl: string): Promise<void> {
         const lib = siteUrl.indexOf("https") > -1 ? https : http;
-        let reqUrl = UrlJoin([siteUrl, "_api/web/title"])
+        let reqUrl = UrlJoin([siteUrl, "_api/web/title"]);
         let parsedUrl = url.parse(reqUrl as string);
         let authValue = NodeJsomHandlerImpl._authOptions;
         if (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) {
             authValue = NTLM.createType1Message(NodeJsomHandlerImpl._authOptions);
-            NodeJsomHandlerImpl._agents[siteUrl] = new lib.Agent({ keepAlive: true, maxSockets: 1 });
+            NodeJsomHandlerImpl._agents[siteUrl] = new lib.Agent({ keepAlive: true, maxSockets: 1, keepAliveMsecs: 100 });
         }
         let options = {
             hostname: parsedUrl.hostname,
@@ -130,7 +130,7 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                 connection: "keep-alive",
                 "Authorization": authValue,
             },
-            agent: NodeJsomHandlerImpl._agents[siteUrl],
+            agent: (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) ? NodeJsomHandlerImpl._agents[siteUrl] : false,
         };
 
         return new Promise<void>((resolve, reject) => {
@@ -218,7 +218,21 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                     }
                     return new Promise((res, rej) => {
                         const lib = siteUrl.indexOf("https") > -1 ? https : http;
-                        const request = lib.get(UrlJoin([siteUrl, currentValue]), response => {
+
+                        let reqUrl = UrlJoin([siteUrl, currentValue]);
+                        let parsedUrl = url.parse(reqUrl as string);
+                        let authValue = NodeJsomHandlerImpl._authOptions;
+                        let options = {
+                            hostname: parsedUrl.hostname,
+                            path: parsedUrl.path,
+                            url: reqUrl,
+                            method: "GET",
+                            headers: (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) ?
+                            { connection: "keep-alive" } : { "Authorization": authValue },
+                            agent: (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) ? NodeJsomHandlerImpl._agents[siteUrl] : false,
+                        };
+
+                        const request = lib.get(options, response => {
                             const body = [];
                             response.on("data", (chunk) => body.push(chunk));
                             response.on("end", () => res(body.join("")));
@@ -230,7 +244,14 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                 if (loadedScript) {
                     vm.runInThisContext(loadedScript);
                 }
-                resolve();
+                let context = new SP.ClientContext(siteUrl);
+                let web = context.get_web();
+                context.load(web);
+                context.executeQueryAsync((sender, args) => {
+                    resolve();
+                }, (sender, args) => {
+                    reject(`Error while initialize JSOM: ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                });
             });
         });
     }

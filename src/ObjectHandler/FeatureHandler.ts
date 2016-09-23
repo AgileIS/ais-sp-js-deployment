@@ -23,8 +23,11 @@ export class FeatureHandler implements ISPObjectHandler {
                     ? featureConfig.ControlOption : "Active";
             Logger.write(`Processing ${processingCrlOption} feature: '${featureConfig.ID}'`, Logger.LogLevel.Info);
 
-            let context = new SP.ClientContext(parentWeb.toUrl().split("_api")[0]);
-            let featureCollection = context.get_web().get_features();
+            let context = new SP.ClientContext(parentWeb.toUrl().split("/_")[0]);
+            let featureCollection = context.get_site().get_features();
+            if (featureConfig.Scope === SP.FeatureDefinitionScope.web) {
+                featureCollection = context.get_web().get_features();
+            }
             let feature = featureCollection.getById(new SP.Guid(featureConfig.ID));
             context.load(feature);
             context.executeQueryAsync(
@@ -69,8 +72,10 @@ export class FeatureHandler implements ISPObjectHandler {
 
     private addFeature(featureConfig: IFeature, featureCollection: SP.FeatureCollection): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            let scope = featureConfig.Scope === SP.FeatureDefinitionScope.web ? SP.FeatureDefinitionScope.web : featureConfig.Scope;
-            featureCollection.add(new SP.Guid(featureConfig.ID), true, scope);
+            let scope = featureConfig.Scope ? SP.FeatureDefinitionScope[featureConfig.Scope] : SP.FeatureDefinitionScope.none;
+            scope = scope === SP.FeatureDefinitionScope.web ? SP.FeatureDefinitionScope.none : scope;
+            scope = scope === SP.FeatureDefinitionScope.site ? SP.FeatureDefinitionScope.farm : scope;
+            featureCollection.add(new SP.Guid(featureConfig.ID), false, scope as SP.FeatureDefinitionScope);
             featureCollection.get_context().executeQueryAsync(
                 (sender, args) => {
                     Resolve(resolve, `Activated feature: '${featureConfig.ID}'`, featureConfig.ID);
