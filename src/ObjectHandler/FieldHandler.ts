@@ -8,7 +8,7 @@ import { IField }  from "../interface/Types/IField";
 import { FieldTypeKind } from "../Constants/FieldTypeKind";
 import { ControlOption } from "../Constants/ControlOption";
 import { Reject, Resolve } from "../Util/Util";
-
+import * as url from "url";
 
 export class FieldHandler {
     public execute(fieldConfig: IField, parentPromise: Promise<List | Web>): Promise<Field> {
@@ -65,12 +65,12 @@ export class FieldHandler {
                 .catch((error) => { Reject(reject, `Error while requesting field with the internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });
         });
     }
-
+ 
     private addField(fieldConfig: IField, parentFields: Fields): Promise<Field> {
         return new Promise<Field>((resolve, reject) => {
             let processingPromise: Promise<Field> = undefined;
 
-            switch (fieldConfig.FieldTypeKind) {
+            switch (FieldTypeKind[fieldConfig.FieldType]) {
                 case undefined:
                 case "":
                 case null:
@@ -119,7 +119,34 @@ export class FieldHandler {
 
     private addLookupField(fieldConfig: IField, parentFields: Fields) {
         return new Promise<Field>((resolve, reject) => {
-            Reject(reject, "Add lookup field not implemented yet", fieldConfig.Title);
+            let context = SP.ClientContext.get_current();
+            let urlParts = parentFields.toUrl().split("/").reverse();
+
+            let lookupList: SP.List = context.get_web().get_lists().getByTitle(fieldConfig.LookupList);
+            let fieldCollection: SP.FieldCollection = undefined;
+
+            if ((urlParts[1] as string).indexOf("lists") === 0) {
+                let listId = (urlParts[1] as string).split("'")[1];
+                fieldCollection = context.get_web().get_lists().getById(listId).get_fields();
+            } else {
+                fieldCollection = context.get_web().get_fields(); // ??? Possible for Web Fields ???
+            }
+
+            context.load(lookupList);
+            context.load(fieldCollection);
+            context.executeQueryAsync((sender, args) => {
+                const fieldXml = `<Field Type='${fieldConfig.FieldType}' ${fieldConfig.Multivalue ? "Mult='TRUE'" : ""} DisplayName='${fieldConfig.Title}' ShowField='${fieldConfig.ShowField}'` +
+                                 ` StaticName='${fieldConfig.InternalName}' List='${lookupList.get_id().toString()}' Name='${fieldConfig.InternalName}'></Field>`;
+                let lookupField = fieldCollection.addFieldAsXml(fieldXml, false, SP.AddFieldOptions.defaultValue);
+                context.executeQueryAsync((sender, args) => {
+                    // Props
+                    // Dependend..
+                }, (sender, args) => {
+                    Reject(reject, `Error while adding LookupField with InternalName '${fieldConfig.InternalName}': ${args.get_message()} '\n' ${args.get_stackTrace()}`, fieldConfig.InternalName);
+                });
+            }, (sender, args) => {
+                Reject(reject, `Error while adding LookupField with InternalName '${fieldConfig.InternalName}': ${args.get_message()} '\n' ${args.get_stackTrace()}`, fieldConfig.InternalName);
+            });
         });
     }
 
@@ -148,7 +175,7 @@ export class FieldHandler {
             case ControlOption.Update:
                 delete parsedObject.ControlOption;
                 delete parsedObject.InternalName;
-                delete parsedObject.FieldTypeKind;
+                delete parsedObject.FieldType;
                 delete parsedObject.DateFormat;
                 delete parsedObject.OutputType;
                 delete parsedObject.Formula;
@@ -160,6 +187,8 @@ export class FieldHandler {
                 delete parsedObject.DateFormat;
                 delete parsedObject.Formula;
                 delete parsedObject.OutputType;
+                parsedObject.FieldTypeKind = FieldTypeKind[parsedObject.FieldType];
+                delete parsedObject.FieldType;
                 break;
         }
         stringifiedObject = JSON.stringify(parsedObject);

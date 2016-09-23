@@ -104,17 +104,17 @@ export class ListHandler implements ISPObjectHandler {
             case ControlOption.Update:
                 delete parsedObject.InternalName;
                 delete parsedObject.ControlOption;
-                delete parsedObject.Field;
+                delete parsedObject.Fields;
                 delete parsedObject.EnableContentTypes;
-                delete parsedObject.View;
+                delete parsedObject.Views;
                 delete parsedObject.TemplateType;
                 break;
             default:
                 delete parsedObject.InternalName;
                 delete parsedObject.EnableContentTypes;
                 delete parsedObject.ControlOption;
-                delete parsedObject.Field;
-                delete parsedObject.View;
+                delete parsedObject.Fields;
+                delete parsedObject.Views;
                 delete parsedObject.Title;
                 delete parsedObject.Description;
                 delete parsedObject.TemplateType;
