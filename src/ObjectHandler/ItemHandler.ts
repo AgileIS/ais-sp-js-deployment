@@ -10,14 +10,14 @@ export class ItemHandler implements ISPObjectHandler {
     public execute(itemConfig: IItem, parentPromise: Promise<List>): Promise<Item> {
         return new Promise<Item>((resolve, reject) => {
             parentPromise.then(parentList => {
-                this.processingViewConfig(itemConfig, parentList)
+                this.processingItemConfig(itemConfig, parentList)
                     .then((itemProsssingResult) => { resolve(itemProsssingResult); })
                     .catch((error) => { reject(error); });
             });
         });
     }
 
-    private processingViewConfig(itemConfig: IItem, parentList: List): Promise<Item> {
+    private processingItemConfig(itemConfig: IItem, parentList: List): Promise<Item> {
         return new Promise<Item>((resolve, reject) => {
             let processingText = itemConfig.ControlOption === ControlOption.Add || itemConfig.ControlOption === undefined || itemConfig.ControlOption === ""
                 ? "Add" : itemConfig.ControlOption;
@@ -100,7 +100,6 @@ export class ItemHandler implements ISPObjectHandler {
                 break;
             default:
                 delete parsedObject.ControlOption;
-                delete parsedObject.Title;
                 break;
         }
         stringifiedObject = JSON.stringify(parsedObject);

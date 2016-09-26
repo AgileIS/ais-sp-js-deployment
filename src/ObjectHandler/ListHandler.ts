@@ -109,6 +109,7 @@ export class ListHandler implements ISPObjectHandler {
                 delete parsedObject.Fields;
                 delete parsedObject.EnableContentTypes;
                 delete parsedObject.Views;
+                delete parsedObject.Items;
                 delete parsedObject.TemplateType;
                 break;
             default:
@@ -118,6 +119,7 @@ export class ListHandler implements ISPObjectHandler {
                 delete parsedObject.Fields;
                 delete parsedObject.Views;
                 delete parsedObject.Title;
+                delete parsedObject.Items;
                 delete parsedObject.Description;
                 delete parsedObject.TemplateType;
                 break;

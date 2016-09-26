@@ -2,6 +2,7 @@ import { IFolder } from "./IFolder";
 import { IListFieldRef } from "./IListFieldRef";
 import { IField } from "./IField";
 import { IView } from "./IView";
+import { IItem } from "./IItem";
 import { ISecurity } from "./ISecurity";
 import { IContentTypeBinding } from "./IContentTypeBinding";
 
@@ -37,4 +38,5 @@ export interface IList {
     InternalName: string;
     EnableContentTypes: boolean;
     ControlOption: string;
+    Items: Array<IItem>;
 }

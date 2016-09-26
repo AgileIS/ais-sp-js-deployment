@@ -84,6 +84,21 @@
                                 }
                             ]
                         }
+                    ],
+                     "Items": [
+                        {
+                            "ControlOption": "",
+                            "Title": "TestTitle"
+                        },
+                         {
+                            "ControlOption": "",
+                            "Title": "TestTitle2"
+                        },
+                         {
+                            "ControlOption": "",
+                            "Title": "TestTitle3",
+                            "AIS_TestList1Field1": 10
+                        }
                     ]
                 },
                 {
