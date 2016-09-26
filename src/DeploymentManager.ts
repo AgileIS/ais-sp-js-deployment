@@ -6,11 +6,13 @@ import { SiteCollectionConfig } from "./interface/Config/SiteCollectionConfig";
 import { ISPObjectHandler } from "./interface/ObjectHandler/ispobjecthandler";
 import { SiteHandler } from "./ObjectHandler/SiteHandler";
 import { ListHandler } from "./ObjectHandler/ListHandler";
+import { ItemHandler } from "./ObjectHandler/ItemHandler";
 import { FieldHandler } from "./ObjectHandler/FieldHandler";
 import { ViewHandler } from "./ObjectHandler/ViewHandler";
 import { FeatureHandler } from "./ObjectHandler/FeatureHandler";
 import { ViewFieldHandler } from "./ObjectHandler/ViewFieldHandler";
 import { ContentTypeHandler } from "./ObjectHandler/ContentTypeHandler";
+import { NavigationHandler } from "./ObjectHandler/NavigationHandler";
 import { AuthenticationType } from "./Constants/AuthenticationType";
 import { NodeHttpProxy } from "./NodeHttpProxy";
 import { NodeJsomHandler } from "./NodeJsomHandler";
@@ -26,6 +28,8 @@ export class DeploymentManager {
         Fields: new FieldHandler(),
         Views: new ViewHandler(),
         ViewFields: new ViewFieldHandler(),
+        Items: new ItemHandler(),
+        Navigation: new NavigationHandler(),
     };
     private _deployDependencies: Promise<void>;
 
@@ -101,7 +105,7 @@ export class DeploymentManager {
     private setupPnPJs(): void {
         let userConfig = this._deploymentConfig.User;
         Logger.write("Setup pnp-core-js", Logger.LogLevel.Info);
-        Logger.write(`pno-core-js authentication type: ${userConfig.authtype}`, Logger.LogLevel.Info);
+        Logger.write(`pnp-core-js authentication type: ${userConfig.authtype}`, Logger.LogLevel.Info);
 
         let pnpConfig: LibraryConfiguration;
         if (String(userConfig.authtype).toLowerCase() === AuthenticationType.Ntlm.toLowerCase()) {

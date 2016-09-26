@@ -61,6 +61,8 @@ export class FieldHandler {
                         processingPromise
                             .then((fieldProcessingResult) => { resolve(fieldProcessingResult); })
                             .catch((error) => { reject(error); });
+                    } else {
+                        Logger.write("Field handler processing promise is undefined!");
                     }
                 })
                 .catch((error) => { Reject(reject, `Error while requesting field with the internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });

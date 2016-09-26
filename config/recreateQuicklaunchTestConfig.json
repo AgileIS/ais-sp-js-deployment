@@ -1,0 +1,31 @@
+{
+    "User": {
+        "username": "dev\\tuser",
+        "authtype": "Ntlm",
+        "password": "Start@123",
+        "proxyUrl": "http://localhost:8888"
+    },
+    "Sites": [
+        {
+            "Url": "http://dev2013vm3/sites/deploymentjs2/subsite",
+            "Navigation": {
+                "UseShared": false,
+                "ReCreateQuicklaunch": true,
+                "QuickLaunch": [
+                    {
+                        "Title": "Nav1",
+                        "Url": "http://google.de",
+                        "IsExternal": true,
+                        "Children": [
+                            {
+                                "Title": "Nav12",
+                                "Url": "http://google.de",
+                                "IsExternal": true
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}
