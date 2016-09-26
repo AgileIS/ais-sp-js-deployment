@@ -1,9 +1,6 @@
-/// <reference path="../../typings/index.d.ts" />
-
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
 import { ContentType } from "@agileis/sp-pnp-js/lib/sharepoint/rest/ContentTypes";
-import { Util } from "@agileis/sp-pnp-js/lib/utils/util";
 import { ISPObjectHandler } from "../interface/ObjectHandler/ispobjecthandler";
 import { IContentType } from "../interface/Types/IContentType";
 import { ControlOption } from "../Constants/ControlOption";
@@ -13,9 +10,13 @@ export class ContentTypeHandler implements ISPObjectHandler {
     public execute(contentTypeConfig: IContentType, parentPromise: Promise<Web>): Promise<ContentType> {
         return new Promise<ContentType>((resolve, reject) => {
             parentPromise.then((parentList) => {
-                this.processingContentTypeConfig(contentTypeConfig, parentList)
-                    .then((contentTypeProsssingResult) => { resolve(contentTypeProsssingResult); })
-                    .catch((error) => { reject(error); });
+                if (contentTypeConfig.Id && contentTypeConfig.Name) {
+                    this.processingContentTypeConfig(contentTypeConfig, parentList)
+                        .then((contentTypeProsssingResult) => { resolve(contentTypeProsssingResult); })
+                        .catch((error) => { reject(error); });
+                } else {
+                    Reject(reject, `Error while processing content type with the name '${contentTypeConfig.Name}': Content type id or/and name are undefined`, contentTypeConfig.Name);
+                }
             });
         });
     }
@@ -26,117 +27,179 @@ export class ContentTypeHandler implements ISPObjectHandler {
                 ? "Add" : contentTypeConfig.ControlOption;
             Logger.write(`Processing ${processingText} content type: '${contentTypeConfig.Name}'`, Logger.LogLevel.Info);
 
-            parentWeb.contentTypes.filter(`Name eq '${contentTypeConfig.Name}'`).get().then((contentTypeRequestResults) => {
-                let processingPromise: Promise<ContentType> = undefined;
+            let context = new SP.ClientContext(parentWeb.toUrl().split("/_")[0]);
+            let web = context.get_web();
+            let rootWeb = context.get_site().get_rootWeb();
+            let webContentType = web.get_contentTypes().getById(contentTypeConfig.Id);
+            let siteContentType = web.get_availableContentTypes().getById(contentTypeConfig.Id);
+            context.load(webContentType, "Id", "Name");
+            context.load(siteContentType, "Id", "Name");
+            context.executeQueryAsync(
+                (sender, args) => {
+                    let processingPromise: Promise<SP.ContentType> = undefined;
 
-                if (contentTypeRequestResults && contentTypeRequestResults.length === 1) {
-                    let contentType = parentWeb.contentTypes.getById(contentTypeRequestResults[0].Id.StringValue);
-                    switch (contentTypeConfig.ControlOption) {
-                        case ControlOption.Update:
-                            processingPromise = this.updateContentType(contentTypeConfig, contentType);
-                            break;
-                        case ControlOption.Delete:
-                            processingPromise = this.deleteContentType(contentTypeConfig, contentType);
-                            break;
-                        default:
-                            Resolve(resolve, `Content type with the name '${contentTypeConfig.Name}' already exists`, contentTypeConfig.Name, contentType);
-                            break;
+                    if (!siteContentType.get_serverObjectIsNull() || !webContentType.get_serverObjectIsNull()) {
+                        let contentType: SP.ContentType = undefined;
+                        if (!webContentType.get_serverObjectIsNull()) {
+                            contentType = webContentType;
+                        } else {
+                            contentType = siteContentType;
+                        }
+
+                        let restContentType = parentWeb.contentTypes.getById(contentType.get_id().get_typeId());
+
+                        switch (contentTypeConfig.ControlOption) {
+                            case ControlOption.Update:
+                                processingPromise = this.updateContentType(contentTypeConfig, contentType);
+                                break;
+                            case ControlOption.Delete:
+                                processingPromise = this.deleteContentType(contentTypeConfig, contentType);
+                                break;
+                            default:
+                                Resolve(resolve, `Content type with the name '${contentTypeConfig.Name}' already exists in target web`, contentTypeConfig.Name, restContentType);
+                                break;
+                        }
+                    } else {
+                        switch (contentTypeConfig.ControlOption) {
+                            case ControlOption.Update:
+                            case ControlOption.Delete:
+                                Reject(reject, `Content type with the name '${contentTypeConfig.Name}' does not exists`, contentTypeConfig.Name);
+                                break;
+                            default:
+                                processingPromise = this.addContentType(contentTypeConfig, rootWeb.get_contentTypes());
+                                break;
+                        }
                     }
-                } else {
-                    switch (contentTypeConfig.ControlOption) {
-                        case ControlOption.Update:
-                        case ControlOption.Delete:
-                            Reject(reject, `Content type with the name '${contentTypeConfig.Name}' does not exists`, contentTypeConfig.Name);
-                            break;
-                        default:
-                            processingPromise = this.addContentType(contentTypeConfig, parentWeb);
-                            break;
+
+                    if (processingPromise) {
+                        processingPromise
+                            .then((contentTypeProsssingResult) => {
+                                let resolveResult = undefined;
+                                if (typeof contentTypeProsssingResult !== "string") {
+                                    resolveResult = parentWeb.contentTypes.getById(contentTypeProsssingResult.get_id().get_stringValue());
+                                }
+                                resolve(resolveResult);
+                            })
+                            .catch((error) => { reject(error); });
                     }
-                }
-
-                if (processingPromise) {
-                    processingPromise.then((contentTypeProsssingResult) => { resolve(contentTypeProsssingResult); }).catch((error) => { reject(error); });
-                }
-            }).catch((error) => {
-                Reject(reject, `Error while requesting content type with the name '${contentTypeConfig.Name}': ` + error, contentTypeConfig.Name);
-            });
+                },
+                (sender, args) => {
+                    Reject(reject, `Error while requesting content type with the name '${contentTypeConfig.Name}': ${args.get_message()} '\n' ${args.get_stackTrace()}`, contentTypeConfig.Name);
+                });
         });
     }
 
-    private addContentTypeToCollection(properties: IContentType, parentWeb: Web): Promise<ContentTypeAddResult> {
-        let postBody = JSON.stringify(Util.extend({
-            "__metadata": { "type": "SP.ContentType" },
-        }, properties));
-
-        return parentWeb.contentTypes.post({ body: postBody })
-            .then((data) => {
-                return { contentType: parentWeb.contentTypes.getById(data.Id), data: data };
-            });
-    }
-
-    private addContentType(contentTypeConfig: IContentType, parentWeb: Web): Promise<ContentType> {
-        return new Promise<ContentType>((resolve, reject) => {
-            let properties = this.createProperties(contentTypeConfig);
-            this.addContentTypeToCollection(properties, parentWeb)
-                .then((contentTypeAddResult) => { Resolve(resolve, `Added content Type: '${contentTypeConfig.Name}'`, contentTypeConfig.Name, contentTypeAddResult.contentType); })
-                .catch((error) => { Reject(reject, `Error while adding content type with the name '${contentTypeConfig.Name}': ` + error, contentTypeConfig.Name); });
-        });
-    }
-
-    private mergeContentType(properties: any, contentType: ContentType): Promise<ContentTypeUpdateResult> {
-        let postBody: string = JSON.stringify(Util.extend({
-            "__metadata": { "type": "SP.ContentType" },
-        }, properties));
-
-        return contentType.post({ body: postBody, headers: { "X-HTTP-Method": "MERGE" } })
-            .then((data) => {
-                return {
-                    contentType: contentType,
-                    data: data,
-                };
-            });
-    }
-
-    private updateContentType(contentTypeConfig: IContentType, contentType: ContentType): Promise<ContentType> {
-        return new Promise<ContentType>((resolve, reject) => {
-            let properties = this.createProperties(contentTypeConfig);
-            this.mergeContentType(properties, contentType)
-                .then((contentTypeUpdateResult) => { Resolve(resolve, `Updated content type: '${contentTypeConfig.Name}'`, contentTypeConfig.Name, contentTypeUpdateResult.contentType); })
-                .catch((error) => { Reject(reject, `Error while updating content type with the name '${contentTypeConfig.Name}': ` + error, contentTypeConfig.Name); });
-        });
-    }
-
-    private deleteContentType(contentTypeConfig: IContentType, contentType: ContentType): Promise<ContentType> {
-        return new Promise<ContentType>((resolve, reject) => {
-            contentType.post({ headers: { "X-HTTP-Method": "DELETE" } })
-                .then(() => { Resolve(resolve, `Deleted content Type: '${contentTypeConfig.Name}'`, contentTypeConfig.Name); })
-                .catch((error) => { Reject(reject, `Error while deleting content type with the name '${contentTypeConfig.Name}': ` + error, contentTypeConfig.Name); });
-        });
-    }
-
-    private createProperties(contentTypeConfig: IContentType) {
-        let stringifiedObject: string;
-        stringifiedObject = JSON.stringify(contentTypeConfig);
-        let parsedObject: IContentType = JSON.parse(stringifiedObject);
-        switch (contentTypeConfig.ControlOption) {
-            case ControlOption.Update:
-                delete parsedObject.ControlOption;
-                break;
-            default:
-                delete parsedObject.ControlOption;
-                break;
+    private setContentTypeProperties(contentTypeConfig: IContentType, contentType: SP.ContentType): void {
+        for (let prop in contentTypeConfig) {
+            switch (prop) {
+                case "Description":
+                    contentType.set_description(contentTypeConfig.Description);
+                    break;
+                case "DisplayFormTemplateName":
+                    contentType.set_displayFormTemplateName(contentTypeConfig.DisplayFormTemplateName);
+                    break;
+                case "DisplayFormUrl":
+                    contentType.set_displayFormUrl(contentTypeConfig.DisplayFormUrl);
+                    break;
+                case "DocumentTemplate":
+                    contentType.set_documentTemplate(contentTypeConfig.DocumentTemplate);
+                    break;
+                case "EditFormTemplateName":
+                    contentType.set_editFormTemplateName(contentTypeConfig.EditFormTemplateName);
+                    break;
+                case "EditFormUrl":
+                    contentType.set_editFormUrl(contentTypeConfig.EditFormUrl);
+                    break;
+                case "Group":
+                    contentType.set_group(contentTypeConfig.Group);
+                    break;
+                case "Hidden":
+                    contentType.set_hidden(contentTypeConfig.Hidden);
+                    break;
+                case "JSLink":
+                    contentType.set_jsLink(contentTypeConfig.JSLink);
+                    break;
+                case "Name":
+                    contentType.set_name(contentTypeConfig.Name);
+                    break;
+                case "NewFormTemplateName":
+                    contentType.set_newFormTemplateName(contentTypeConfig.NewFormTemplateName);
+                    break;
+                case "NewFormUrl":
+                    contentType.set_newFormUrl(contentTypeConfig.NewFormUrl);
+                    break;
+                case "ReadOnly":
+                    contentType.set_readOnly(contentTypeConfig.ReadOnly);
+                    break;
+                case "Sealed":
+                    contentType.set_sealed(contentTypeConfig.Sealed);
+                    break;
+            }
         }
-        stringifiedObject = JSON.stringify(parsedObject);
-        return JSON.parse(stringifiedObject);
     }
-}
 
-export interface ContentTypeAddResult {
-    contentType: ContentType;
-    data: any;
-}
+    private getContentTypeCreationInfo(contentTypeConfig: IContentType): SP.ContentTypeCreationInformation {
+        let contentTypeCreationInfo = new SP.ContentTypeCreationInformation();
+        contentTypeCreationInfo.set_id(contentTypeConfig.Id);
+        contentTypeCreationInfo.set_name(contentTypeConfig.Name);
+        if (contentTypeConfig.Description) {
+            contentTypeCreationInfo.set_description(contentTypeConfig.Description);
+        }
+        if (contentTypeConfig.Group) {
+            contentTypeCreationInfo.set_group(contentTypeConfig.Group);
+        }
+        return contentTypeCreationInfo;
+    }
 
-export interface ContentTypeUpdateResult {
-    contentType: ContentType;
-    data: any;
+
+    private addContentType(contentTypeConfig: IContentType, contentTypeCollection: SP.ContentTypeCollection): Promise<SP.ContentType> {
+        return new Promise<SP.ContentType>((resolve, reject) => {
+            let contentTypeCreationInfo = this.getContentTypeCreationInfo(contentTypeConfig);
+            let newContentType = contentTypeCollection.add(contentTypeCreationInfo);
+            let context = contentTypeCollection.get_context();
+            context.load(newContentType, "Name", "Id", "FieldLinks");
+            context.executeQueryAsync(
+                (sender, args) => {
+                    this.updateContentType(contentTypeConfig, newContentType)
+                        .then((contentTypeUpdateResult) => {
+                            Resolve(resolve, `Created and updated content Type: '${contentTypeConfig.Name}'.`,
+                                contentTypeConfig.Name, contentTypeUpdateResult);
+                        })
+                        .catch((error) => { reject(error); });
+                },
+                (sender, args) => {
+                    Reject(reject, `Error while adding content type with the name '${contentTypeConfig.Name}':  ${args.get_message()} '\n' ${args.get_stackTrace()}`, contentTypeConfig.Name);
+                }
+            );
+        });
+    }
+
+    private updateContentType(contentTypeConfig: IContentType, contentType: SP.ContentType): Promise<SP.ContentType> {
+        return new Promise<SP.ContentType>((resolve, reject) => {
+            this.setContentTypeProperties(contentTypeConfig, contentType);
+            contentType.update(true);
+            contentType.get_context().executeQueryAsync(
+                (sender, args) => {
+                    Resolve(resolve, `Updated content type: '${contentTypeConfig.Name}'`, contentTypeConfig.Name, contentType);
+                },
+                (sender, args) => {
+                    Reject(reject, `Error while updating content type with the name '${contentTypeConfig.Name}': ${args.get_message()} '\n' ${args.get_stackTrace()}`, contentTypeConfig.Name);
+                }
+            );
+        });
+    }
+
+    private deleteContentType(contentTypeConfig: IContentType, contentType: SP.ContentType): Promise<SP.ContentType> {
+        return new Promise<SP.ContentType>((resolve, reject) => {
+            contentType.deleteObject();
+            contentType.get_context().executeQueryAsync(
+                (sender, args) => {
+                    Resolve(resolve, `Deleted content Type: '${contentTypeConfig.Name}'`, contentTypeConfig.Name);
+                },
+                (sender, args) => {
+                    Reject(reject, `Error while deleting content type with the name '${contentTypeConfig.Name}': ${args.get_message()} '\n' ${args.get_stackTrace()}`, contentTypeConfig.Name);
+                }
+            );
+        });
+    }
 }

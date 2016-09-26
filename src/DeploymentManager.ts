@@ -101,7 +101,7 @@ export class DeploymentManager {
     private setupPnPJs(): void {
         let userConfig = this._deploymentConfig.User;
         Logger.write("Setup pnp-core-js", Logger.LogLevel.Info);
-        Logger.write(`pno-core-js authentication type: ${userConfig.authtype}`, Logger.LogLevel.Info);
+        Logger.write(`pnp-core-js authentication type: ${userConfig.authtype}`, Logger.LogLevel.Info);
 
         let pnpConfig: LibraryConfiguration;
         if (String(userConfig.authtype).toLowerCase() === AuthenticationType.Ntlm.toLowerCase()) {

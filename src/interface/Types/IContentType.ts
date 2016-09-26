@@ -1,4 +1,5 @@
 export interface IContentType {
+    Id: string;
     Name: string;
     Description: string;
     DisplayFormUrl: string;
@@ -12,5 +13,6 @@ export interface IContentType {
     Hidden: boolean;
     JSLink: string;
     Sealed: boolean;
+    ReadOnly: boolean;
     ControlOption: string;
 }
