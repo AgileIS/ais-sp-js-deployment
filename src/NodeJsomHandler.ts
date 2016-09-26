@@ -39,14 +39,14 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
 
     public static httpRequest(options: http.RequestOptions, callback?: (res: http.IncomingMessage) => void): http.ClientRequest {
         if (typeof options !== "string" && !options.protocol) {
-            options.protocol = "http";
+            options.protocol = "http:";
         }
         return NodeJsomHandlerImpl.instance._httpSavedRequest(NodeJsomHandlerImpl.setRequiredOptions(options), callback);
     }
 
     public static httpsRequest(options: http.RequestOptions, callback?: (res: http.IncomingMessage) => void): http.ClientRequest {
         if (typeof options !== "string" && !options.protocol) {
-            options.protocol = "https";
+            options.protocol = "https:";
         }
         return NodeJsomHandlerImpl.instance._httpsSavedRequest(NodeJsomHandlerImpl.setRequiredOptions(options), callback);
     }
@@ -135,23 +135,29 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
 
         return new Promise<void>((resolve, reject) => {
             http.get(options, firstResponse => {
-                firstResponse.socket.emit("free");
-                if (firstResponse.statusCode === 401) {
-                    let type2msg = NTLM.parseType2Message(firstResponse.headers["www-authenticate"], error => {
-                        reject(error);
-                    });
-                    let type3msg = NTLM.createType3Message(type2msg, NodeJsomHandlerImpl._authOptions);
-                    options.headers.Authorization = type3msg;
-                    http.get(options, secondResponse => {
-                        firstResponse.socket.emit("free");
-                        if (secondResponse.statusCode !== 200) {
-                            reject(secondResponse.statusCode + ": after handshake!");
-                        }
+                firstResponse.on("data", () => null);
+                firstResponse.on("end", () => {
+                    if (firstResponse.statusCode === 401) {
+                         let type2msg = NTLM.parseType2Message(firstResponse.headers["www-authenticate"], error => {
+                            reject(error);
+                        });
+                        let type3msg = NTLM.createType3Message(type2msg, NodeJsomHandlerImpl._authOptions);
+                        options.headers.Authorization = type3msg;
+                        http.get(options, secondResponse => {
+                            secondResponse.on("data", () => null);
+                            secondResponse.on("end", () => {
+                                if (secondResponse.statusCode !== 200) {
+                                    reject(secondResponse.statusCode + ": after handshake!");
+                                }
+                                resolve();
+                            });
+                        });
+                    } else if (firstResponse.statusCode === 200)  {
                         resolve();
-                    });
-                } else {
-                    resolve();
-                }
+                    } else {
+                        reject("JSOM Ntlm initialize error.");
+                    }
+                });
             }).on("error", error => reject(error));
         });
     }
