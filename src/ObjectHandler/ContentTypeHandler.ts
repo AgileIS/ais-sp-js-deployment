@@ -81,6 +81,8 @@ export class ContentTypeHandler implements ISPObjectHandler {
                                 resolve(resolveResult);
                             })
                             .catch((error) => { reject(error); });
+                    } else {
+                        Logger.write("Content type handler processing promise is undefined!");
                     }
                 },
                 (sender, args) => {

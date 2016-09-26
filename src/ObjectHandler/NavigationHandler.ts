@@ -32,6 +32,8 @@ export class NavigationHandler implements ISPObjectHandler {
 
                     if (navigationConfig.ReCreateQuicklaunch) {
                         processingPromise = this.recreatingQuicklaunch(quicklaunch, navigationConfig.QuickLaunch);
+                    }else{
+                        processingPromise = this.insertNodesInQuicklaunch();
                     }
 
                     if (processingPromise) {
@@ -41,7 +43,7 @@ export class NavigationHandler implements ISPObjectHandler {
                             })
                             .catch((error) => { reject(error); });
                     } else {
-                        resolve();
+                        Logger.write("Navigation handler processing promise is undefined!");
                     }
                 },
                 (sender, args) => {
@@ -51,7 +53,7 @@ export class NavigationHandler implements ISPObjectHandler {
         });
     }
 
-    private recreatingQuicklaunch(quicklaunch: SP.NavigationNodeCollection, navigatioNodes: Array<INavigationNode>) {
+    private recreatingQuicklaunch(quicklaunch: SP.NavigationNodeCollection, navigatioNodes: Array<INavigationNode>): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             Logger.write("Recreating quicklaunch", Logger.LogLevel.Info);
 
@@ -108,5 +110,11 @@ export class NavigationHandler implements ISPObjectHandler {
                 }
             }
         );
+    }
+
+    private insertNodesInQuicklaunch(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            resolve();
+        });
     }
 }

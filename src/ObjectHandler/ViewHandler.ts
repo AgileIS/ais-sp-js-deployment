@@ -56,6 +56,8 @@ export class ViewHandler implements ISPObjectHandler {
                         processingPromise
                             .then((viewProsssingResult) => { resolve(viewProsssingResult); })
                             .catch((error) => { reject(error); });
+                    } else {
+                        Logger.write("View handler processing promise is undefined!");
                     }
                 })
                 .catch((error) => { Reject(reject, `Error while requesting view with the title '${viewConfig.Title}': ` + error, viewConfig.Title); });

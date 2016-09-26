@@ -61,6 +61,8 @@ export class FeatureHandler implements ISPObjectHandler {
                         processingPromise
                             .then((listProcessingResult) => { resolve(listProcessingResult); })
                             .catch((error) => { reject(error); });
+                    } else {
+                        Logger.write("Feature handler processing promise is undefined!");
                     }
                 },
                 (sender, args) => {

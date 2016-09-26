@@ -56,6 +56,8 @@ export class ItemHandler implements ISPObjectHandler {
                         processingPromise
                             .then((itemProcessingResult) => { resolve(itemProcessingResult); })
                             .catch((error) => { reject(error); });
+                    } else {
+                        Logger.write("List handler processing promise is undefined!");
                     }
                 })
                 .catch((error) => { Reject(reject, `Error while requesting item with the title '${itemConfig.Title}': ` + error, itemConfig.Title); });

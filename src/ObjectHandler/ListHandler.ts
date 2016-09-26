@@ -56,6 +56,8 @@ export class ListHandler implements ISPObjectHandler {
                         processingPromise
                             .then((listProcessingResult) => { resolve(listProcessingResult); })
                             .catch((error) => { reject(error); });
+                    } else {
+                        Logger.write("List handler processing promise is undefined!");
                     }
                 })
                 .catch((error) => { Reject(reject, `Error while requesting list with the internal name '${listConfig.InternalName}': ` + error, listConfig.Title); });
