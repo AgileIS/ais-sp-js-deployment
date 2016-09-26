@@ -12,6 +12,7 @@ import { ViewHandler } from "./ObjectHandler/ViewHandler";
 import { FeatureHandler } from "./ObjectHandler/FeatureHandler";
 import { ViewFieldHandler } from "./ObjectHandler/ViewFieldHandler";
 import { ContentTypeHandler } from "./ObjectHandler/ContentTypeHandler";
+import { NavigationHandler } from "./ObjectHandler/NavigationHandler";
 import { AuthenticationType } from "./Constants/AuthenticationType";
 import { NodeHttpProxy } from "./NodeHttpProxy";
 import { NodeJsomHandler } from "./NodeJsomHandler";
@@ -28,6 +29,7 @@ export class DeploymentManager {
         Views: new ViewHandler(),
         ViewFields: new ViewFieldHandler(),
         Items: new ItemHandler(),
+        Navigation: new NavigationHandler(),
     };
     private _deployDependencies: Promise<void>;
 
