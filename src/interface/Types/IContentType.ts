@@ -14,5 +14,6 @@ export interface IContentType {
     JSLink: string;
     Sealed: boolean;
     ReadOnly: boolean;
+    FieldLinks: Array<string>
     ControlOption: string;
 }

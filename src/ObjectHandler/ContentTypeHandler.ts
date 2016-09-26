@@ -9,9 +9,9 @@ import { Reject, Resolve } from "../Util/Util";
 export class ContentTypeHandler implements ISPObjectHandler {
     public execute(contentTypeConfig: IContentType, parentPromise: Promise<Web>): Promise<ContentType> {
         return new Promise<ContentType>((resolve, reject) => {
-            parentPromise.then((parentList) => {
+            parentPromise.then((parentWeb) => {
                 if (contentTypeConfig.Id && contentTypeConfig.Name) {
-                    this.processingContentTypeConfig(contentTypeConfig, parentList)
+                    this.processingContentTypeConfig(contentTypeConfig, parentWeb)
                         .then((contentTypeProsssingResult) => { resolve(contentTypeProsssingResult); })
                         .catch((error) => { reject(error); });
                 } else {
@@ -50,7 +50,7 @@ export class ContentTypeHandler implements ISPObjectHandler {
 
                         switch (contentTypeConfig.ControlOption) {
                             case ControlOption.Update:
-                                processingPromise = this.updateContentType(contentTypeConfig, contentType);
+                                processingPromise = this.updateContentType(contentTypeConfig, contentType, web);
                                 break;
                             case ControlOption.Delete:
                                 processingPromise = this.deleteContentType(contentTypeConfig, contentType);
@@ -66,7 +66,7 @@ export class ContentTypeHandler implements ISPObjectHandler {
                                 Reject(reject, `Content type with the name '${contentTypeConfig.Name}' does not exists`, contentTypeConfig.Name);
                                 break;
                             default:
-                                processingPromise = this.addContentType(contentTypeConfig, rootWeb.get_contentTypes());
+                                processingPromise = this.addContentType(contentTypeConfig, rootWeb.get_contentTypes(), web);
                                 break;
                         }
                     }
@@ -91,7 +91,7 @@ export class ContentTypeHandler implements ISPObjectHandler {
         });
     }
 
-    private setContentTypeProperties(contentTypeConfig: IContentType, contentType: SP.ContentType): void {
+    private setContentTypeProperties(contentTypeConfig: IContentType, contentType: SP.ContentType, parentWeb: SP.Web): void {
         for (let prop in contentTypeConfig) {
             switch (prop) {
                 case "Description":
@@ -138,6 +138,16 @@ export class ContentTypeHandler implements ISPObjectHandler {
                     break;
             }
         }
+
+        if (contentTypeConfig.FieldLinks && contentTypeConfig.FieldLinks.length > 0) {
+            let fieldLinks = contentType.get_fieldLinks();
+            contentTypeConfig.FieldLinks.forEach((fieldInternalName, index, array) => {
+                let fieldLink = new SP.FieldLinkCreationInformation();
+                let field = parentWeb.get_availableFields().getByInternalNameOrTitle(fieldInternalName);
+                fieldLink.set_field(field);
+                fieldLinks.add(fieldLink);
+            });
+        }
     }
 
     private getContentTypeCreationInfo(contentTypeConfig: IContentType): SP.ContentTypeCreationInformation {
@@ -154,7 +164,7 @@ export class ContentTypeHandler implements ISPObjectHandler {
     }
 
 
-    private addContentType(contentTypeConfig: IContentType, contentTypeCollection: SP.ContentTypeCollection): Promise<SP.ContentType> {
+    private addContentType(contentTypeConfig: IContentType, contentTypeCollection: SP.ContentTypeCollection, parentWeb: SP.Web): Promise<SP.ContentType> {
         return new Promise<SP.ContentType>((resolve, reject) => {
             let contentTypeCreationInfo = this.getContentTypeCreationInfo(contentTypeConfig);
             let newContentType = contentTypeCollection.add(contentTypeCreationInfo);
@@ -162,7 +172,7 @@ export class ContentTypeHandler implements ISPObjectHandler {
             context.load(newContentType, "Name", "Id", "FieldLinks");
             context.executeQueryAsync(
                 (sender, args) => {
-                    this.updateContentType(contentTypeConfig, newContentType)
+                    this.updateContentType(contentTypeConfig, newContentType, parentWeb)
                         .then((contentTypeUpdateResult) => {
                             Resolve(resolve, `Created and updated content Type: '${contentTypeConfig.Name}'.`,
                                 contentTypeConfig.Name, contentTypeUpdateResult);
@@ -176,9 +186,9 @@ export class ContentTypeHandler implements ISPObjectHandler {
         });
     }
 
-    private updateContentType(contentTypeConfig: IContentType, contentType: SP.ContentType): Promise<SP.ContentType> {
+    private updateContentType(contentTypeConfig: IContentType, contentType: SP.ContentType, parentWeb: SP.Web): Promise<SP.ContentType> {
         return new Promise<SP.ContentType>((resolve, reject) => {
-            this.setContentTypeProperties(contentTypeConfig, contentType);
+            this.setContentTypeProperties(contentTypeConfig, contentType, parentWeb);
             contentType.update(true);
             contentType.get_context().executeQueryAsync(
                 (sender, args) => {
