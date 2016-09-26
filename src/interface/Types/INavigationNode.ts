@@ -3,4 +3,5 @@ export interface INavigationNode {
     Url: string;
     Children: Array<INavigationNode>;
     IsExternal: boolean;
+    ControlOption: string;
 }

@@ -15,7 +15,14 @@
                     {
                         "Title": "Nav1",
                         "Url": "http://google.de",
-                        "IsExternal": true
+                        "IsExternal": true,
+                        "Children": [
+                            {
+                                "Title": "Nav12",
+                                "Url": "http://google.de",
+                                "IsExternal": true
+                            }
+                        ]
                     }
                 ]
             }

@@ -3,6 +3,7 @@ import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
 import { ISPObjectHandler } from "../interface/ObjectHandler/ispobjecthandler";
 import { INavigation } from "../interface/Types/INavigation";
 import { INavigationNode } from "../interface/Types/inavigationnode";
+import { ControlOption } from "../Constants/ControlOption";
 import { Resolve, Reject } from "../Util/Util";
 
 export class NavigationHandler implements ISPObjectHandler {
@@ -25,15 +26,15 @@ export class NavigationHandler implements ISPObjectHandler {
             let navigation = web.get_navigation();
             navigation.set_useShared(navigationConfig.UseShared === true ? navigationConfig.UseShared : false);
             let quicklaunch = navigation.get_quickLaunch();
-            context.load(quicklaunch);
+            context.load(quicklaunch, "Include(Title,Url,IsExternal,Children)");
             context.executeQueryAsync(
                 (sender, args) => {
                     let processingPromise: Promise<void> = undefined;
 
                     if (navigationConfig.ReCreateQuicklaunch) {
-                        processingPromise = this.recreatingQuicklaunch(quicklaunch, navigationConfig.QuickLaunch);
-                    }else{
-                        processingPromise = this.insertNodesInQuicklaunch();
+                        processingPromise = this.recreatingNavigationNodes(quicklaunch, navigationConfig.QuickLaunch);
+                    } else {
+                        processingPromise = this.updateNavigationNodeCollection(quicklaunch, navigationConfig.QuickLaunch);
                     }
 
                     if (processingPromise) {
@@ -53,14 +54,13 @@ export class NavigationHandler implements ISPObjectHandler {
         });
     }
 
-    private recreatingQuicklaunch(quicklaunch: SP.NavigationNodeCollection, navigatioNodes: Array<INavigationNode>): Promise<void> {
+    private recreatingNavigationNodes(navigationNodeCollection: SP.NavigationNodeCollection, navigatioNodes: Array<INavigationNode>): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             Logger.write("Recreating quicklaunch", Logger.LogLevel.Info);
+            this.clearNavigationNodeCollection(navigationNodeCollection);
+            this.addNavNodesToNavCollection(navigationNodeCollection, navigatioNodes);
 
-            this.clearNavigationNodeCollection(quicklaunch);
-            this.addNavNodesToNavCollection(quicklaunch, navigatioNodes);
-
-            quicklaunch.get_context().executeQueryAsync(
+            navigationNodeCollection.get_context().executeQueryAsync(
                 (sender2, args2) => {
                     Resolve(resolve, `Recreated quicklaunch`, "Navigation > Quicklaunch");
                 },
@@ -71,10 +71,10 @@ export class NavigationHandler implements ISPObjectHandler {
         });
     }
 
-    private clearNavigationNodeCollection(nodeNavigationCollection: SP.NavigationNodeCollection): void {
+    private clearNavigationNodeCollection(navigationNodeCollection: SP.NavigationNodeCollection): void {
         Logger.write("Clearing navigation node collection", Logger.LogLevel.Info);
 
-        let nodeEnumurator = nodeNavigationCollection.getEnumerator();
+        let nodeEnumurator = navigationNodeCollection.getEnumerator();
         let toDeleteNodes: Array<SP.NavigationNode> = new Array<SP.NavigationNode>();
         while (nodeEnumurator.moveNext()) {
             toDeleteNodes.push(nodeEnumurator.get_current());
@@ -87,34 +87,94 @@ export class NavigationHandler implements ISPObjectHandler {
         );
     }
 
-    private addNavNodesToNavCollection(nodeNavigationCollection: SP.NavigationNodeCollection, navigatioNodes: Array<INavigationNode>): void {
+    private addNavNodesToNavCollection(navigationNodeCollection: SP.NavigationNodeCollection, navigatioNodes: Array<INavigationNode>): void {
         Logger.write("Adding navigation nodes to navigation node collection", Logger.LogLevel.Info);
+        if (navigatioNodes) {
+            navigatioNodes.forEach(
+                (nodeConfig, index, array) => {
+                    if (nodeConfig.Title && nodeConfig.Url) {
+                        let nodeCreationInfo = new SP.NavigationNodeCreationInformation();
+                        nodeCreationInfo.set_title(nodeConfig.Title);
+                        nodeCreationInfo.set_url(nodeConfig.Url);
+                        let IsExternal = nodeConfig.IsExternal === true ? nodeConfig.IsExternal : false;
+                        nodeCreationInfo.set_isExternal(IsExternal);
+                        nodeCreationInfo.set_asLastNode(true);
 
-        navigatioNodes.forEach(
-            (nodeConfig, index, array) => {
-                if (nodeConfig.Title && nodeConfig.Url) {
-                    let nodeCreationInfo = new SP.NavigationNodeCreationInformation();
-                    nodeCreationInfo.set_title(nodeConfig.Title);
-                    nodeCreationInfo.set_url(nodeConfig.Url);
-                    let IsExternal = nodeConfig.IsExternal === true ? nodeConfig.IsExternal : false;
-                    nodeCreationInfo.set_isExternal(IsExternal);
-                    nodeCreationInfo.set_asLastNode(true);
+                        let navNode = navigationNodeCollection.add(nodeCreationInfo);
+                        Logger.write(`Added navigation node: ${nodeConfig.Title} - ${nodeConfig.Url}`, Logger.LogLevel.Info);
 
-                    let navNode = nodeNavigationCollection.add(nodeCreationInfo);
-
-                    if (nodeConfig.Children) {
-                        this.addNavNodesToNavCollection(navNode.get_children(), nodeConfig.Children);
+                        if (nodeConfig.Children) {
+                            this.addNavNodesToNavCollection(navNode.get_children(), nodeConfig.Children);
+                        }
+                    } else {
+                        Logger.write(`QuickLaunch navigation node ${index} missing title or/and url`, Logger.LogLevel.Error);
                     }
-                } else {
-                    Logger.write(`QuickLaunch navigation node ${index} missing title or/and url`, Logger.LogLevel.Error);
                 }
-            }
-        );
+            );
+        }
     }
 
-    private insertNodesInQuicklaunch(): Promise<void> {
+    private getNavigationNodeByTitle(title: string, navigationNodeCollection: SP.NavigationNodeCollection): SP.NavigationNode {
+        let navigationNode: SP.NavigationNode = undefined;
+        if (navigationNodeCollection) {
+            let nodeEnumurator = navigationNodeCollection.getEnumerator();
+            while (nodeEnumurator.moveNext()) {
+                let currentNode = nodeEnumurator.get_current();
+                if (currentNode.get_title() === title) {
+                    navigationNode = currentNode;
+                    break;
+                }
+
+                let children = currentNode.get_children();
+                if (children) {
+                    let foundNodeInChilds = this.getNavigationNodeByTitle(title, children);
+                    if (foundNodeInChilds) {
+                        navigationNode = foundNodeInChilds;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return navigationNode;
+    }
+
+    private updateNavigationNodeCollection(navigationNodeCollection: SP.NavigationNodeCollection, navigatioNodes: Array<INavigationNode>): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            resolve();
+            Logger.write("Updating quicklaunch.", Logger.LogLevel.Info);
+            Resolve(resolve, "Updated quicklaunch", "Navigation > Quicklaunch");
+/* todo:
+            if (navigatioNodes) {
+                navigatioNodes.forEach((nodeConfig, index, array) => {
+                    let navNode = this.getNavigationNodeByTitle(nodeConfig.Title, navigationNodeCollection);
+                    if (navNode) {
+                        switch (nodeConfig.ControlOption) {
+                            case ControlOption.Update:
+                                navNode
+                                break;
+                            case ControlOption.Delete:
+                                navNode.deleteObject();
+                                break;
+                            default:
+                                Resolve(resolve, `View with the title '${viewConfig.Title}' already exists`, viewConfig.Title, view);
+                                break;
+                        }
+                    } else {
+                        switch (nodeConfig.ControlOption) {
+                            case ControlOption.Delete:
+                                Resolve(resolve, `Deleted quicklaunch navigation node with title '${nodeConfig.Title}'.`, "Navigation > Quicklaunch");
+                                break;
+                            case ControlOption.Update:
+
+                            default:
+                                processingPromise = this.addView(viewConfig, parentList);
+                                break;
+                        }
+                    }
+                });
+            } else {
+                Resolve(resolve, "Updated quicklaunch", "Navigation > Quicklaunch");
+            }*/
         });
     }
 }
