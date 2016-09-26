@@ -22,20 +22,12 @@ export class DeploymentManager {
     private _objectHandlers: { [id: string]: ISPObjectHandler } = {
         Features: new FeatureHandler(),
         Sites: new SiteHandler(),
-<<<<<<< HEAD
-/*      ContentTypes: new ContentTypeHandler(),
-=======
         ContentTypes: new ContentTypeHandler(),
->>>>>>> 5133bbe1785fd771aef3273252fa6a290b70a6f3
         Lists: new ListHandler(),
         Fields: new FieldHandler(),
         Views: new ViewHandler(),
         ViewFields: new ViewFieldHandler(),
-<<<<<<< HEAD
         Items: new ItemHandler(),
-*/
-=======
->>>>>>> 5133bbe1785fd771aef3273252fa6a290b70a6f3
     };
     private _deployDependencies: Promise<void>;
 
