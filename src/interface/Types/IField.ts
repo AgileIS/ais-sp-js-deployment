@@ -8,7 +8,7 @@ export interface IField {
     EnforceUniqueValues: boolean;
     Direction: string;
     EntityPropertyName: string;
-    FieldTypeKind: any;
+    FieldType: string;
     Filterable: boolean;
     Group: string;
     Hidden: boolean;
@@ -31,4 +31,8 @@ export interface IField {
     DateFormat: string;
     OutputType: string;
     ControlOption: string;
+    LookupList: string;
+    ShowField: string;
+    Multivalue: boolean;
+    RelationshipDeleteBehavior: string;
 }
