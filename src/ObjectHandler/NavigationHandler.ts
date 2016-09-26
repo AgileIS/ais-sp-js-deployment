@@ -1,5 +1,3 @@
-/// <reference path="../../typings/index.d.ts" />
-
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
 import { ISPObjectHandler } from "../interface/ObjectHandler/ispobjecthandler";
@@ -21,6 +19,7 @@ export class NavigationHandler implements ISPObjectHandler {
     private processingQuicklaunchNavigationConfig(navigationConfig: INavigation, parentWeb: Web): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             Logger.write(`Processing quicklaunch navigation nodes`, Logger.LogLevel.Info);
+
             let context = new SP.ClientContext(parentWeb.toUrl().split("/_")[0]);
             let web = context.get_web();
             let navigation = web.get_navigation();
@@ -55,8 +54,9 @@ export class NavigationHandler implements ISPObjectHandler {
     private recreatingQuicklaunch(quicklaunch: SP.NavigationNodeCollection, navigatioNodes: Array<INavigationNode>) {
         return new Promise<void>((resolve, reject) => {
             Logger.write("Recreating quicklaunch", Logger.LogLevel.Info);
+
             this.clearNavigationNodeCollection(quicklaunch);
-            this.addNodesToQuickLaunch(quicklaunch, navigatioNodes);
+            this.addNavNodesToNavCollection(quicklaunch, navigatioNodes);
 
             quicklaunch.get_context().executeQueryAsync(
                 (sender2, args2) => {
@@ -69,8 +69,10 @@ export class NavigationHandler implements ISPObjectHandler {
         });
     }
 
-    private clearNavigationNodeCollection(quicklaunch: SP.NavigationNodeCollection): void {
-        let nodeEnumurator = quicklaunch.getEnumerator();
+    private clearNavigationNodeCollection(nodeNavigationCollection: SP.NavigationNodeCollection): void {
+        Logger.write("Clearing navigation node collection", Logger.LogLevel.Info);
+
+        let nodeEnumurator = nodeNavigationCollection.getEnumerator();
         let toDeleteNodes: Array<SP.NavigationNode> = new Array<SP.NavigationNode>();
         while (nodeEnumurator.moveNext()) {
             toDeleteNodes.push(nodeEnumurator.get_current());
@@ -83,17 +85,24 @@ export class NavigationHandler implements ISPObjectHandler {
         );
     }
 
-    private addNodesToQuickLaunch(quicklaunch: SP.NavigationNodeCollection, navigatioNodes: Array<INavigationNode>): void {
+    private addNavNodesToNavCollection(nodeNavigationCollection: SP.NavigationNodeCollection, navigatioNodes: Array<INavigationNode>): void {
+        Logger.write("Adding navigation nodes to navigation node collection", Logger.LogLevel.Info);
+
         navigatioNodes.forEach(
-            (node, index, array) => {
-                if (node.Title && node.Url) {
+            (nodeConfig, index, array) => {
+                if (nodeConfig.Title && nodeConfig.Url) {
                     let nodeCreationInfo = new SP.NavigationNodeCreationInformation();
-                    nodeCreationInfo.set_title(node.Title);
-                    nodeCreationInfo.set_url(node.Url);
-                    let IsExternal = node.IsExternal === true ? node.IsExternal : false;
+                    nodeCreationInfo.set_title(nodeConfig.Title);
+                    nodeCreationInfo.set_url(nodeConfig.Url);
+                    let IsExternal = nodeConfig.IsExternal === true ? nodeConfig.IsExternal : false;
                     nodeCreationInfo.set_isExternal(IsExternal);
                     nodeCreationInfo.set_asLastNode(true);
-                    quicklaunch.add(nodeCreationInfo); // childnodes
+
+                    let navNode = nodeNavigationCollection.add(nodeCreationInfo);
+
+                    if (nodeConfig.Children) {
+                        this.addNavNodesToNavCollection(navNode.get_children(), nodeConfig.Children);
+                    }
                 } else {
                     Logger.write(`QuickLaunch navigation node ${index} missing title or/and url`, Logger.LogLevel.Error);
                 }

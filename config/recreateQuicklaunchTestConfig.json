@@ -16,10 +16,6 @@
                         "Title": "Nav1",
                         "Url": "http://google.de",
                         "IsExternal": true
-                    },
-                    {
-                        "Title": "Nav2",
-                        "Url": "http://dev2013vm3/sites/deploymentjs2/_layouts/15/start.aspx#/Lists/AIS_TestList1/AllItems.aspx"
                     }
                 ]
             }
