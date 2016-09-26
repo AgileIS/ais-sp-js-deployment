@@ -32,7 +32,13 @@ export interface IField {
     OutputType: string;
     ControlOption: string;
     LookupList: string;
-    ShowField: string;
+    LookupField: string;
     Multivalue: boolean;
     RelationshipDeleteBehavior: string;
+    DependendFields: Array<IFieldDependendLookup>;
+}
+
+export interface IFieldDependendLookup {
+    InternalName: string;
+    Title: string;
 }

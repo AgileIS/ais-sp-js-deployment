@@ -14,14 +14,14 @@ export class FieldHandler {
     public execute(fieldConfig: IField, parentPromise: Promise<List | Web>): Promise<Field> {
         return new Promise<Field>((resolve, reject) => {
             parentPromise.then((parentInstance) => {
-                this.ProcessingViewConfig(fieldConfig, parentInstance.fields)
-                    .then((viewProsssingResult) => { resolve(viewProsssingResult); })
+                this.ProcessingFieldConfig(fieldConfig, parentInstance.fields)
+                    .then((fieldProcessingResult) => { resolve(fieldProcessingResult); })
                     .catch((error) => { reject(error); });
             });
         });
     }
 
-    private ProcessingViewConfig(fieldConfig: IField, parentFields: Fields): Promise<Field> {
+    private ProcessingFieldConfig(fieldConfig: IField, parentFields: Fields): Promise<Field> {
         return new Promise<Field>((resolve, reject) => {
             let processingText = fieldConfig.ControlOption === ControlOption.Add || fieldConfig.ControlOption === undefined || fieldConfig.ControlOption === ""
                 ? "Add" : fieldConfig.ControlOption;
@@ -46,11 +46,12 @@ export class FieldHandler {
                         }
                     } else {
                         switch (fieldConfig.ControlOption) {
-                            case ControlOption.Update:
                             case ControlOption.Delete:
                                 Reject(reject, `field with internal name '${fieldConfig.InternalName}' does not exists`, fieldConfig.Title);
                                 break;
-                            default:
+                            case ControlOption.Update:
+                                fieldConfig.ControlOption = "";
+                            default: // tslint:disable-line
                                 processingPromise = this.addField(fieldConfig, parentFields);
                                 break;
                         }
@@ -67,7 +68,7 @@ export class FieldHandler {
                 .catch((error) => { Reject(reject, `Error while requesting field with the internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });
         });
     }
- 
+
     private addField(fieldConfig: IField, parentFields: Fields): Promise<Field> {
         return new Promise<Field>((resolve, reject) => {
             let processingPromise: Promise<Field> = undefined;
@@ -97,11 +98,12 @@ export class FieldHandler {
         });
     }
 
-    private addDefaultField(fieldConfig: IField, parentFields: Fields) {
+    private addDefaultField(fieldConfig: IField, parentFields: Fields): Promise<Field> {
         return new Promise<Field>((resolve, reject) => {
             let propertyHash = this.createProperties(fieldConfig);
             parentFields.add(fieldConfig.InternalName, "SP.Field", propertyHash)
                 .then((fieldAddResult) => {
+                    fieldConfig.ControlOption = ControlOption.Update;
                     this.updateField(fieldConfig, fieldAddResult.field)
                         .then((fieldUpdateResult) => { Resolve(resolve, `Added field: '${fieldConfig.InternalName}'`, fieldConfig.Title, fieldUpdateResult); })
                         .catch((error) => { Reject(reject, `Error while adding and updating field with the internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });
@@ -110,7 +112,7 @@ export class FieldHandler {
         });
     }
 
-    private addCalculatedField(fieldConfig: IField, parentFields: Fields) {
+    private addCalculatedField(fieldConfig: IField, parentFields: Fields): Promise<Field> {
         return new Promise<Field>((resolve, reject) => {
             let propertyHash = this.createProperties(fieldConfig);
             parentFields.addCalculated(fieldConfig.InternalName, fieldConfig.Formula, Types.DateTimeFieldFormatType[fieldConfig.DateFormat], Types.FieldTypes[fieldConfig.OutputType], propertyHash)
@@ -119,7 +121,7 @@ export class FieldHandler {
         });
     }
 
-    private addLookupField(fieldConfig: IField, parentFields: Fields) {
+    private addLookupField(fieldConfig: IField, parentFields: Fields): Promise<Field> {
         return new Promise<Field>((resolve, reject) => {
             let context = SP.ClientContext.get_current();
             let urlParts = parentFields.toUrl().split("/").reverse();
@@ -131,18 +133,47 @@ export class FieldHandler {
                 let listId = (urlParts[1] as string).split("'")[1];
                 fieldCollection = context.get_web().get_lists().getById(listId).get_fields();
             } else {
-                fieldCollection = context.get_web().get_fields(); // ??? Possible for Web Fields ???
+                fieldCollection = context.get_web().get_fields();
             }
 
             context.load(lookupList);
             context.load(fieldCollection);
             context.executeQueryAsync((sender, args) => {
-                const fieldXml = `<Field Type='${fieldConfig.FieldType}' ${fieldConfig.Multivalue ? "Mult='TRUE'" : ""} DisplayName='${fieldConfig.Title}' ShowField='${fieldConfig.ShowField}'` +
-                                 ` StaticName='${fieldConfig.InternalName}' List='${lookupList.get_id().toString()}' Name='${fieldConfig.InternalName}'></Field>`;
+                const fieldXml = `<Field Type='${fieldConfig.FieldType}' ${fieldConfig.Multivalue ? "Mult='TRUE'" : ""} DisplayName='${fieldConfig.InternalName}'` +
+                    ` ShowField='${fieldConfig.LookupField}' List='${lookupList.get_id().toString()}' Name='${fieldConfig.InternalName}'></Field>`;
                 let lookupField = fieldCollection.addFieldAsXml(fieldXml, false, SP.AddFieldOptions.defaultValue);
+                context.load(lookupField);
                 context.executeQueryAsync((sender, args) => {
-                    // Props
-                    // Dependend..
+                    for (let prop in fieldConfig) {
+                        switch (prop) {
+                            case "Title":
+                                lookupField.set_title(fieldConfig[prop]);
+                                break;
+                            case "Required":
+                                lookupField.set_required(fieldConfig[prop]);
+                                break;
+                            case "Indexed":
+                                lookupField.set_indexed(fieldConfig[prop]);
+                                break;
+                            case "JSLink":
+                                lookupField.set_jsLink(fieldConfig[prop]);
+                                break;
+                            case "RelationshipDeleteBehavior":
+                                (lookupField.get_typedObject() as SP.FieldLookup).set_relationshipDeleteBehavior(SP.RelationshipDeleteBehaviorType[(fieldConfig[prop] as string).toLowerCase()]);
+                                break;
+                        }
+                    }
+                    lookupField.update();
+                    fieldConfig.DependendFields.forEach(dependendField => {
+                        fieldCollection.addDependentLookup(`${lookupList.get_title()}:${dependendField.Title}`, lookupField, dependendField.InternalName);
+                    });
+                    context.executeQueryAsync((sender, args) => {
+                        Resolve(resolve, `Added field: '${fieldConfig.InternalName}'`, fieldConfig.Title, lookupField);
+                    }, (sender, args) => {
+                        Reject(reject, `Error while updating LookupField with InternalName '${fieldConfig.InternalName}': ${args.get_message()} '`
+                            + `\n' ${args.get_stackTrace()}`, fieldConfig.InternalName);
+                    });
+
                 }, (sender, args) => {
                     Reject(reject, `Error while adding LookupField with InternalName '${fieldConfig.InternalName}': ${args.get_message()} '\n' ${args.get_stackTrace()}`, fieldConfig.InternalName);
                 });
@@ -155,7 +186,7 @@ export class FieldHandler {
     private updateField(fieldConfig: IField, field: Field): Promise<Field> {
         return new Promise<Field>((resolve, reject) => {
             let properties = this.createProperties(fieldConfig);
-            field.update(properties)
+            field.update(properties, `SP.Field${fieldConfig.FieldType}`)
                 .then((fieldUpdateResult) => { Resolve(resolve, `Updated field: '${fieldConfig.InternalName}'`, fieldConfig.Title, fieldUpdateResult.field); })
                 .catch((error) => { Reject(reject, `Error while updating field with internal name '${fieldConfig.InternalName}': ` + error, fieldConfig.Title); });
         });
@@ -180,7 +211,11 @@ export class FieldHandler {
                 delete parsedObject.FieldType;
                 delete parsedObject.DateFormat;
                 delete parsedObject.OutputType;
-                delete parsedObject.Formula;
+                delete parsedObject.DependendFields;
+                delete parsedObject.LookupList;
+                if (fieldConfig.RelationshipDeleteBehavior) {
+                    parsedObject.RelationshipDeleteBehavior = SP.RelationshipDeleteBehaviorType[fieldConfig.RelationshipDeleteBehavior.toLowerCase()];
+                }
                 break;
             default:
                 delete parsedObject.ControlOption;

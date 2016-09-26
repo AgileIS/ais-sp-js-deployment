@@ -36,7 +36,7 @@
                             "DateFormat": "DateOnly",
                             "OutputType": "Text",
                             "Formula": "=IF(TestList1Field1<=1,\"OK\",\"Nicht OK\")",
-                            "ControlOption": ""
+                            "ControlOption": "Update"
                         }
                     ],
                     "Views": [
@@ -113,22 +113,22 @@
                             "ControlOption": ""
                         },
                         {
-                            "Title": "TestList2Lookup2",
+                            "Title": "TestList2Lookup2222",
                             "InternalName": "AIS_TestList2Lookup2",
                             "FieldType": "Lookup",
-                            "ShowField": "AIS_TestList1Field1",
+                            "LookupField": "AIS_TestList1Field1",
                             "LookupList": "TestListe1",
                             "Required": true,
-                            "Indexed":true,
-                            "RelationshipDeleteBehavior":"Cascade",
-                            "JSLink":"~sitecollection/_catalogs/masterpage/HannRe.Insiderverzeichnis/Scripts/reInsiderverzeichnisLookupSelect2Bundle.js",
+                            "Indexed": true,
+                            "RelationshipDeleteBehavior": "Cascade",
+                            "JSLink": "~sitecollection/_catalogs/masterpage/HannRe.Insiderverzeichnis/Scripts/reInsiderverzeichnisLookupSelect2Bundle.js",
                             "DependendFields": [
                                 {
                                     "Title": "TestList1Field2",
                                     "InternalName": "AIS_TestList1Field2"
                                 }
                             ],
-                            "ControlOption": ""
+                            "ControlOption": "Update"
                         }
                     ],
                     "Views": [
@@ -172,6 +172,62 @@
                 {
                     "Title": "TestField3",
                     "InternalName": "AIS_TestField3",
+                    "FieldType": "Number",
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "TestField3",
+                    "InternalName": "AIS_TestField3",
+                    "FieldType": "Number",
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "TestField3",
+                    "InternalName": "AIS_TestField4",
+                    "FieldType": "Number",
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "TestField3",
+                    "InternalName": "AIS_TestField5",
+                    "FieldType": "Number",
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "TestField3",
+                    "InternalName": "AIS_TestField3",
+                    "FieldType": "Number",
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "TestField3",
+                    "InternalName": "AIS_TestField6",
+                    "FieldType": "Number",
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "TestField3",
+                    "InternalName": "AIS_TestField7",
+                    "FieldType": "Number",
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "TestField3",
+                    "InternalName": "AIS_TestField8",
+                    "FieldType": "Number",
+                    "Group": "AISGroup",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "TestField3",
+                    "InternalName": "AIS_TestField9",
                     "FieldType": "Number",
                     "Group": "AISGroup",
                     "ControlOption": ""
