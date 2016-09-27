@@ -1,42 +1,58 @@
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
-import { ContentType } from "@agileis/sp-pnp-js/lib/sharepoint/rest/ContentTypes";
-import { ISPObjectHandler } from "../interface/ObjectHandler/ispobjecthandler";
-import { IContentType } from "../interface/Types/IContentType";
+import { ContentType } from "@agileis/sp-pnp-js/lib/sharepoint/rest/contenttypes";
+import { ISPObjectHandler } from "../Interfaces/ObjectHandler/ISPObjectHandler";
+import { IContentType } from "../Interfaces/Types/IContentType";
+import { IPromiseResult } from "../Interfaces/IPromiseResult";
+import { PromiseResult } from "../PromiseResult";
 import { ControlOption } from "../Constants/ControlOption";
-import { Reject, Resolve } from "../Util/Util";
+import { Util } from "../Util/Util";
 
 export class ContentTypeHandler implements ISPObjectHandler {
-    public execute(contentTypeConfig: IContentType, parentPromise: Promise<Web>): Promise<ContentType> {
-        return new Promise<ContentType>((resolve, reject) => {
-            parentPromise.then((parentWeb) => {
-                if (contentTypeConfig.Id && contentTypeConfig.Name) {
-                    this.processingContentTypeConfig(contentTypeConfig, parentWeb)
-                        .then((contentTypeProsssingResult) => { resolve(contentTypeProsssingResult); })
-                        .catch((error) => { reject(error); });
+    public execute(contentTypeConfig: IContentType, parentPromise: Promise<IPromiseResult<Web>>): Promise<IPromiseResult<void | ContentType>> {
+        return new Promise<IPromiseResult<ContentType>>((resolve, reject) => {
+            parentPromise.then((promiseResult) => {
+                if (!promiseResult || !promiseResult.value) {
+                    Util.Reject<void>(reject, contentTypeConfig.Id,
+                        `Content type handler parent promise value result is null or undefined for the content type with the id '${contentTypeConfig.Id}'!`);
                 } else {
-                    Reject(reject, `Error while processing content type with the name '${contentTypeConfig.Name}': Content type id or/and name are undefined`, contentTypeConfig.Name);
+                    if (contentTypeConfig && contentTypeConfig.Id && contentTypeConfig.Name) {
+                        let web = promiseResult.value;
+                        let context = SP.ClientContext.get_current();
+                        this.processingContentTypeConfig(contentTypeConfig, context)
+                            .then((contentTypeProsssingResult) => {
+                                let resolveValue = undefined;
+                                if (contentTypeProsssingResult.value) {
+                                    let contentType = (<SP.ContentType>contentTypeProsssingResult.value);
+                                    resolveValue = web.contentTypes.getById(contentType.get_id().get_stringValue());
+                                }
+                                resolve(new PromiseResult(contentTypeProsssingResult.message, resolveValue));
+                            })
+                            .catch((error) => { reject(error); });
+                    } else {
+                        Util.Reject<void>(reject, contentTypeConfig.Id, `Error while processing content type with the id '${contentTypeConfig.Id}': Content type id or/and name are undefined.`);
+                    }
                 }
             });
         });
     }
 
-    private processingContentTypeConfig(contentTypeConfig: IContentType, parentWeb: Web): Promise<ContentType> {
-        return new Promise<ContentType>((resolve, reject) => {
+    private processingContentTypeConfig(contentTypeConfig: IContentType, clientContext: SP.ClientContext): Promise<IPromiseResult<void | SP.ContentType>> {
+        return new Promise<IPromiseResult<void | SP.ContentType>>((resolve, reject) => {
             let processingText = contentTypeConfig.ControlOption === ControlOption.Add || contentTypeConfig.ControlOption === undefined || contentTypeConfig.ControlOption === ""
                 ? "Add" : contentTypeConfig.ControlOption;
-            Logger.write(`Processing ${processingText} content type: '${contentTypeConfig.Name}'`, Logger.LogLevel.Info);
+            Logger.write(`Processing ${processingText} content type: '${contentTypeConfig.Id}'.`, Logger.LogLevel.Info);
 
-            let context = new SP.ClientContext(parentWeb.toUrl().split("/_")[0]);
-            let web = context.get_web();
-            let rootWeb = context.get_site().get_rootWeb();
+            let web = clientContext.get_web();
+            let rootWeb = clientContext.get_site().get_rootWeb();
             let webContentType = web.get_contentTypes().getById(contentTypeConfig.Id);
             let siteContentType = web.get_availableContentTypes().getById(contentTypeConfig.Id);
-            context.load(webContentType, "Id", "Name");
-            context.load(siteContentType, "Id", "Name");
-            context.executeQueryAsync(
+            clientContext.load(webContentType, "Id", "Name", "FieldLinks");
+            clientContext.load(siteContentType, "Id", "Name", "FieldLinks");
+            clientContext.executeQueryAsync(
                 (sender, args) => {
-                    let processingPromise: Promise<SP.ContentType> = undefined;
+                    let rejectOrResolved = false;
+                    let processingPromise: Promise<IPromiseResult<void | SP.ContentType>> = undefined;
 
                     if (!siteContentType.get_serverObjectIsNull() || !webContentType.get_serverObjectIsNull()) {
                         let contentType: SP.ContentType = undefined;
@@ -46,8 +62,6 @@ export class ContentTypeHandler implements ISPObjectHandler {
                             contentType = siteContentType;
                         }
 
-                        let restContentType = parentWeb.contentTypes.getById(contentType.get_id().get_typeId());
-
                         switch (contentTypeConfig.ControlOption) {
                             case ControlOption.Update:
                                 processingPromise = this.updateContentType(contentTypeConfig, contentType, web);
@@ -56,15 +70,19 @@ export class ContentTypeHandler implements ISPObjectHandler {
                                 processingPromise = this.deleteContentType(contentTypeConfig, contentType);
                                 break;
                             default:
-                                Resolve(resolve, `Content type with the name '${contentTypeConfig.Name}' already exists in target web`, contentTypeConfig.Name, restContentType);
+                                Util.Resolve<SP.ContentType>(resolve, contentTypeConfig.Id,
+                                    `Added content type with the id '${contentTypeConfig.Id}', because it already exists.`, contentType);
+                                rejectOrResolved = true;
                                 break;
                         }
                     } else {
                         switch (contentTypeConfig.ControlOption) {
-                            case ControlOption.Update:
                             case ControlOption.Delete:
-                                Reject(reject, `Content type with the name '${contentTypeConfig.Name}' does not exists`, contentTypeConfig.Name);
+                                Util.Resolve<void>(resolve, contentTypeConfig.Id, `Deleted content type with the id '${contentTypeConfig.Id}', because it does not exists.`);
+                                rejectOrResolved = true;
                                 break;
+                            case ControlOption.Update:
+                                contentTypeConfig.ControlOption = ControlOption.Add;
                             default:
                                 processingPromise = this.addContentType(contentTypeConfig, rootWeb.get_contentTypes(), web);
                                 break;
@@ -73,25 +91,20 @@ export class ContentTypeHandler implements ISPObjectHandler {
 
                     if (processingPromise) {
                         processingPromise
-                            .then((contentTypeProsssingResult) => {
-                                let resolveResult = undefined;
-                                if (typeof contentTypeProsssingResult !== "string") {
-                                    resolveResult = parentWeb.contentTypes.getById(contentTypeProsssingResult.get_id().get_stringValue());
-                                }
-                                resolve(resolveResult);
-                            })
+                            .then((contentTypeProsssingResult) => { resolve(contentTypeProsssingResult); })
                             .catch((error) => { reject(error); });
-                    } else {
-                        Logger.write("Content type handler processing promise is undefined!");
+                    } else if (!rejectOrResolved) {
+                        Logger.write(`Content type handler processing promise is undefined for the content type with the id '${contentTypeConfig.Id}'!`, Logger.LogLevel.Error);
                     }
                 },
                 (sender, args) => {
-                    Reject(reject, `Error while requesting content type with the name '${contentTypeConfig.Name}': ${args.get_message()} '\n' ${args.get_stackTrace()}`, contentTypeConfig.Name);
+                    Util.Reject<void>(reject, contentTypeConfig.Id,
+                        `Error while requesting content type with the id '${contentTypeConfig.Id}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
                 });
         });
     }
 
-    private setContentTypeProperties(contentTypeConfig: IContentType, contentType: SP.ContentType, parentWeb: SP.Web): void {
+    private setContentTypeProperties(contentTypeConfig: IContentType, contentType: SP.ContentType): void {
         for (let prop in contentTypeConfig) {
             switch (prop) {
                 case "Description":
@@ -138,16 +151,29 @@ export class ContentTypeHandler implements ISPObjectHandler {
                     break;
             }
         }
+    }
+
+    private setContentTypeFieldLinks(contentTypeConfig: IContentType, contentType: SP.ContentType, web: SP.Web) {
+        let currentFieldLinks: Array<string> = new Array<string>();
+        let fieldLinks = contentType.get_fieldLinks();
+        let fieldLinksEnumarator = fieldLinks.getEnumerator();
+        while (fieldLinksEnumarator.moveNext()) {
+            let fieldLink = fieldLinksEnumarator.get_current();
+            currentFieldLinks.push(fieldLink.get_name());
+        }
 
         if (contentTypeConfig.FieldLinks && contentTypeConfig.FieldLinks.length > 0) {
-            let fieldLinks = contentType.get_fieldLinks();
             contentTypeConfig.FieldLinks.forEach((fieldInternalName, index, array) => {
-                let fieldLink = new SP.FieldLinkCreationInformation();
-                let field = parentWeb.get_availableFields().getByInternalNameOrTitle(fieldInternalName);
-                fieldLink.set_field(field);
-                fieldLinks.add(fieldLink);
+                if (currentFieldLinks.indexOf(fieldInternalName) < 0) {
+                    let fieldLink = new SP.FieldLinkCreationInformation();
+                    let field = web.get_availableFields().getByInternalNameOrTitle(fieldInternalName);
+                    fieldLink.set_field(field);
+                    fieldLinks.add(fieldLink);
+                }
             });
         }
+
+        fieldLinks.reorder(contentTypeConfig.FieldLinks);
     }
 
     private getContentTypeCreationInfo(contentTypeConfig: IContentType): SP.ContentTypeCreationInformation {
@@ -163,53 +189,57 @@ export class ContentTypeHandler implements ISPObjectHandler {
         return contentTypeCreationInfo;
     }
 
-
-    private addContentType(contentTypeConfig: IContentType, contentTypeCollection: SP.ContentTypeCollection, parentWeb: SP.Web): Promise<SP.ContentType> {
-        return new Promise<SP.ContentType>((resolve, reject) => {
+    private addContentType(contentTypeConfig: IContentType, contentTypeCollection: SP.ContentTypeCollection, web: SP.Web): Promise<IPromiseResult<SP.ContentType>> {
+        return new Promise<IPromiseResult<SP.ContentType>>((resolve, reject) => {
             let contentTypeCreationInfo = this.getContentTypeCreationInfo(contentTypeConfig);
             let newContentType = contentTypeCollection.add(contentTypeCreationInfo);
             let context = contentTypeCollection.get_context();
             context.load(newContentType, "Name", "Id", "FieldLinks");
             context.executeQueryAsync(
                 (sender, args) => {
-                    this.updateContentType(contentTypeConfig, newContentType, parentWeb)
+                    this.updateContentType(contentTypeConfig, newContentType, web)
                         .then((contentTypeUpdateResult) => {
-                            Resolve(resolve, `Created and updated content Type: '${contentTypeConfig.Name}'.`,
-                                contentTypeConfig.Name, contentTypeUpdateResult);
+                            Util.Resolve<SP.ContentType>(resolve, contentTypeConfig.Id,
+                                `Created and updated content Type: '${contentTypeConfig.Id}'.`,
+                                contentTypeUpdateResult.value);
                         })
                         .catch((error) => { reject(error); });
                 },
                 (sender, args) => {
-                    Reject(reject, `Error while adding content type with the name '${contentTypeConfig.Name}':  ${args.get_message()} '\n' ${args.get_stackTrace()}`, contentTypeConfig.Name);
+                    Util.Reject<void>(reject, contentTypeConfig.Id,
+                        `Error while adding content type with the id '${contentTypeConfig.Id}':  ${args.get_message()} '\n' ${args.get_stackTrace()}`);
                 }
             );
         });
     }
 
-    private updateContentType(contentTypeConfig: IContentType, contentType: SP.ContentType, parentWeb: SP.Web): Promise<SP.ContentType> {
-        return new Promise<SP.ContentType>((resolve, reject) => {
-            this.setContentTypeProperties(contentTypeConfig, contentType, parentWeb);
+    private updateContentType(contentTypeConfig: IContentType, contentType: SP.ContentType, web: SP.Web): Promise<IPromiseResult<SP.ContentType>> {
+        return new Promise<IPromiseResult<SP.ContentType>>((resolve, reject) => {
+            this.setContentTypeProperties(contentTypeConfig, contentType);
+            this.setContentTypeFieldLinks(contentTypeConfig, contentType, web);
             contentType.update(true);
             contentType.get_context().executeQueryAsync(
                 (sender, args) => {
-                    Resolve(resolve, `Updated content type: '${contentTypeConfig.Name}'`, contentTypeConfig.Name, contentType);
+                    Util.Resolve<SP.ContentType>(resolve, contentTypeConfig.Id, `Updated content type: '${contentTypeConfig.Id}'.`, contentType);
                 },
                 (sender, args) => {
-                    Reject(reject, `Error while updating content type with the name '${contentTypeConfig.Name}': ${args.get_message()} '\n' ${args.get_stackTrace()}`, contentTypeConfig.Name);
+                    Util.Reject<void>(reject, contentTypeConfig.Id,
+                        `Error while updating content type with the id '${contentTypeConfig.Id}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
                 }
             );
         });
     }
 
-    private deleteContentType(contentTypeConfig: IContentType, contentType: SP.ContentType): Promise<SP.ContentType> {
-        return new Promise<SP.ContentType>((resolve, reject) => {
+    private deleteContentType(contentTypeConfig: IContentType, contentType: SP.ContentType): Promise<IPromiseResult<void>> {
+        return new Promise<IPromiseResult<void>>((resolve, reject) => {
             contentType.deleteObject();
             contentType.get_context().executeQueryAsync(
                 (sender, args) => {
-                    Resolve(resolve, `Deleted content Type: '${contentTypeConfig.Name}'`, contentTypeConfig.Name);
+                    Util.Resolve<void>(resolve, contentTypeConfig.Id, `Deleted content type: '${contentTypeConfig.Id}'.`);
                 },
                 (sender, args) => {
-                    Reject(reject, `Error while deleting content type with the name '${contentTypeConfig.Name}': ${args.get_message()} '\n' ${args.get_stackTrace()}`, contentTypeConfig.Name);
+                    Util.Reject<void>(reject, contentTypeConfig.Id,
+                        `Error while deleting content type with the id '${contentTypeConfig.Id}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
                 }
             );
         });

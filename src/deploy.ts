@@ -5,13 +5,13 @@ import * as minimist from "minimist";
 import * as promptly from "promptly";
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { MyConsoleLogger } from "./Logger/MyConsoleLogger";
-import { DeploymentConfig } from "./interface/Config/DeploymentConfig";
+import { DeploymentConfig } from "./Interfaces/Config/DeploymentConfig";
 import { DeploymentManager } from "./DeploymentManager";
 
 interface ConsoleArguments {
     deploymentConfigPath: string;
     userPassword: string;
-    logLevel: Logger.LogLevel;
+    logLevel: string;
 }
 
 let clArgs: ConsoleArguments = <any>minimist(global.process.argv.slice(2), {
@@ -20,13 +20,13 @@ let clArgs: ConsoleArguments = <any>minimist(global.process.argv.slice(2), {
         l: "logLevel",
     },
     default: {
-        l: Logger.LogLevel.Verbose,
+        l: "Verbose",
     },
     string: ["f", "l"],
 });
 
 Logger.subscribe(new MyConsoleLogger());
-Logger.activeLogLevel = clArgs.logLevel;
+Logger.activeLogLevel = Logger.LogLevel[clArgs.logLevel];
 
 Logger.write("Start deployment", Logger.LogLevel.Info);
 Logger.write(`Console arguments: ${JSON.stringify(clArgs)}`, 0);
@@ -38,8 +38,8 @@ if (clArgs.deploymentConfigPath) {
         Logger.write(JSON.stringify(deploymentConfig), 0);
 
         Logger.write(`Authentication details:`);
-        Logger.write(`Authtype: ${deploymentConfig.User.authtype}:`);
-        Logger.write(`Username: ${deploymentConfig.User.username}`);
+        Logger.write(`Authtype: ${deploymentConfig.User.authtype}.`);
+        Logger.write(`Username: ${deploymentConfig.User.username}.`);
 
         if (!deploymentConfig.User.password) {
             promptly.password("Password:", (error, password) => {
@@ -57,5 +57,8 @@ if (clArgs.deploymentConfigPath) {
         }
     }
 } else {
-    Logger.write("Required deploy paramater are not available!", Logger.LogLevel.Error);
+    Logger.write("The required deploy config path paramater is not available!", Logger.LogLevel.Error);
+    Logger.write("deploy.js parameters are:");
+    Logger.write("\tf - for deployment config path. (required)");
+    Logger.write("\tl - for custom log level. Available log levels are Verbose, Info, Warning, Error and Off.");
 }

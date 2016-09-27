@@ -1,5 +1,5 @@
 export interface IFeature {
-    ID: string;
+    Id: string;
     Deactivate: boolean;
     Description: string;
     Scope: SP.FeatureDefinitionScope;
