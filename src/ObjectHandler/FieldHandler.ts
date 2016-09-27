@@ -7,7 +7,7 @@ import { List } from "@agileis/sp-pnp-js/lib/sharepoint/rest/Lists";
 import { IField }  from "../interface/Types/IField";
 import { FieldTypeKind } from "../Constants/FieldTypeKind";
 import { ControlOption } from "../Constants/ControlOption";
-import { Reject, Resolve } from "../Util/Util";
+import { Reject, Resolve, Retry } from "../Util/Util";
 import * as url from "url";
 
 export class FieldHandler {
@@ -16,7 +16,10 @@ export class FieldHandler {
             parentPromise.then((parentInstance) => {
                 this.ProcessingFieldConfig(fieldConfig, parentInstance.fields)
                     .then((fieldProcessingResult) => { resolve(fieldProcessingResult); })
-                    .catch((error) => { reject(error); });
+                    // .catch((error) => { reject(error); });
+                    .catch(() => { Retry(() => {
+                        return this.ProcessingFieldConfig(fieldConfig, parentInstance.fields);
+                    }, fieldConfig.Title); });
             });
         });
     }

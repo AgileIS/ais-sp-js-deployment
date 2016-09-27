@@ -4,7 +4,7 @@ import { Item } from "@agileis/sp-pnp-js/lib/sharepoint/rest/Items";
 import { ISPObjectHandler } from "../interface/ObjectHandler/ispobjecthandler";
 import { IItem } from "../interface/Types/IItem";
 import { ControlOption } from "../Constants/ControlOption";
-import { Resolve, Reject } from "../Util/Util";
+import { Resolve, Reject, Retry } from "../Util/Util";
 
 export class ItemHandler implements ISPObjectHandler {
     public execute(itemConfig: IItem, parentPromise: Promise<List>): Promise<Item> {
@@ -12,7 +12,10 @@ export class ItemHandler implements ISPObjectHandler {
             parentPromise.then(parentList => {
                 this.processingItemConfig(itemConfig, parentList)
                     .then((itemProsssingResult) => { resolve(itemProsssingResult); })
-                    .catch((error) => { reject(error); });
+                    // .catch((error) => { reject(error); });
+                    .catch(() => { Retry(() => {
+                        return this.processingItemConfig(itemConfig, parentList);
+                    }, itemConfig.Title); });
             });
         });
     }

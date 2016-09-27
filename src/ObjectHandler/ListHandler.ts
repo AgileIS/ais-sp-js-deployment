@@ -4,7 +4,7 @@ import { List} from "@agileis/sp-pnp-js/lib/sharepoint/rest/lists";
 import { ISPObjectHandler } from "../interface/ObjectHandler/ispobjecthandler";
 import { IList } from "../interface/Types/IList";
 import { ControlOption } from "../Constants/ControlOption";
-import { Resolve, Reject } from "../Util/Util";
+import { Resolve, Reject, Retry } from "../Util/Util";
 
 export class ListHandler implements ISPObjectHandler {
     public execute(listConfig: IList, parentPromise: Promise<Web>): Promise<List> {
@@ -12,7 +12,10 @@ export class ListHandler implements ISPObjectHandler {
             parentPromise.then(parentWeb => {
                 this.processingViewConfig(listConfig, parentWeb)
                     .then((listProsssingResult) => { resolve(listProsssingResult); })
-                    .catch((error) => { reject(error); });
+                    //.catch((error) => { reject(error); });
+                    .catch(() => { Retry(() => {
+                        return this.processingViewConfig(listConfig, parentWeb);
+                    }, listConfig.Title); });
             });
         });
     }

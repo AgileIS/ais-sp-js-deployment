@@ -4,7 +4,7 @@ import { View } from "@agileis/sp-pnp-js/lib/sharepoint/rest/views";
 import { ISPObjectHandler } from "../interface/ObjectHandler/ispobjecthandler";
 import { IView } from "../interface/Types/IView";
 import { ControlOption } from "../Constants/ControlOption";
-import { Reject, Resolve } from "../Util/Util";
+import { Reject, Resolve, Retry } from "../Util/Util";
 
 export class ViewHandler implements ISPObjectHandler {
     public execute(viewConfig: IView, parentPromise: Promise<List>): Promise<View> {
@@ -12,7 +12,10 @@ export class ViewHandler implements ISPObjectHandler {
             parentPromise.then((parentList) => {
                 this.processingViewConfig(viewConfig, parentList)
                     .then((viewProsssingResult) => { resolve(viewProsssingResult); })
-                    .catch((error) => { reject(error); });
+                    // .catch((error) => { reject(error); });
+                    .catch(() => { Retry(() => {
+                        return this.processingViewConfig(viewConfig, parentList);
+                    }, viewConfig.Title); });
             });
         });
     }

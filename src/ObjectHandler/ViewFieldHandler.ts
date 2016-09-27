@@ -2,7 +2,7 @@ import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { View } from "@agileis/sp-pnp-js/lib/sharepoint/rest/views";
 import { ISPObjectHandler } from "../interface/ObjectHandler/ispobjecthandler";
 import { IViewField } from "../interface/Types/IViewField";
-import { Reject, Resolve } from "../Util/Util";
+import { Reject, Resolve, Retry } from "../Util/Util";
 
 export class ViewFieldHandler implements ISPObjectHandler {
     public execute(viewFieldConfig: IViewField, parentPromise: Promise<View>): Promise<void> {
@@ -10,7 +10,10 @@ export class ViewFieldHandler implements ISPObjectHandler {
             parentPromise.then((parentView) => {
                 this.processingViewFieldConfig(viewFieldConfig, parentView)
                     .then(() => { resolve(); })
-                    .catch((error) => { reject(error); });
+                    // .catch((error) => { reject(error); });
+                    .catch(() => { Retry(() => {
+                        return this.processingViewFieldConfig(viewFieldConfig, parentView);
+                    }, viewFieldConfig.InternalFieldName); });
             });
         });
     }

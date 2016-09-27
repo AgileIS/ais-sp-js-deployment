@@ -43,3 +43,23 @@ export function UrlJoin(urlParts: Array<string>): string {
 
     return normalizedUrl;
 }
+
+export function Retry(func: () => Promise<any>, element: any) {
+    Logger.write(`Retry process: '${element}'`);
+    setTimeout(() => {
+        Logger.write(`Retry first time: '${element}'`);
+        func().then((result) => {
+            return Promise.resolve(result);
+        }).catch(() => {
+            setTimeout(() => {
+                Logger.write(`Retry failed first time: '${element}' - second try`);
+                func().then((result) => {
+                    return Promise.resolve(result);
+                }).catch((error) => {
+                    Logger.write(`Retry failed second time: '${element}' - Reject`);
+                    return Promise.reject(error);
+                });
+            }, 1000);
+        });
+    }, 500);
+}

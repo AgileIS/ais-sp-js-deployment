@@ -88,20 +88,32 @@
                      "Items": [
                         {
                             "ControlOption": "",
-                            "Title": "TestTitle"
+                            "Title": "List1TestTitle"
+                        },{
+                            "ControlOption": "",
+                            "Title": "List1TestTitle1"
+                        },{
+                            "ControlOption": "",
+                            "Title": "List1TestTitle23"
+                        },{
+                            "ControlOption": "",
+                            "Title": "List1TestTitle35"
+                        },{
+                            "ControlOption": "",
+                            "Title": "List1TestTitle36"
                         },
                          {
                             "ControlOption": "",
-                            "Title": "TestTitle2"
+                            "Title": "List1TestTitle2"
                         },
                          {
                             "ControlOption": "",
-                            "Title": "TestTitle3",
+                            "Title": "List1TestTitle3",
                             "AIS_TestList1Field1": 10
                         },
                          {
                             "ControlOption": "Update",
-                            "Title": "TestTitle555",
+                            "Title": "List1TestTitle555",
                             "AIS_TestList1Field1": 1000
                         }
                     ]
@@ -133,8 +145,8 @@
                             "ControlOption": ""
                         },
                         {
-                            "Title": "TestList2Lookup2222",
-                            "InternalName": "AIS_TestList2Lookup2",
+                            "Title": "TestList2Lookup",
+                            "InternalName": "AIS_TestList2Lookup",
                             "FieldType": "Lookup",
                             "LookupField": "AIS_TestList1Field1",
                             "LookupList": "TestListe1",
@@ -148,7 +160,7 @@
                                     "InternalName": "AIS_TestList1Field2"
                                 }
                             ],
-                            "ControlOption": "Update"
+                            "ControlOption": ""
                         }
                     ],
                     "Views": [
@@ -175,15 +187,15 @@
                      "Items": [
                         {
                             "ControlOption": "",
-                            "Title": "TestTitle"
+                            "Title": "List2TestTitle"
                         },
                          {
                             "ControlOption": "",
-                            "Title": "TestTitle2"
+                            "Title": "List2TestTitle2"
                         },
                          {
                             "ControlOption": "",
-                            "Title": "TestTitle3",
+                            "Title": "List2TestTitle3",
                             "AIS_TestList2Field2": "Test ItemEntry"
                         }
                     ]
