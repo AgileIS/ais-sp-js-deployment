@@ -98,6 +98,11 @@
                             "ControlOption": "",
                             "Title": "TestTitle3",
                             "AIS_TestList1Field1": 10
+                        },
+                         {
+                            "ControlOption": "Update",
+                            "Title": "TestTitle555",
+                            "AIS_TestList1Field1": 1000
                         }
                     ]
                 },
@@ -165,6 +170,21 @@
                                     "InternalFieldName": "ID"
                                 }
                             ]
+                        }
+                    ],
+                     "Items": [
+                        {
+                            "ControlOption": "",
+                            "Title": "TestTitle"
+                        },
+                         {
+                            "ControlOption": "",
+                            "Title": "TestTitle2"
+                        },
+                         {
+                            "ControlOption": "",
+                            "Title": "TestTitle3",
+                            "AIS_TestList2Field2": "Test ItemEntry"
                         }
                     ]
                 }

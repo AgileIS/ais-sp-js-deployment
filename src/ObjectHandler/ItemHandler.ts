@@ -42,11 +42,11 @@ export class ItemHandler implements ISPObjectHandler {
                         }
                     } else {
                         switch (itemConfig.ControlOption) {
-                            case ControlOption.Update:
                             case ControlOption.Delete:
-                                Reject(reject, `Item with Title '${itemConfig.Title}' does not exists`, itemConfig.Title);
+                                Resolve(resolve, `Item with the title '${itemConfig.Title}'  not found anyway`, itemConfig.Title);
                                 break;
-                            default:
+                            case ControlOption.Update:
+                            default: // tslint:disable-line
                                 processingPromise = this.addItem(itemConfig, parentList);
                                 break;
                         }
