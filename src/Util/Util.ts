@@ -1,7 +1,6 @@
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
 import { PromiseResult } from "../PromiseResult";
-import { Queryable } from "@agileis/sp-pnp-js/lib/sharepoint/rest/queryable";
 
 export namespace Util {
     export function ViewFieldRetry(pSpWeb: Web, pListId: string, pParentTitle: string, pElementName: string, pTimeout: number): Promise<void> {
@@ -44,4 +43,24 @@ export namespace Util {
 
         return normalizedUrl;
     }
+}
+
+export function Retry(func: () => Promise<any>, element: any) {
+    Logger.write(`Retry process: '${element}'`);
+    setTimeout(() => {
+        Logger.write(`Retry first time: '${element}'`);
+        func().then((result) => {
+            return Promise.resolve(result);
+        }).catch(() => {
+            setTimeout(() => {
+                Logger.write(`Retry failed first time: '${element}' - second try`);
+                func().then((result) => {
+                    return Promise.resolve(result);
+                }).catch((error) => {
+                    Logger.write(`Retry failed second time: '${element}' - Reject`);
+                    return Promise.reject(error);
+                });
+            }, 1000);
+        });
+    }, 500);
 }
