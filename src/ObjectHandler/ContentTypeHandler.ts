@@ -28,7 +28,12 @@ export class ContentTypeHandler implements ISPObjectHandler {
                                 }
                                 resolve(new PromiseResult(contentTypeProsssingResult.message, resolveValue));
                             })
-                            .catch((error) => { reject(error); });
+                            .catch((error) => {
+                                Util.Retry(error, contentTypeConfig.Id,
+                                    () => {
+                                        return this.processingContentTypeConfig(contentTypeConfig, context);
+                                    });
+                            });
                     } else {
                         Util.Reject<void>(reject, contentTypeConfig.Id, `Error while processing content type with the id '${contentTypeConfig.Id}': Content type id or/and name are undefined.`);
                     }

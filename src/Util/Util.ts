@@ -1,16 +1,8 @@
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
-import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
+import { IPromiseResult } from "../Interfaces/IPromiseResult";
 import { PromiseResult } from "../PromiseResult";
 
 export namespace Util {
-    export function ViewFieldRetry(pSpWeb: Web, pListId: string, pParentTitle: string, pElementName: string, pTimeout: number): Promise<void> {
-        let promise: Promise<void>;
-        setTimeout(() => {
-            promise = pSpWeb.lists.getById(pListId).views.getByTitle(pParentTitle).fields.add(pElementName);
-        }, pTimeout);
-        return promise;
-    }
-
     /** Resolve with a IPromiseResult */
     export function Resolve<T>(resolve: (value?: PromiseResult<T> | Thenable<PromiseResult<T>>) => void, configNodeIdentifier: string, promiseResultMessage: string, promiseResultValue?: T) {
         if (configNodeIdentifier && promiseResultMessage) {
@@ -43,24 +35,25 @@ export namespace Util {
 
         return normalizedUrl;
     }
-}
 
-export function Retry(func: () => Promise<any>, element: any) {
-    Logger.write(`Retry process: '${element}'`);
-    setTimeout(() => {
-        Logger.write(`Retry first time: '${element}'`);
-        func().then((result) => {
-            return Promise.resolve(result);
-        }).catch(() => {
-            setTimeout(() => {
-                Logger.write(`Retry failed first time: '${element}' - second try`);
-                func().then((result) => {
-                    return Promise.resolve(result);
-                }).catch((error) => {
-                    Logger.write(`Retry failed second time: '${element}' - Reject`);
-                    return Promise.reject(error);
-                });
-            }, 1000);
-        });
-    }, 500);
+    export function Retry(error: any, configNodeIdentifier: string, retryFunction: () => Promise<IPromiseResult<any>>) {
+        //todo: bessere error ausgabe?
+        Logger.write(`Retry process: '${configNodeIdentifier}'`);
+        setTimeout(() => {
+            Logger.write(`Retry first time: '${configNodeIdentifier}'`);
+            retryFunction().then((result) => {
+                return Promise.resolve(result);
+            }).catch(() => {
+                setTimeout(() => {
+                    Logger.write(`Retry failed first time: '${configNodeIdentifier}' - start second try`);
+                    retryFunction().then((result) => {
+                        return Promise.resolve(result);
+                    }).catch((error) => {
+                        Logger.write(`Retry failed second time: '${configNodeIdentifier}' - Reject`);
+                        return Promise.reject(error);
+                    });
+                }, 1000);
+            });
+        }, 500);
+    }
 }

@@ -16,7 +16,12 @@ export class ViewFieldHandler implements ISPObjectHandler {
                     let targetWeb = promiseResult.value;
                     this.processingViewFieldConfig(viewFieldConfig, targetWeb)
                         .then(() => { resolve(); })
-                        .catch((error) => { reject(error); });
+                        .catch((error) => {
+                            Util.Retry(error, viewFieldConfig.InternalFieldName,
+                                () => {
+                                    return this.processingViewFieldConfig(viewFieldConfig, targetWeb);
+                                });
+                        });
                 }
             });
         });

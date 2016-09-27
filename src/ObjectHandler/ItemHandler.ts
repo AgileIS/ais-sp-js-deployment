@@ -18,7 +18,12 @@ export class ItemHandler implements ISPObjectHandler {
                     let list = promiseResult.value;
                     this.processingItemConfig(itemConfig, list)
                         .then((itemProsssingResult) => { resolve(itemProsssingResult); })
-                        .catch((error) => { reject(error); });
+                        .catch((error) => {
+                            Util.Retry(error, itemConfig.Title,
+                                () => {
+                                    return this.processingItemConfig(itemConfig, list);
+                                });
+                        });
                 }
             });
         });
@@ -84,12 +89,12 @@ export class ItemHandler implements ISPObjectHandler {
         });
     }
 
-    private updateItem(itemConfig: IItem, item: Item): Promise<IPromiseResult<Item>>  {
+    private updateItem(itemConfig: IItem, item: Item): Promise<IPromiseResult<Item>> {
         return new Promise<IPromiseResult<Item>>((resolve, reject) => {
             let properties = this.createProperties(itemConfig);
             item.update(properties)
                 .then((itemUpdateResult) => { Util.Resolve<Item>(resolve, itemConfig.Title, `Updated item: '${itemConfig.Title}'.`, itemUpdateResult.item); })
-                .catch((error) => {  Util.Reject<void>(reject, itemConfig.Title, `Error while updating item with title '${itemConfig.Title}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, itemConfig.Title, `Error while updating item with title '${itemConfig.Title}': ` + error); });
         });
     }
 

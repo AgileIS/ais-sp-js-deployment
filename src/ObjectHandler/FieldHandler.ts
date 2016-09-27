@@ -32,7 +32,12 @@ export class FieldHandler implements ISPObjectHandler {
                 } else {
                     this.processingFieldConfig(fieldConfig, promiseResult.value.fields)
                         .then((fieldProcessingResult) => { resolve(fieldProcessingResult); })
-                        .catch((error) => { reject(error); });
+                        .catch((error) => {
+                            Util.Retry(error, fieldConfig.InternalName,
+                                () => {
+                                    return this.processingFieldConfig(fieldConfig, promiseResult.value.fields);
+                                });
+                        });
                 }
             });
         });

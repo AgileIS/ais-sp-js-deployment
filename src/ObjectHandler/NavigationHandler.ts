@@ -18,7 +18,12 @@ export class NavigationHandler implements ISPObjectHandler {
                     let context = SP.ClientContext.get_current();
                     this.processingQuicklaunchNavigationConfig(navigationConfig, context)
                         .then((NavigationProsssingResult) => { resolve(NavigationProsssingResult); })
-                        .catch((error) => { reject(error); });
+                        .catch((error) => {
+                            Util.Retry(error, "Navigation > Quicklaunch",
+                                () => {
+                                    return this.processingQuicklaunchNavigationConfig(navigationConfig, context);
+                                });
+                        });
                 }
             });
         });
@@ -154,38 +159,38 @@ export class NavigationHandler implements ISPObjectHandler {
         return new Promise<IPromiseResult<SP.NavigationNodeCollection>>((resolve, reject) => {
             Logger.write("Updating quicklaunch.", Logger.LogLevel.Info);
             Util.Resolve<SP.NavigationNodeCollection>(resolve, "Navigation > Quicklaunch", "Updated quicklaunch.", navigationNodeCollection);
-/* todo:
-            if (navigatioNodes) {
-                navigatioNodes.forEach((nodeConfig, index, array) => {
-                    let navNode = this.getNavigationNodeByTitle(nodeConfig.Title, navigationNodeCollection);
-                    if (navNode) {
-                        switch (nodeConfig.ControlOption) {
-                            case ControlOption.Update:
-                                navNode
-                                break;
-                            case ControlOption.Delete:
-                                navNode.deleteObject();
-                                break;
-                            default:
-                                Resolve(resolve, `View with the title '${viewConfig.Title}' already exists`, viewConfig.Title, view);
-                                break;
-                        }
-                    } else {
-                        switch (nodeConfig.ControlOption) {
-                            case ControlOption.Delete:
-                                Resolve(resolve, `Deleted quicklaunch navigation node with title '${nodeConfig.Title}'.`, "Navigation > Quicklaunch");
-                                break;
-                            case ControlOption.Update:
-
-                            default:
-                                processingPromise = this.addView(viewConfig, parentList);
-                                break;
-                        }
-                    }
-                });
-            } else {
-                Resolve(resolve, "Updated quicklaunch", "Navigation > Quicklaunch");
-            }*/
+            /* todo:
+                        if (navigatioNodes) {
+                            navigatioNodes.forEach((nodeConfig, index, array) => {
+                                let navNode = this.getNavigationNodeByTitle(nodeConfig.Title, navigationNodeCollection);
+                                if (navNode) {
+                                    switch (nodeConfig.ControlOption) {
+                                        case ControlOption.Update:
+                                            navNode
+                                            break;
+                                        case ControlOption.Delete:
+                                            navNode.deleteObject();
+                                            break;
+                                        default:
+                                            Resolve(resolve, `View with the title '${viewConfig.Title}' already exists`, viewConfig.Title, view);
+                                            break;
+                                    }
+                                } else {
+                                    switch (nodeConfig.ControlOption) {
+                                        case ControlOption.Delete:
+                                            Resolve(resolve, `Deleted quicklaunch navigation node with title '${nodeConfig.Title}'.`, "Navigation > Quicklaunch");
+                                            break;
+                                        case ControlOption.Update:
+            
+                                        default:
+                                            processingPromise = this.addView(viewConfig, parentList);
+                                            break;
+                                    }
+                                }
+                            });
+                        } else {
+                            Resolve(resolve, "Updated quicklaunch", "Navigation > Quicklaunch");
+                        }*/
         });
     }
 }

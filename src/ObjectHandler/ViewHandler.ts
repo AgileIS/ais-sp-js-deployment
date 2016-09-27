@@ -18,7 +18,12 @@ export class ViewHandler implements ISPObjectHandler {
                     let list = promiseResult.value;
                     this.processingViewConfig(viewConfig, list)
                         .then((viewProsssingResult) => { resolve(viewProsssingResult); })
-                        .catch((error) => { reject(error); });
+                        .catch((error) => {
+                            Util.Retry(error, viewConfig.Title,
+                                () => {
+                                    return this.processingViewConfig(viewConfig, list);
+                                });
+                        });
                 }
             });
         });
@@ -33,7 +38,7 @@ export class ViewHandler implements ISPObjectHandler {
             list.views.filter(`Title eq '${viewConfig.Title}'`).select("Id").get()
                 .then((viewRequestResults) => {
                     let rejectOrResolved = false;
-                    let processingPromise: Promise<IPromiseResult<void | View>>  = undefined;
+                    let processingPromise: Promise<IPromiseResult<void | View>> = undefined;
 
                     if (viewRequestResults && viewRequestResults.length === 1) {
                         let view = list.views.getByTitle(viewConfig.Title);

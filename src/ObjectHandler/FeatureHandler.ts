@@ -18,7 +18,12 @@ export class FeatureHandler implements ISPObjectHandler {
                         let context = SP.ClientContext.get_current();
                         this.processingFeatureConfig(featureConfig, context)
                             .then((featureProsssingResult) => { resolve(featureProsssingResult); })
-                            .catch((error) => { reject(error); });
+                            .catch((error) => {
+                                Util.Retry(error, featureConfig.Id,
+                                    () => {
+                                        return this.processingFeatureConfig(featureConfig, context);
+                                    });
+                            });
                     } else {
                         Util.Reject<void>(reject, featureConfig.Id, `Error while processing feature with the id '${featureConfig.Id}': Feature id is undefined.`);
                     }

@@ -18,7 +18,12 @@ export class ListHandler implements ISPObjectHandler {
                     let web = promiseResult.value;
                     this.processingListConfig(listConfig, web)
                         .then((listProsssingResult) => { resolve(listProsssingResult); })
-                        .catch((error) => { reject(error); });
+                        .catch((error) => {
+                            Util.Retry(error, listConfig.InternalName,
+                                () => {
+                                    return this.processingListConfig(listConfig, web);
+                                });
+                        });
                 }
             });
         });
