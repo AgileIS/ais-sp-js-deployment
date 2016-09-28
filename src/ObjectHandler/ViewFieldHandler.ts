@@ -13,13 +13,13 @@ export class ViewFieldHandler implements ISPObjectHandler {
                     Util.Reject<void>(reject, viewFieldConfig.InternalFieldName,
                         `View field handler parent promise value result is null or undefined for the view field with the internal name '${viewFieldConfig.InternalFieldName}'!`);
                 } else {
-                    let targetWeb = promiseResult.value;
-                    this.processingViewFieldConfig(viewFieldConfig, targetWeb)
+                    let view = promiseResult.value;
+                    this.processingViewFieldConfig(viewFieldConfig, view)
                         .then(() => { resolve(); })
                         .catch((error) => {
                             Util.Retry(error, viewFieldConfig.InternalFieldName,
                                 () => {
-                                    return this.processingViewFieldConfig(viewFieldConfig, targetWeb);
+                                    return this.processingViewFieldConfig(viewFieldConfig, view);
                                 });
                         });
                 }
@@ -30,7 +30,6 @@ export class ViewFieldHandler implements ISPObjectHandler {
     private processingViewFieldConfig(viewFieldConfig: IViewField, targetView: View): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             Logger.write(`Processing Add view field: '${viewFieldConfig.InternalFieldName}'.`, Logger.LogLevel.Info);
-
             targetView.fields.add(viewFieldConfig.InternalFieldName)
                 .then(() => { Util.Resolve<void>(resolve, viewFieldConfig.InternalFieldName, `Added view field: '${viewFieldConfig.InternalFieldName}'.`); })
                 .catch((error) => {

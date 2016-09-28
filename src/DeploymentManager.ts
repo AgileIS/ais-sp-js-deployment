@@ -26,7 +26,7 @@ export class DeploymentManager {
         Lists: new ListHandler(),
         Fields: new FieldHandler(),
         Views: new ViewHandler(),
-        ViewFields: new ViewFieldHandler(),
+      //  ViewFields: new ViewFieldHandler(),
         Items: new ItemHandler(),
         Navigation: new NavigationHandler(),
     };

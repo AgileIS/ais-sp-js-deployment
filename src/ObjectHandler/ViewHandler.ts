@@ -3,6 +3,7 @@ import { List } from "@agileis/sp-pnp-js/lib/sharepoint/rest/lists";
 import { View } from "@agileis/sp-pnp-js/lib/sharepoint/rest/views";
 import { ISPObjectHandler } from "../Interfaces/ObjectHandler/ISPObjectHandler";
 import { IView } from "../Interfaces/Types/IView";
+import { IViewField } from "../Interfaces/Types/IViewField";
 import { IPromiseResult } from "../Interfaces/IPromiseResult";
 import { ControlOption } from "../Constants/ControlOption";
 import { Util } from "../Util/Util";
@@ -41,6 +42,7 @@ export class ViewHandler implements ISPObjectHandler {
                     let processingPromise: Promise<IPromiseResult<void | View>> = undefined;
 
                     if (viewRequestResults && viewRequestResults.length === 1) {
+                        Logger.write(`Found view with title: '${viewConfig.Title}'`);
                         let view = list.views.getByTitle(viewConfig.Title);
                         switch (viewConfig.ControlOption) {
                             case ControlOption.Update:
@@ -50,14 +52,18 @@ export class ViewHandler implements ISPObjectHandler {
                                 processingPromise = this.deleteView(viewConfig, view);
                                 break;
                             default:
-                                Util.Resolve<View>(resolve, viewConfig.Title, `Added view with the title '${viewConfig.Title}', beacause it already exists.`, view);
-                                rejectOrResolved = true;
+                                this.addViewFields(viewConfig, view)
+                                    .then(() => {
+                                        Util.Resolve<View>(resolve, viewConfig.Title, `Added viewfields to view with the title '${viewConfig.Title}'.`, view);
+                                        rejectOrResolved = true;
+                                    })
+                                    .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while adding viewfields in the view with the title '${viewConfig.Title}': ` + error); });
                                 break;
                         }
                     } else {
                         switch (viewConfig.ControlOption) {
                             case ControlOption.Delete:
-                                Util.Resolve<void>(reject, viewConfig.Title, `Deleted view with title '${viewConfig.Title}', because it does not exists.`);
+                                Util.Resolve<void>(reject, viewConfig.Title, `Could not delete view with title '${viewConfig.Title}', because it does not exist.`);
                                 rejectOrResolved = true;
                                 break;
                             case ControlOption.Update:
@@ -85,9 +91,11 @@ export class ViewHandler implements ISPObjectHandler {
             let properties = this.createProperties(viewConfig);
             list.views.add(viewConfig.Title, viewConfig.PersonalView, properties)
                 .then((viewAddResult) => {
-                    viewAddResult.view.fields.removeAll()
-                        .then(() => { Util.Resolve<View>(resolve, viewConfig.Title, `Added view: '${viewConfig.Title}' and removed all default fields.`, viewAddResult.view); })
-                        .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while deleting all fields in the view with the title '${viewConfig.Title}': ` + error); });
+                    this.addViewFields(viewConfig, viewAddResult.view)
+                        .then(() => {
+                            Util.Resolve<View>(resolve, viewConfig.Title, `Added view: '${viewConfig.Title}' and added all Viewfields.`, viewAddResult.view);
+                        })
+                        .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while adding Viewfields in the view with the title '${viewConfig.Title}': ` + error); });
                 })
                 .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while adding view with the title '${viewConfig.Title}': ` + error); });
         });
@@ -98,9 +106,11 @@ export class ViewHandler implements ISPObjectHandler {
             let properties = this.createProperties(viewConfig);
             view.update(properties)
                 .then((viewUpdateResult) => {
-                    viewUpdateResult.view.fields.removeAll()
-                        .then(() => { Util.Resolve<View>(resolve, viewConfig.Title, `Updated view: '${viewConfig.Title}'.`, viewUpdateResult.view); })
-                        .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while deleting all fields in the view with the title '${viewConfig.Title}': ` + error); });
+                    this.addViewFields(viewConfig, viewUpdateResult.view)
+                        .then(() => {
+                            Util.Resolve<View>(resolve, viewConfig.Title, `Updated view: '${viewConfig.Title}' and added all Viewfields.`, viewUpdateResult.view);
+                        })
+                        .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while adding Viewfields in the view with the title '${viewConfig.Title}': ` + error); });
                 })
                 .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while updating view with the title '${viewConfig.Title}': ` + error); });
         });
@@ -113,6 +123,34 @@ export class ViewHandler implements ISPObjectHandler {
                 .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while deleting view with the title '${viewConfig.Title}': ` + error); });
         });
     }
+
+    private addViewFields(viewConfig: IView, view: View): Promise<IPromiseResult<void>> {
+        return new Promise<IPromiseResult<void>>((resolve, reject) => {
+            view.fields.removeAll()
+                .then(() => {
+                    Logger.write(`Deleted all viewfields from view with title: '${viewConfig.Title}' - begin adding viewfields `, Logger.LogLevel.Verbose);
+                    let viewUrl = view.toUrl();
+                    let listUrlParts = viewUrl.split("'");
+                    let context = SP.ClientContext.get_current();
+                    let spView: SP.View = context.get_web().get_lists().getByTitle(listUrlParts[1]).get_views().getByTitle(viewConfig.Title);
+                    let viewFieldCollection = spView.get_viewFields();
+                    context.load(viewFieldCollection);
+                    for (let value of viewConfig.ViewFields){
+                        viewFieldCollection.add(value.InternalFieldName);
+                    }
+                    spView.update();
+                    context.executeQueryAsync(
+                        (sender, args) => {
+                            resolve();
+                        },
+                        (sender, args) => {
+                            reject();
+                        });
+                })
+                .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while deleting all fields in the view with the title '${viewConfig.Title}': ` + error); });
+        });
+    }
+
 
     private createProperties(viewConfig: IView) {
         let stringifiedObject: string;

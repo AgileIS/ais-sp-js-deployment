@@ -10,7 +10,8 @@ const replace = require("gulp-replace");
 
 
 const userConfigPrefix = 'config/userconfig_*.json';
-const partialConfigPrefix = 'config/insiderverzeichnis_*.json';
+//const partialConfigPrefix = 'config/insiderverzeichnis_*.json';
+const partialConfigPrefix = 'config/partialconfig_*.json';
 const configPrefix = 'config_';
 const assignments = {
   Lists: 'InternalName',
