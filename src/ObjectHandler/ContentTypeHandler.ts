@@ -60,6 +60,7 @@ export class ContentTypeHandler implements ISPObjectHandler {
                     let processingPromise: Promise<IPromiseResult<void | SP.ContentType>> = undefined;
 
                     if (!siteContentType.get_serverObjectIsNull() || !webContentType.get_serverObjectIsNull()) {
+                        Logger.write(`Found ContentType with id: '${contentTypeConfig.Id}'`);
                         let contentType: SP.ContentType = undefined;
                         if (!webContentType.get_serverObjectIsNull()) {
                             contentType = webContentType;
@@ -76,14 +77,14 @@ export class ContentTypeHandler implements ISPObjectHandler {
                                 break;
                             default:
                                 Util.Resolve<SP.ContentType>(resolve, contentTypeConfig.Id,
-                                    `Added content type with the id '${contentTypeConfig.Id}', because it already exists.`, contentType);
+                                    `Content type with the id '${contentTypeConfig.Id}' does not have to be added, because it already exists.`, contentType);
                                 rejectOrResolved = true;
                                 break;
                         }
                     } else {
                         switch (contentTypeConfig.ControlOption) {
                             case ControlOption.Delete:
-                                Util.Resolve<void>(resolve, contentTypeConfig.Id, `Deleted content type with the id '${contentTypeConfig.Id}', because it does not exists.`);
+                                Util.Resolve<void>(resolve, contentTypeConfig.Id, `Content type with the id '${contentTypeConfig.Id}' does not have to be deleted, because it does not exist.`);
                                 rejectOrResolved = true;
                                 break;
                             case ControlOption.Update:

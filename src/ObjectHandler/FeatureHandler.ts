@@ -51,6 +51,7 @@ export class FeatureHandler implements ISPObjectHandler {
                     let rejectOrResolved = false;
                     let processingPromise: Promise<IPromiseResult<void>> = undefined;
                     if (!feature.get_serverObjectIsNull()) {
+                        Logger.write(`Found Feature with id: '${featureConfig.Id}'`);
                         switch (featureConfig.ControlOption) {
                             case ControlOption.Update:
                                 processingPromise = this.updateFeature(featureConfig, featureCollection);
@@ -59,14 +60,14 @@ export class FeatureHandler implements ISPObjectHandler {
                                 processingPromise = this.deactivateFeature(featureConfig, featureCollection);
                                 break;
                             default:
-                                Util.Resolve<void>(resolve, featureConfig.Id, `Added feature with the id '${featureConfig.Id}', because it already exists.`);
+                                Util.Resolve<void>(resolve, featureConfig.Id, `Feature with the id '${featureConfig.Id}' does not have to be added, because it already exists.`);
                                 rejectOrResolved = true;
                                 break;
                         }
                     } else {
                         switch (featureConfig.ControlOption) {
                             case ControlOption.Delete:
-                                Util.Resolve<void>(resolve, featureConfig.Id, `Deactivated feature with id '${featureConfig.Id}', because it was not activated.`);
+                                Util.Resolve<void>(resolve, featureConfig.Id, `Feature with id '${featureConfig.Id}' does not have to be deactivated, because it was not activated.`);
                                 rejectOrResolved = true;
                                 break;
                             case ControlOption.Update:

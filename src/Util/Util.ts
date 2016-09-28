@@ -37,20 +37,23 @@ export namespace Util {
     }
 
     export function Retry(error: any, configNodeIdentifier: string, retryFunction: () => Promise<IPromiseResult<any>>) {
-        //todo: bessere error ausgabe?
-        Logger.write(`Retry process: '${configNodeIdentifier}'`);
+        let errorMessage = error;
+        if (typeof error === "object") {
+            if ((error as Object).hasOwnProperty("message")) { errorMessage = error.message; }
+        }
+        Logger.write(`Retry process for '${configNodeIdentifier}' because Error: ${errorMessage}`);
         setTimeout(() => {
             Logger.write(`Retry first time: '${configNodeIdentifier}'`);
             retryFunction().then((result) => {
                 return Promise.resolve(result);
-            }).catch(() => {
+            }).catch((firstRetryError) => {
                 setTimeout(() => {
-                    Logger.write(`Retry failed first time: '${configNodeIdentifier}' - start second try`);
+                    Logger.write(`Retry failed first time for '${configNodeIdentifier}' - ${firstRetryError}`);
                     retryFunction().then((result) => {
                         return Promise.resolve(result);
-                    }).catch((error) => {
+                    }).catch((secondRetryError) => {
                         Logger.write(`Retry failed second time: '${configNodeIdentifier}' - Reject`);
-                        return Promise.reject(error);
+                        return Promise.reject(secondRetryError);
                     });
                 }, 3000);
             });

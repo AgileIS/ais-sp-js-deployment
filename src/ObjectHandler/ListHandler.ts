@@ -41,6 +41,7 @@ export class ListHandler implements ISPObjectHandler {
                     let processingPromise: Promise<IPromiseResult<void | List>> = undefined;
 
                     if (listRequestResults && listRequestResults.length === 1) {
+                        Logger.write(`Found List with title: '${listConfig.Title}'`);
                         let list = web.lists.getById(listRequestResults[0].Id);
                         switch (listConfig.ControlOption) {
                             case ControlOption.Update:
@@ -50,14 +51,15 @@ export class ListHandler implements ISPObjectHandler {
                                 processingPromise = this.deleteList(listConfig, list);
                                 break;
                             default:
-                                Util.Resolve<List>(resolve, listConfig.InternalName, `Added list with the internal name '${listConfig.InternalName}', because it already exists.`, list);
+                                Util.Resolve<List>(resolve, listConfig.InternalName, `List with internal name '${listConfig.InternalName}'` +
+                                    ` does not have to be added, because it already exists.`, list);
                                 rejectOrResolved = true;
                                 break;
                         }
                     } else {
                         switch (listConfig.ControlOption) {
                             case ControlOption.Delete:
-                                Util.Resolve<void>(resolve, listConfig.InternalName, `Deleted list with internal name '${listConfig.InternalName}', because it does not exists.`);
+                                Util.Resolve<void>(resolve, listConfig.InternalName, `List with internal name '${listConfig.InternalName}' does not have to be deleted, because it does not exist.`);
                                 rejectOrResolved = true;
                                 break;
                             case ControlOption.Update:

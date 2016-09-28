@@ -55,6 +55,7 @@ export class FieldHandler implements ISPObjectHandler {
                     let processingPromise: Promise<IPromiseResult<void | Field>> = undefined;
 
                     if (fieldRequestResults && fieldRequestResults.length === 1) {
+                        Logger.write(`Found Field with the internal name: '${fieldConfig.InternalName}'`);
                         let field = fieldCollection.getById(fieldRequestResults[0].Id);
                         switch (fieldConfig.ControlOption) {
                             case ControlOption.Update:
@@ -64,14 +65,15 @@ export class FieldHandler implements ISPObjectHandler {
                                 processingPromise = this.deleteField(fieldConfig, field);
                                 break;
                             default:
-                                Util.Resolve<Field>(resolve, fieldConfig.InternalName, `Added field with the internal name '${fieldConfig.InternalName}', because it already exists.`, field);
+                                Util.Resolve<Field>(resolve, fieldConfig.InternalName, `Field with the internal name '${fieldConfig.InternalName}'` +
+                                    ` does not have to be added, because it already exists.`, field);
                                 rejectOrResolved = true;
                                 break;
                         }
                     } else {
                         switch (fieldConfig.ControlOption) {
                             case ControlOption.Delete:
-                                Util.Resolve<void>(resolve, fieldConfig.InternalName, `Deleted field with internal name '${fieldConfig.InternalName}', because it does not exists.`);
+                                Util.Resolve<void>(resolve, fieldConfig.InternalName, `Field with internal name '${fieldConfig.InternalName}' does not have to be deleted, because it does not exist.`);
                                 rejectOrResolved = true;
                                 break;
                             case ControlOption.Update:

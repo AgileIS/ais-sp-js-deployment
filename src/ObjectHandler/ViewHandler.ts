@@ -3,7 +3,6 @@ import { List } from "@agileis/sp-pnp-js/lib/sharepoint/rest/lists";
 import { View } from "@agileis/sp-pnp-js/lib/sharepoint/rest/views";
 import { ISPObjectHandler } from "../Interfaces/ObjectHandler/ISPObjectHandler";
 import { IView } from "../Interfaces/Types/IView";
-import { IViewField } from "../Interfaces/Types/IViewField";
 import { IPromiseResult } from "../Interfaces/IPromiseResult";
 import { ControlOption } from "../Constants/ControlOption";
 import { Util } from "../Util/Util";
@@ -63,7 +62,7 @@ export class ViewHandler implements ISPObjectHandler {
                     } else {
                         switch (viewConfig.ControlOption) {
                             case ControlOption.Delete:
-                                Util.Resolve<void>(reject, viewConfig.Title, `Could not delete view with title '${viewConfig.Title}', because it does not exist.`);
+                                Util.Resolve<void>(reject, viewConfig.Title, `View with the title '${viewConfig.Title}' does not have to be deleted, because it does not exist.`);
                                 rejectOrResolved = true;
                                 break;
                             case ControlOption.Update:

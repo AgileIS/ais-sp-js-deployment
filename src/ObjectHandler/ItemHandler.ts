@@ -41,6 +41,7 @@ export class ItemHandler implements ISPObjectHandler {
                     let processingPromise: Promise<IPromiseResult<void | Item>> = undefined;
 
                     if (itemRequestResults && itemRequestResults.length === 1) {
+                        Logger.write(`Found Item with the title: '${itemConfig.Title}'`);
                         let item = list.items.getById(itemRequestResults[0].Id);
                         switch (itemConfig.ControlOption) {
                             case ControlOption.Update:
@@ -50,14 +51,14 @@ export class ItemHandler implements ISPObjectHandler {
                                 processingPromise = this.deleteItem(itemConfig, item);
                                 break;
                             default:
-                                Util.Resolve<Item>(resolve, itemConfig.Title, `Added item with the title '${itemConfig.Title}', because it already exists.`, item);
+                                Util.Resolve<Item>(resolve, itemConfig.Title, `Item with the title '${itemConfig.Title}' does not have to be added, because it already exists.`, item);
                                 rejectOrResolved = true;
                                 break;
                         }
                     } else {
                         switch (itemConfig.ControlOption) {
                             case ControlOption.Delete:
-                                Util.Resolve<void>(resolve, itemConfig.Title, `Deleted item with Title '${itemConfig.Title}', because it does not exists.`);
+                                Util.Resolve<void>(resolve, itemConfig.Title, `Item with Title '${itemConfig.Title}' does not have to be deleted, because it does not exist.`);
                                 rejectOrResolved = true;
                                 break;
                             case ControlOption.Update:
