@@ -2,6 +2,20 @@
     "Sites": [
         {
             "Identifier": "insidervz",
+            "Features": [
+                {
+                    "Id": "bb07b7bf-d005-48dc-977b-fa15de5e9ba9",
+                    "Deactivate": false,
+                    "Description": "Hannover Re - Common JS registration (Agile-IS GmbH)",
+                    "Scope": "Site"
+                },
+                {
+                    "Id": "646132ad-5536-4dac-ab90-57698962f58c",
+                    "Deactivate": false,
+                    "Description": "Hannover Re - Application branding feature (Agile-IS GmbH)",
+                    "Scope": "Site"
+                }
+            ],
             "Naviation": {
                 "UseShared": false,
                 "ReCreateQuicklaunch": true,
@@ -506,7 +520,7 @@
             ],
             "Lists": [
                 {
-                    "InternalName": "re_ivz_insiderslist",
+                    "InternalName": "Insider",
                     "Title": "Insider",
                     "Description": "",
                     "TemplateType": "GenericList",
@@ -678,7 +692,7 @@
                     ]
                 },
                 {
-                    "InternalName": "re_ivz_projectslist",
+                    "InternalName": "Projekte",
                     "Title": "Projekte",
                     "Description": "",
                     "TemplateType": "GenericList",
@@ -745,7 +759,7 @@
                     ]
                 },
                 {
-                    "InternalName": "re_ivz_projectstoinsiderslist",
+                    "InternalName": "Projekt zu Insider",
                     "Title": "Projekt zu Insider",
                     "Description": "",
                     "TemplateType": "GenericList",
@@ -1120,7 +1134,7 @@
                     ]
                 },
                 {
-                    "InternalName": "re_ivz_reportslist",
+                    "InternalName": "Projekte",
                     "Title": "Reports",
                     "Description": "",
                     "TemplateType": "DocumentLibrary",
