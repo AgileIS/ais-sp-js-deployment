@@ -2,6 +2,7 @@ import { IFolder } from "./IFolder";
 import { IListFieldRef } from "./IListFieldRef";
 import { IField } from "./IField";
 import { IView } from "./IView";
+import { IFile } from "./IFile";
 import { IItem } from "./IItem";
 import { ISecurity } from "./ISecurity";
 import { IContentTypeBinding } from "./IContentTypeBinding";
@@ -12,7 +13,7 @@ export interface IList {
     Description: string;
     DocumentTemplate: string;
     OnQuickLaunch: boolean;
-    TemplateType: number;
+    TemplateType: string;
     EnableVersioning: boolean;
     EnableMinorVersions: boolean;
     EnableModeration: boolean;
@@ -38,5 +39,6 @@ export interface IList {
     InternalName: string;
     EnableContentTypes: boolean;
     ControlOption: string;
+    Files: Array<IFile | IFolder>;
     Items: Array<IItem>;
 }

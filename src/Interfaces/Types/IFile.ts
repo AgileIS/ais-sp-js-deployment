@@ -9,4 +9,6 @@ export interface IFile {
     RemoveExistingWebParts: boolean;
     WebParts: Array<IWebPart>;
     Views: Array<IHiddenView>;
+    Name: string;
+    ControlOption: string;
 }

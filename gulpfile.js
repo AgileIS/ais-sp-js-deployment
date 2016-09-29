@@ -5,8 +5,8 @@ const mergeStreams = require('merge-stream');
 const jsonFormat = require('gulp-json-format');
 const fs = require('fs');
 const rename = require('gulp-rename');
-const concat = require("gulp-concat");
-const replace = require("gulp-replace");
+const concat = require('gulp-concat');
+const replace = require('gulp-replace');
 
 
 const userConfigPrefix = 'config/userconfig_*.json';
@@ -19,8 +19,9 @@ const assignments = {
   Views: 'Title',
   Sites: 'Identifier',
   Features: 'ID',
-  ContentTypes: "Id",
-  QuickLaunch: "Title"
+  ContentTypes: 'Id',
+  QuickLaunch: 'Title',
+  Files: 'Name'
 };
 
 function merge(target, source) {
@@ -70,37 +71,37 @@ gulp.task('combineAll', () => {
   return mergeStreams(streams);
 });
 
-gulp.task("spjsom-clean", function () {
-  return fs.stat("./src/node-spjsom/index.js", function (err, stat) {
+gulp.task('spjsom-clean', function () {
+  return fs.stat('./src/node-spjsom/index.js', function (err, stat) {
     if (err == null) {
-      fs.unlinkSync("./src/node-spjsom/index.js");
+      fs.unlinkSync('./src/node-spjsom/index.js');
     }
   });
 });
 
-gulp.task("spjcom-merge-scripts", function () {
-  return gulp.src(["./src/node-spjsom/scripts/INIT.debug.js",
-    "./src/node-spjsom/scripts/MicrosoftAjax-4.0.0.0.debug.js",
-    "./src/node-spjsom/scripts/SP.Core.debug.js",
-    "./src/node-spjsom/scripts/SP.Runtime.debug.js",
-    "./src/node-spjsom/scripts/SP.debug.js"])
-    .pipe(concat({ path: "spjsom.js" }))
-    .pipe(gulp.dest("./src/node-spjsom/scripts"))
+gulp.task('spjcom-merge-scripts', function () {
+  return gulp.src(['./src/node-spjsom/scripts/INIT.debug.js',
+    './src/node-spjsom/scripts/MicrosoftAjax-4.0.0.0.debug.js',
+    './src/node-spjsom/scripts/SP.Core.debug.js',
+    './src/node-spjsom/scripts/SP.Runtime.debug.js',
+    './src/node-spjsom/scripts/SP.debug.js'])
+    .pipe(concat({ path: 'spjsom.js' }))
+    .pipe(gulp.dest('./src/node-spjsom/scripts'))
 
 });
 
-gulp.task("spjsom-insert-scripts", ["spjcom-merge-scripts"], function () {
-  var fileContent = fs.readFileSync("./src/node-spjsom/scripts/spjsom.js");
-  return gulp.src("./src/node-spjsom/indexDev.js")
-    .pipe(replace("//spjcsom", fileContent))
-    .pipe(rename("index.js"))
-    .pipe(gulp.dest("./src/node-spjsom"));
+gulp.task('spjsom-insert-scripts', ['spjcom-merge-scripts'], function () {
+  var fileContent = fs.readFileSync('./src/node-spjsom/scripts/spjsom.js');
+  return gulp.src('./src/node-spjsom/indexDev.js')
+    .pipe(replace('//spjcsom', fileContent))
+    .pipe(rename('index.js'))
+    .pipe(gulp.dest('./src/node-spjsom'));
 });
 
-gulp.task("spjsom-init", ["spjsom-clean", "spjsom-insert-scripts", "spjcom-merge-scripts"], function () {
-    return fs.stat("./src/node-spjsom/scripts/spjsom.js", function (err, stat) {
+gulp.task('spjsom-init', ['spjsom-clean', 'spjsom-insert-scripts', 'spjcom-merge-scripts'], function () {
+    return fs.stat('./src/node-spjsom/scripts/spjsom.js', function (err, stat) {
     if (err == null) {
-      fs.unlinkSync("./src/node-spjsom/scripts/spjsom.js");
+      fs.unlinkSync('./src/node-spjsom/scripts/spjsom.js');
     }
   });
 });

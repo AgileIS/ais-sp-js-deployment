@@ -1,9 +1,10 @@
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
 import { List} from "@agileis/sp-pnp-js/lib/sharepoint/rest/lists";
-import { ISPObjectHandler } from "../Interfaces/ObjectHandler/ISPObjectHandler";
+import { ISPObjectHandler } from "../interfaces/ObjectHandler/ispobjecthandler";
+import { IList } from "../interfaces/Types/IList";
+import { ListTemplates } from "../Constants/ListTemplates";
 import { IPromiseResult } from "../Interfaces/IPromiseResult";
-import { IList } from "../Interfaces/Types/IList";
 import { ControlOption } from "../Constants/ControlOption";
 import { Util } from "../Util/Util";
 
@@ -39,7 +40,6 @@ export class ListHandler implements ISPObjectHandler {
                 .then((listRequestResults) => {
                     let rejectOrResolved = false;
                     let processingPromise: Promise<IPromiseResult<void | List>> = undefined;
-
                     if (listRequestResults && listRequestResults.length === 1) {
                         Logger.write(`Found List with title: '${listConfig.Title}'`);
                         let list = web.lists.getById(listRequestResults[0].Id);
@@ -86,7 +86,7 @@ export class ListHandler implements ISPObjectHandler {
         return new Promise<IPromiseResult<List>>((resolve, reject) => {
             if (listConfig.TemplateType) {
                 let properties = this.createProperties(listConfig);
-                web.lists.add(listConfig.InternalName, listConfig.Description, listConfig.TemplateType, listConfig.EnableContentTypes, properties)
+                web.lists.add(listConfig.InternalName, listConfig.Description, ListTemplates[(listConfig.TemplateType as string)], listConfig.EnableContentTypes, properties)
                     .then((listAddResult) => {
                         listAddResult.list.update({ Title: listConfig.Title })
                             .then((listUpdateResult) => { Util.Resolve<List>(resolve, listConfig.InternalName, `Added list: '${listConfig.InternalName}'.`, listUpdateResult.list); })
@@ -132,6 +132,7 @@ export class ListHandler implements ISPObjectHandler {
                 delete parsedObject.Views;
                 delete parsedObject.Items;
                 delete parsedObject.TemplateType;
+                delete parsedObject.Files;
                 break;
             default:
                 delete parsedObject.InternalName;
@@ -143,6 +144,7 @@ export class ListHandler implements ISPObjectHandler {
                 delete parsedObject.Items;
                 delete parsedObject.Description;
                 delete parsedObject.TemplateType;
+                delete parsedObject.Files;
                 break;
         }
         stringifiedObject = JSON.stringify(parsedObject);
