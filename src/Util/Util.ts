@@ -58,8 +58,8 @@ export namespace Util {
                         Logger.write(`Retry failed second time: '${configNodeIdentifier}' - Reject`);
                         return Promise.reject(getErrorMessage(secondRetryError));
                     });
-                }, 3000);
+                }, 5000);
             });
-        }, 1000);
+        }, 2500);
     }
 }

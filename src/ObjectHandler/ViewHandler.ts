@@ -141,7 +141,7 @@ export class ViewHandler implements ISPObjectHandler {
                     resolve();
                 },
                 (sender, args) => {
-                    reject();
+                    reject(args.get_message());
                 });
         });
     }
