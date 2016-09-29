@@ -23,7 +23,7 @@ export class FileHandler implements ISPObjectHandler {
                         let parent = parentResult.value;
                         if (parentResult.value instanceof Web) {
                             parent = new Folder(parentResult.value.toUrl(), (fileFolderConfig as IFile).Src ? "" : `GetFolderByServerRelativeUrl('${fileFolderConfig.Name}')`);
-                             Util.Resolve<Folder>(resolve, fileFolderConfig.Name, `'${fileFolderConfig.Name}' is RootFolder`, parent as Folder);
+                            Util.Resolve<Folder>(resolve, fileFolderConfig.Name, `'${fileFolderConfig.Name}' is RootFolder`, parent as Folder);
                         } else {
                             if (parentResult.value instanceof List) {
                                 parent = new Folder(parentRequestResult.RootFolder.__deferred.uri);
@@ -89,8 +89,8 @@ export class FileHandler implements ISPObjectHandler {
         });
     }
 
-    private processingFileConfig(fileConfig: IFile, parentFolder: Files): Promise<IPromiseResult<File>> {
-        return new Promise<IPromiseResult<File>>((resolve, reject) => {
+    private processingFileConfig(fileConfig: IFile, parentFolder: Files): Promise<IPromiseResult<File | void>> {
+        return new Promise<IPromiseResult<File | void>>((resolve, reject) => {
             let processingText = fileConfig.ControlOption === ControlOption.Add || fileConfig.ControlOption === undefined || fileConfig.ControlOption === ""
                 ? "Add" : fileConfig.ControlOption;
             Logger.write(`Processing ${processingText} file: '${fileConfig.Name}' in ${parentFolder.toUrl()}`, Logger.LogLevel.Info);
@@ -98,13 +98,13 @@ export class FileHandler implements ISPObjectHandler {
             let file = parentFolder.getByName(fileConfig.Name);
             file.get()
                 .then(folderRequestResult => {
-                    let processingPromise: Promise<IPromiseResult<File>> = undefined;
+                    let processingPromise: Promise<IPromiseResult<File | void>> = undefined;
                     switch (fileConfig.ControlOption) {
                         case ControlOption.Delete:
                             processingPromise = this.deleteFile(fileConfig, file);
                             break;
                         case ControlOption.Update:
-
+                            processingPromise = this.addFile(fileConfig, parentFolder, true);
                             break;
                         default:
                             Util.Resolve<File>(resolve, fileConfig.Name, `File with the name '${fileConfig.Name}' already exists in '${parentFolder.toUrl()}'`, file);
@@ -130,7 +130,6 @@ export class FileHandler implements ISPObjectHandler {
                                 this.addFile(fileConfig, parentFolder)
                                     .then((folderProcessingResult) => {
                                         resolve(folderProcessingResult);
-                                        // ToDo update FileItem properties
                                     })
                                     .catch((addingError) => { reject(addingError); });
                                 break;
@@ -158,32 +157,50 @@ export class FileHandler implements ISPObjectHandler {
         });
     }
 
-    private addFile(fileConfig: IFile, parentFolder: Files): Promise<IPromiseResult<File>> {
+    private addFile(fileConfig: IFile, parentFolder: Files, overwrite?: boolean): Promise<IPromiseResult<File>> {
         return new Promise<IPromiseResult<File>>((resolve, reject) => {
             let file: NodeFile = {
                 data: fs.readFileSync(fileConfig.Src),
                 mime: mime.lookup(fileConfig.Name),
             };
-            parentFolder.add(fileConfig.Name, file)
-                .then((fileAddResult) => { Util.Resolve<File>(resolve, fileConfig.Name, `Added file: '${fileConfig.Name}'`, fileAddResult.file); })
-                .catch((error) => { Util.Reject<void>(reject, fileConfig.Name, `Error while adding folder with name '${fileConfig.Name}': ` + error); });
+            parentFolder.add(fileConfig.Name, file, overwrite)
+                .then((fileAddResult) => {
+                    if (fileConfig.Properties) {
+                        this.updateFileProperties(fileConfig, fileAddResult.file)
+                            .then((fileUpdateResult) => {
+                                Util.Resolve<File>(resolve, fileConfig.Name, `Added file: '${fileConfig.Name}'`, fileAddResult.file);
+                            })
+                            .catch((error) => {
+                                Util.Reject<void>(reject, fileConfig.Name, `Error while updating file item fields with name '${fileConfig.Name}': ` + error);
+                            });
+                    } else {
+                        Util.Resolve<File>(resolve, fileConfig.Name, `Added file: '${fileConfig.Name}'`, fileAddResult.file);
+                    }
+
+                })
+                .catch((error) => { Util.Reject<void>(reject, fileConfig.Name, `Error while adding file with name '${fileConfig.Name}': ` + error); });
         });
     }
 
-    private deleteFile(fileConfig: IFile, file: File): Promise<IPromiseResult<File>> {
-        return new Promise<IPromiseResult<File>>((resolve, reject) => {
+    private deleteFile(fileConfig: IFile, file: File): Promise<IPromiseResult<void>> {
+        return new Promise<IPromiseResult<void>>((resolve, reject) => {
             file.delete()
-                .then(() => { Util.Resolve(resolve, fileConfig.Name, `Deleted file: '${fileConfig.Name}'`); })
+                .then(() => { Util.Resolve<void>(resolve, fileConfig.Name, `Deleted file: '${fileConfig.Name}'`); })
                 .catch((error) => { Util.Reject(reject, fileConfig.Name, `Error while deleting file with name '${fileConfig.Name}': ` + error); });
         });
     }
 
-    private updateFile(fileConfig: IFile, file: File): Promise<IPromiseResult<Item>> {
+    private updateFileProperties(fileConfig: IFile, file: File): Promise<IPromiseResult<Item>> {
         return new Promise<IPromiseResult<Item>>((resolve, reject) => {
             let properties = this.createProperties(fileConfig.Properties as IItem);
+            properties.__metadata = { type: "SP.ListItem" };
             file.listItemAllFields.update(properties)
-                .then((itemUpdateResult) => { Util.Resolve<Item>(resolve, fileConfig.Name, `Updated item: '${fileConfig.Name}'`, itemUpdateResult.item); })
-                .catch((error) => { Util.Reject(reject, `Error while updating item with title '${fileConfig.Name}': ` + error, fileConfig.Name); });
+                .then((itemUpdateResult) => {
+                    Util.Resolve<Item>(resolve, fileConfig.Name, `Updated item: '${fileConfig.Name}'`, itemUpdateResult.item);
+                })
+                .catch((error) => {
+                    Util.Reject<void>(reject, fileConfig.Name, `Error while updating item with title '${fileConfig.Name}': ` + error);
+                });
         });
     }
 
@@ -191,15 +208,10 @@ export class FileHandler implements ISPObjectHandler {
         let stringifiedObject: string;
         stringifiedObject = JSON.stringify(itemConfig);
         let parsedObject = JSON.parse(stringifiedObject);
-        switch (itemConfig.ControlOption) {
-            case ControlOption.Update:
-                delete parsedObject.ControlOption;
-                break;
-            default:
-                delete parsedObject.ControlOption;
-                delete parsedObject.Title;
-                break;
-        }
+
+        delete parsedObject.ControlOption;
+        delete parsedObject.Name;
+
         stringifiedObject = JSON.stringify(parsedObject);
         return JSON.parse(stringifiedObject);
     }
