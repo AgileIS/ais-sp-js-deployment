@@ -25,7 +25,10 @@
                 "NewFormUrl": "test",
                 "NewFormTemplateName": "test",
                 "DocumentTemplate": "http://dev2013vm3/sites/deploymentjs2/Documents/Word.docx?Web=1",
-                "ControlOption": ""
+                "FieldLinks": [
+                    "AIS_TestField3"
+                ],
+                "ControlOption": "Update"
             }
             ]
         }

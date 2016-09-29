@@ -1,0 +1,1148 @@
+{
+    "Sites": [
+        {
+            "Identifier": "insidervz",
+            "Features": [
+                {
+                    "Id": "bb07b7bf-d005-48dc-977b-fa15de5e9ba9",
+                    "Deactivate": false,
+                    "Description": "Hannover Re - Common JS registration (Agile-IS GmbH)",
+                    "Scope": "Site"
+                },
+                {
+                    "Id": "646132ad-5536-4dac-ab90-57698962f58c",
+                    "Deactivate": false,
+                    "Description": "Hannover Re - Application branding feature (Agile-IS GmbH)",
+                    "Scope": "Site"
+                }
+            ],
+            "Naviation": {
+                "UseShared": false,
+                "ReCreateQuicklaunch": true,
+                "QuickLaunch": [
+                    {
+                        "Title": "Neuer Insider",
+                        "Url": "Lists/Insider/NewForm.aspx",
+                        "Children": [],
+                        "IsExternal": false,
+                        "ControlOption": ""
+                    },
+                    {
+                        "Title": "Neues Projekt",
+                        "Url": "Lists/Projekte/NewForm.aspx",
+                        "Children": [],
+                        "IsExternal": false,
+                        "ControlOption": ""
+                    },
+                    {
+                        "Title": "Zuordnung",
+                        "Url": "Lists/Projekt zu Insider/NewForm.aspx",
+                        "Children": [],
+                        "IsExternal": false,
+                        "ControlOption": ""
+                    },
+                    {
+                        "Title": "Reports",
+                        "Url": "Reports",
+                        "Children": [],
+                        "IsExternal": false,
+                        "ControlOption": ""
+                    },
+                    {
+                        "Title": "Insider",
+                        "Url": "Lists/Insider",
+                        "Children": [],
+                        "IsExternal": false,
+                        "ControlOption": ""
+                    },
+                    {
+                        "Title": "Projekte",
+                        "Url": "Lists/Projekte",
+                        "Children": [],
+                        "IsExternal": false,
+                        "ControlOption": ""
+                    },
+                    {
+                        "Title": "Projekt zu Insider",
+                        "Url": "Lists/Projekt zu Insider",
+                        "Children": [],
+                        "IsExternal": false,
+                        "ControlOption": ""
+                    }
+                ]
+            },
+            "Fields": [
+                {
+                    "Title": "Vorname",
+                    "InternalName": "re_ivz_forename",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Anrede",
+                    "InternalName": "re_ivz_salutation",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Titel",
+                    "InternalName": "re_ivz_salutationTitle",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Name",
+                    "InternalName": "re_ivz_name",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "Required": true,
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Geburtsname",
+                    "InternalName": "re_ivz_birthname",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Geburtsdatum",
+                    "InternalName": "re_ivz_birthday",
+                    "FieldType": "DateTime",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "Required": true,
+                    "DateFormat": "DateOnly",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Geburtsort",
+                    "InternalName": "re_ivz_birthplace",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "Required": true,
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Firma",
+                    "InternalName": "re_ivz_company",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "Required": true,
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Straße (Firma)",
+                    "InternalName": "re_ivz_compStreet",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "Required": true,
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "PLZ (Firma)",
+                    "InternalName": "re_ivz_compZip",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "Required": true,
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Ort (Firma)",
+                    "InternalName": "re_ivz_compCity",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "Required": true,
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Land (Firma)",
+                    "InternalName": "re_ivz_compCountry",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "Required": true,
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Straße",
+                    "InternalName": "re_ivz_street",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "Required": true,
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "PLZ",
+                    "InternalName": "re_ivz_zip",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "Required": true,
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Ort",
+                    "InternalName": "re_ivz_city",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "Required": true,
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Land",
+                    "InternalName": "re_ivz_country",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "Required": true,
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Funktion",
+                    "InternalName": "re_ivz_function",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Interner Titel",
+                    "InternalName": "re_ivz_internalTitle",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Abteilung",
+                    "InternalName": "re_ivz_department",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "PersonalNr",
+                    "InternalName": "re_ivz_staffNumber",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Nationale Identifikationsnummer",
+                    "InternalName": "re_ivz_nationalID",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Private Telefonnummer",
+                    "InternalName": "re_ivz_phonePrivate",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Private Mobilfunknummer",
+                    "InternalName": "re_ivz_mobilePrivate",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "dienstlische Telefonnummer",
+                    "InternalName": "re_ivz_phoneBusiness",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Fax",
+                    "InternalName": "re_ivz_fax",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "eMail",
+                    "InternalName": "re_ivz_email",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Complianceerklärung erhalten",
+                    "InternalName": "re_ivz_compReceived",
+                    "FieldType": "Boolean",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Unterschrieben",
+                    "InternalName": "re_ivz_signed",
+                    "FieldType": "Boolean",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Grund der Erfassung",
+                    "InternalName": "re_ivz_remarkCapture",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "Required": true,
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Archiviert",
+                    "InternalName": "re_ivz_archived",
+                    "FieldType": "Boolean",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Anlegungsdatum des Projekts",
+                    "InternalName": "re_ivz_creationDate",
+                    "FieldType": "DateTime",
+                    "DateFormat": "DateOnly",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "Required": true,
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Datum (der Erlangung des Zugangs zur Insiderinformation)",
+                    "InternalName": "re_ivz_accessDate",
+                    "Description": "Alternativ: (Datum der Erlangung des Zugangs zur Insiderinformation)",
+                    "FieldType": "DateTime",
+                    "DateFormat": "DateOnly",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "Required": true,
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Beschreibung",
+                    "InternalName": "re_ivz_description",
+                    "FieldType": "Note",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "NumberOfLines": 6,
+                    "AppendOnly": true,
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Zugangszeitpunkt",
+                    "InternalName": "re_ivz_accessStart",
+                    "FieldType": "DateTime",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Zugangsende",
+                    "InternalName": "re_ivz_accessEnd",
+                    "FieldType": "DateTime",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Endedatum",
+                    "InternalName": "re_ivz_end",
+                    "FieldType": "DateTime",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
+                    "Title": "Wird zur Insiderinformation am",
+                    "InternalName": "re_ivz_toInsiderDate",
+                    "FieldType": "DateTime",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                }
+            ],
+            "ContentTypes": [
+                {
+                    "Id": "0x0101FD11F734FB214D58BEEDABFE20ECA03A",
+                    "Name": "Projects",
+                    "Description": "Content Type for the Project List",
+                    "Group": "HannRe Insiderverzeichnis Content Types",
+                    "ControlOption": "",
+                    "FieldLinks": [
+                        {
+                            "InternalName": "re_ivz_creationDate"
+                        },
+                        {
+                            "InternalName": "Title"
+                        },
+                        {
+                            "InternalName": "re_ivz_creationDate"
+                        },
+                        {
+                            "InternalName": "re_ivz_toInsiderDate"
+                        },
+                        {
+                            "InternalName": "re_ivz_description"
+                        },
+                        {
+                            "InternalName": "re_ivz_archived"
+                        },
+                        {
+                            "InternalName": "re_ivz_end"
+                        }
+                    ]
+                },
+                {
+                    "Id": "0x0101EA388A28FD9E429BACB8AE5CC797EAB4",
+                    "Name": "Insider",
+                    "Description": "Content Type for the Insider List",
+                    "Group": "HannRe Insiderverzeichnis Content Types",
+                    "ControlOption": "",
+                    "FieldLinks": [
+                        {
+                            "InternalName": "re_ivz_salutation"
+                        },
+                        {
+                            "InternalName": "re_ivz_salutationTitle"
+                        },
+                        {
+                            "InternalName": "re_ivz_forename",
+                            "Required": "true"
+                        },
+                        {
+                            "InternalName": "re_ivz_name",
+                            "Required": "true"
+                        },
+                        {
+                            "InternalName": "re_ivz_birthname"
+                        },
+                        {
+                            "InternalName": "re_ivz_company",
+                            "Required": "true"
+                        },
+                        {
+                            "InternalName": "re_ivz_compStreet",
+                            "Required": "true"
+                        },
+                        {
+                            "InternalName": "re_ivz_compZip",
+                            "Required": "true"
+                        },
+                        {
+                            "InternalName": "re_ivz_compCity",
+                            "Required": "true"
+                        },
+                        {
+                            "InternalName": "re_ivz_compCountry",
+                            "Required": "true"
+                        },
+                        {
+                            "InternalName": "re_ivz_function"
+                        },
+                        {
+                            "InternalName": "re_ivz_remarkCapture"
+                        },
+                        {
+                            "InternalName": "re_ivz_description"
+                        },
+                        {
+                            "InternalName": "re_ivz_accessDate"
+                        },
+                        {
+                            "InternalName": "re_ivz_internalTitle"
+                        },
+                        {
+                            "InternalName": "re_ivz_department"
+                        },
+                        {
+                            "InternalName": "re_ivz_staffNumber"
+                        },
+                        {
+                            "InternalName": "re_ivz_phoneBusiness"
+                        },
+                        {
+                            "InternalName": "re_ivz_fax"
+                        },
+                        {
+                            "InternalName": "re_ivz_email"
+                        },
+                        {
+                            "InternalName": "re_ivz_birthday",
+                            "Required": "true"
+                        },
+                        {
+                            "InternalName": "re_ivz_birthplace",
+                            "Required": "true"
+                        },
+                        {
+                            "InternalName": "re_ivz_nationalID"
+                        },
+                        {
+                            "InternalName": "re_ivz_phonePrivate"
+                        },
+                        {
+                            "InternalName": "re_ivz_mobilePrivate"
+                        },
+                        {
+                            "InternalName": "re_ivz_street",
+                            "Required": "true"
+                        },
+                        {
+                            "InternalName": "re_ivz_zip",
+                            "Required": "true"
+                        },
+                        {
+                            "InternalName": "re_ivz_city",
+                            "Required": "true"
+                        },
+                        {
+                            "InternalName": "re_ivz_country",
+                            "Required": "true"
+                        },
+                        {
+                            "InternalName": "re_ivz_compReceived"
+                        },
+                        {
+                            "InternalName": "re_ivz_signed"
+                        },
+                        {
+                            "InternalName": "re_ivz_archived"
+                        }
+                    ]
+                },
+                {
+                    "Id": "0x010113339EA760B24FB387E5823ACD71F201",
+                    "Name": "Insider2Project",
+                    "Description": "Content Type for the Insider2Project List",
+                    "Group": "HannRe Insiderverzeichnis Content Types",
+                    "ControlOption": "",
+                    "FieldLinks": [
+                        {
+                            "InternalName": "re_ivz_accessStart"
+                        },
+                        {
+                            "InternalName": "re_ivz_accessEnd"
+                        }
+                    ]
+                }
+            ],
+            "Lists": [
+                {
+                    "InternalName": "Insider",
+                    "Title": "Insider",
+                    "Description": "",
+                    "TemplateType": "GenericList",
+                    "ContentTypeBindings": [
+                        {
+                            "ContentTypeId": "0x0101EA388A28FD9E429BACB8AE5CC797EAB4"
+                        }
+                    ],
+                    "EnableContentTypes": true,
+                    "EnableVersioning": true,
+                    "ControlOption": "",
+                    "Fields": [
+                        {
+                            "InternalName": "Created",
+                            "Title": "In Insiderliste seit",
+                            "ControlOption": "Update"
+                        },
+                        {
+                            "InternalName": "Modified",
+                            "Title": "Letzte Änderung am",
+                            "ControlOption": "Update"
+                        },
+                        {
+                            "InternalName": "Editor",
+                            "Title": "Letzte Änderung durch",
+                            "ControlOption": "Update"
+                        },
+                        {
+                            "InternalName": "re_ivz_description",
+                            "Title": "Bemerkung",
+                            "ControlOption": "Update"
+                        },
+                        {
+                            "InternalName": "re_ivz_calcName",
+                            "Title": "Vollständiger Name",
+                            "FieldType": "Calculated",
+                            "Formula": "=CONCATENATE([Vorname], \" \",[Name]",
+                            "OutputType": "Type",
+                            "ControlOption": ""
+                        }
+                    ],
+                    "Views": [
+                        {
+                            "Title": "All Items",
+                            "PersonalView": false,
+                            "ControlOption": "",
+                            "ViewFields": [
+                                {
+                                    "InternalName": "Edit"
+                                },
+                                {
+                                    "InternalName": "ID"
+                                },
+                                {
+                                    "InternalName": "re_ivz_salutation"
+                                },
+                                {
+                                    "InternalName": "re_ivz_salutationTitle"
+                                },
+                                {
+                                    "InternalName": "re_ivz_name"
+                                },
+                                {
+                                    "InternalName": "re_ivz_forename"
+                                },
+                                {
+                                    "InternalName": "re_ivz_phoneBusiness"
+                                },
+                                {
+                                    "InternalName": "re_ivz_phonePrivate"
+                                },
+                                {
+                                    "InternalName": "Created"
+                                },
+                                {
+                                    "InternalName": "Modified"
+                                },
+                                {
+                                    "InternalName": "re_ivz_email"
+                                },
+                                {
+                                    "InternalName": "re_ivz_remarkCapture"
+                                },
+                                {
+                                    "InternalName": "re_ivz_archived"
+                                }
+                            ]
+                        },
+                        {
+                            "Title": "Active Insider",
+                            "PersonalView": false,
+                            "Query": "<Where><Eq><FieldRef Name='re_ivz_archived'<Value Type='Boolean'>0</Value></Eq></Where>",
+                            "ControlOption": "",
+                            "ViewFields": [
+                                {
+                                    "InternalName": "Edit"
+                                },
+                                {
+                                    "InternalName": "re_ivz_salutation"
+                                },
+                                {
+                                    "InternalName": "re_ivz_salutationTitle"
+                                },
+                                {
+                                    "InternalName": "re_ivz_name"
+                                },
+                                {
+                                    "InternalName": "re_ivz_forename"
+                                },
+                                {
+                                    "InternalName": "re_ivz_birthname"
+                                },
+                                {
+                                    "InternalName": "re_ivz_phoneBusiness"
+                                },
+                                {
+                                    "InternalName": "re_ivz_company"
+                                },
+                                {
+                                    "InternalName": "re_ivz_compStreet"
+                                },
+                                {
+                                    "InternalName": "re_ivz_compZip"
+                                },
+                                {
+                                    "InternalName": "re_ivz_compCity"
+                                },
+                                {
+                                    "InternalName": "re_ivz_compCountry"
+                                },
+                                {
+                                    "InternalName": "re_ivz_street"
+                                },
+                                {
+                                    "InternalName": "re_ivz_function"
+                                },
+                                {
+                                    "InternalName": "re_ivz_remarkCapture"
+                                },
+                                {
+                                    "InternalName": "Created"
+                                },
+                                {
+                                    "InternalName": "re_ivz_birthday"
+                                },
+                                {
+                                    "InternalName": "re_ivz_nationalID"
+                                },
+                                {
+                                    "InternalName": "re_ivz_phonePrivate"
+                                },
+                                {
+                                    "InternalName": "re_ivz_mobilePrivate"
+                                },
+                                {
+                                    "InternalName": "re_ivz_street"
+                                },
+                                {
+                                    "InternalName": "re_ivz_zip"
+                                },
+                                {
+                                    "InternalName": "re_ivz_city"
+                                },
+                                {
+                                    "InternalName": "re_ivz_country"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "InternalName": "Projekte",
+                    "Title": "Projekte",
+                    "Description": "",
+                    "TemplateType": "GenericList",
+                    "ContentTypeBindings": [
+                        {
+                            "ContentTypeId": "0x0101FD11F734FB214D58BEEDABFE20ECA03A"
+                        }
+                    ],
+                    "EnableContentTypes": true,
+                    "EnableVersioning": true,
+                    "ControlOption": "",
+                    "Fields": [
+                        {
+                            "InternalName": "Title",
+                            "Title": "Thema",
+                            "ControlOption": "Update"
+                        },
+                        {
+                            "InternalName": "Modified",
+                            "Title": "Letzte Änderung am",
+                            "ControlOption": "Update"
+                        },
+                        {
+                            "InternalName": "Editor",
+                            "Title": "Letzte Änderung durch",
+                            "ControlOption": "Update"
+                        }
+                    ],
+                    "Views": [
+                        {
+                            "Title": "All Items",
+                            "PersonalView": false,
+                            "ControlOption": "",
+                            "ViewFields": [
+                                {
+                                    "InternalName": "Edit"
+                                },
+                                {
+                                    "InternalName": "Title"
+                                },
+                                {
+                                    "InternalName": "re_ivz_creationDate"
+                                },
+                                {
+                                    "InternalName": "re_ivz_toInsiderDate"
+                                },
+                                {
+                                    "InternalName": "re_ivz_description"
+                                },
+                                {
+                                    "InternalName": "re_ivz_end"
+                                },
+                                {
+                                    "InternalName": "re_ivz_archived"
+                                },
+                                {
+                                    "InternalName": "Editor"
+                                },
+                                {
+                                    "InternalName": "Modified"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "InternalName": "Projekt zu Insider",
+                    "Title": "Projekt zu Insider",
+                    "Description": "",
+                    "TemplateType": "GenericList",
+                    "ContentTypeBindings": [
+                        {
+                            "ContentTypeId": "0x010113339EA760B24FB387E5823ACD71F201"
+                        }
+                    ],
+                    "EnableContentTypes": true,
+                    "EnableVersioning": true,
+                    "ControlOption": "",
+                    "Fields": [
+                        {
+                            "InternalName": "re_ivz_insiderlookup",
+                            "Title": "Insider",
+                            "FieldType": "Lookup",
+                            "LookupField": "re_ivz_calcName",
+                            "LookupList": "Insider",
+                            "Required": true,
+                            "Indexed": true,
+                            "RelationshipDeleteBehavior": "Cascade",
+                            "JSLink": "~sitecollection/_catalogs/masterpage/HannRe.Insiderverzeichnis/Scripts/reInsiderverzeichnisLookupSelect2Bundle.js",
+                            "ControlOption": "",
+                            "DependendFields": [
+                                {
+                                    "Title": "Name",
+                                    "InternalName": "re_ivz_name"
+                                },
+                                {
+                                    "Title": "Vorname",
+                                    "InternalName": "re_ivz_forename"
+                                },
+                                {
+                                    "Title": "Anrede",
+                                    "InternalName": "re_ivz_salutation"
+                                },
+                                {
+                                    "Title": "Titel",
+                                    "InternalName": "re_ivz_salutationTitle"
+                                },
+                                {
+                                    "Title": "Geburtsname",
+                                    "InternalName": "re_ivz_birthname"
+                                },
+                                {
+                                    "Title": "Geburtsdatum",
+                                    "InternalName": "re_ivz_birthday"
+                                },
+                                {
+                                    "Title": "Geburtsort",
+                                    "InternalName": "re_ivz_birthplace"
+                                },
+                                {
+                                    "Title": "Stra&#223;e",
+                                    "InternalName": "re_ivz_street"
+                                },
+                                {
+                                    "Title": "PLZ",
+                                    "InternalName": "re_ivz_zip"
+                                },
+                                {
+                                    "Title": "Ort",
+                                    "InternalName": "re_ivz_city"
+                                },
+                                {
+                                    "Title": "Land",
+                                    "InternalName": "re_ivz_country"
+                                },
+                                {
+                                    "Title": "Firma",
+                                    "InternalName": "re_ivz_company"
+                                },
+                                {
+                                    "Title": "Stra&#223;e (Firma)",
+                                    "InternalName": "re_ivz_compStreet"
+                                },
+                                {
+                                    "Title": "PLZ (Firma)",
+                                    "InternalName": "re_ivz_compZip"
+                                },
+                                {
+                                    "Title": "Ort (Firma)",
+                                    "InternalName": "re_ivz_compCity"
+                                },
+                                {
+                                    "Title": "Land (Firma)",
+                                    "InternalName": "re_ivz_compCountry"
+                                },
+                                {
+                                    "Title": "Funktion",
+                                    "InternalName": "re_ivz_function"
+                                },
+                                {
+                                    "Title": "Abteilung",
+                                    "InternalName": "re_ivz_department"
+                                },
+                                {
+                                    "Title": "PersonalNr",
+                                    "InternalName": "re_ivz_staffNumber"
+                                },
+                                {
+                                    "Title": "Nationale Identifikationsnummer",
+                                    "InternalName": "re_ivz_nationalID"
+                                },
+                                {
+                                    "Title": "Private Telefonnummer",
+                                    "InternalName": "re_ivz_phonePrivate"
+                                },
+                                {
+                                    "Title": "Private Mobilfunknummer",
+                                    "InternalName": "re_ivz_mobilePrivate"
+                                },
+                                {
+                                    "Title": "Telefon",
+                                    "InternalName": "re_ivz_phoneBusiness"
+                                },
+                                {
+                                    "Title": "Fax",
+                                    "InternalName": "re_ivz_fax"
+                                },
+                                {
+                                    "Title": "eMail",
+                                    "InternalName": "re_ivz_email"
+                                },
+                                {
+                                    "Title": "Complianceerkl&#228;rung erhalten",
+                                    "InternalName": "re_ivz_compReceived"
+                                },
+                                {
+                                    "Title": "Unterschrieben",
+                                    "InternalName": "re_ivz_signed"
+                                },
+                                {
+                                    "Title": "Grund der Erfassung",
+                                    "InternalName": "re_ivz_remarkCapture"
+                                },
+                                {
+                                    "Title": "Archiviert",
+                                    "InternalName": "re_ivz_archived"
+                                },
+                                {
+                                    "Title": "In Insiderliste seit",
+                                    "InternalName": "Created"
+                                },
+                                {
+                                    "Title": "Letzte &#196;nderung am",
+                                    "InternalName": "Modified"
+                                }
+                            ]
+                        },
+                        {
+                            "InternalName": "re_ivz_projectlookup",
+                            "Title": "Projekte",
+                            "FieldType": "Lookup",
+                            "LookupField": "Title",
+                            "LookupList": "Projekte",
+                            "Required": true,
+                            "Indexed": true,
+                            "RelationshipDeleteBehavior": "Cascade",
+                            "JSLink": "~sitecollection/_catalogs/masterpage/HannRe.Insiderverzeichnis/Scripts/reInsiderverzeichnisLookupSelect2Bundle.js",
+                            "ControlOption": "",
+                            "DependendFields": [
+                                {
+                                    "Title": "Entstehungsdatum",
+                                    "InternalName": "re_ivz_creationDate"
+                                },
+                                {
+                                    "Title": "Erfassungsdatum",
+                                    "InternalName": "Created"
+                                },
+                                {
+                                    "Title": "Archiviert",
+                                    "InternalName": "re_ivz_archived"
+                                },
+                                {
+                                    "Title": "Letzte Änderung am",
+                                    "InternalName": "Modified"
+                                }
+                            ]
+                        },
+                        {
+                            "InternalName": "Modified",
+                            "Title": "Letzte Änderung am",
+                            "ControlOption": ""
+                        }
+                    ],
+                    "Views": [
+                        {
+                            "Title": "All Items",
+                            "PersonalView": false,
+                            "ControlOption": "",
+                            "ViewFields": [
+                                {
+                                    "InternalName": "Edit"
+                                },
+                                {
+                                    "InternalName": "re_ivz_salutation",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_salutationTitle",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_name",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_forename",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_birthname",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_birthday",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_birthplace",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_street",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_zip",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_city",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_country",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_company",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_compStreet",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_compZip",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_compCity",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_compCountry",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_function",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_department",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_staffNumber",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_nationalID",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_phonePrivate",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_mobilePrivate",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_phoneBusiness",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_fax",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_email",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_compReceived",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_signed",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_remarkCapture",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "Created",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "Modified",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Insider"
+                                },
+                                {
+                                    "InternalName": "re_ivz_projectlookup"
+                                },
+                                {
+                                    "InternalName": "re_ivz_creationDate",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Projekte"
+                                },
+                                {
+                                    "InternalName": "Created",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Projekte"
+                                },
+                                {
+                                    "InternalName": "Modified",
+                                    "DependentLookup": "true",
+                                    "LookupList": "Projekte"
+                                },
+                                {
+                                    "InternalName": "re_ivz_accessStart"
+                                },
+                                {
+                                    "InternalName": "re_ivz_accessEnd"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "InternalName": "Projekte",
+                    "Title": "Reports",
+                    "Description": "",
+                    "TemplateType": "DocumentLibrary",
+                    "EnableContentTypes": false,
+                    "EnableVersioning": true,
+                    "ControlOption": ""
+                }
+            ]
+        }
+    ]
+}

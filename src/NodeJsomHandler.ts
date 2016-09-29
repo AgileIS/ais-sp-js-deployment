@@ -5,9 +5,9 @@ import * as http from "http";
 import * as https from "https";
 import * as url from "url";
 import * as vm from "vm";
-import { DeploymentConfig } from "./interface/config/deploymentconfig";
-import { AuthenticationType } from "./constants/authenticationtype";
-import { UrlJoin } from "./util/util";
+import { DeploymentConfig } from "./Interfaces/Config/DeploymentConfig";
+import { AuthenticationType } from "./Constants/AuthenticationType";
+import { Util } from "./Util/Util";
 
 declare var hash: any;
 declare var global: NodeJS.Global;
@@ -59,7 +59,7 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                 requestOptions.headers = options.headers || {};
                 requestOptions.headers.connection = "keep-alive";
                 if (!requestOptions.url) {
-                    requestOptions.url = UrlJoin([options.protocol, options.host, options.path]);
+                    requestOptions.url = Util.UrlJoin([options.protocol, options.host, options.path]);
                 }
                 if (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) {
                     requestOptions.agent = NodeJsomHandlerImpl._agents[requestOptions.url.split("/_")[0]];
@@ -114,7 +114,7 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
 
     private setupSiteContext(siteUrl: string): Promise<void> {
         const lib = siteUrl.indexOf("https") > -1 ? https : http;
-        let reqUrl = UrlJoin([siteUrl, "_api/web/title"]);
+        let reqUrl = Util.UrlJoin([siteUrl, "_api/web/title"]);
         let parsedUrl = url.parse(reqUrl as string);
         let authValue = NodeJsomHandlerImpl._authOptions;
         if (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) {
@@ -225,7 +225,7 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                     return new Promise((res, rej) => {
                         const lib = siteUrl.indexOf("https") > -1 ? https : http;
 
-                        let reqUrl = UrlJoin([siteUrl, currentValue]);
+                        let reqUrl = Util.UrlJoin([siteUrl, currentValue]);
                         let parsedUrl = url.parse(reqUrl as string);
                         let authValue = NodeJsomHandlerImpl._authOptions;
                         let options = {

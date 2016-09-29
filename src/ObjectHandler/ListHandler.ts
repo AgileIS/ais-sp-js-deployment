@@ -1,34 +1,48 @@
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
 import { List} from "@agileis/sp-pnp-js/lib/sharepoint/rest/lists";
-import { ISPObjectHandler } from "../interface/ObjectHandler/ispobjecthandler";
-import { IList } from "../interface/Types/IList";
+import { ISPObjectHandler } from "../interfaces/ObjectHandler/ispobjecthandler";
+import { IList } from "../interfaces/Types/IList";
 import { ListTemplates } from "../Constants/ListTemplates";
+import { IPromiseResult } from "../Interfaces/IPromiseResult";
 import { ControlOption } from "../Constants/ControlOption";
-import { Resolve, Reject } from "../Util/Util";
+import { Util } from "../Util/Util";
 
 export class ListHandler implements ISPObjectHandler {
-    public execute(listConfig: IList, parentPromise: Promise<Web>): Promise<List> {
-        return new Promise<List>((resolve, reject) => {
-            parentPromise.then(parentWeb => {
-                this.processingViewConfig(listConfig, parentWeb)
-                    .then((listProsssingResult) => { resolve(listProsssingResult); })
-                    .catch((error) => { reject(error); });
+    public execute(listConfig: IList, parentPromise: Promise<IPromiseResult<Web>>): Promise<IPromiseResult<void | List>> {
+        return new Promise<IPromiseResult<void | List>>((resolve, reject) => {
+            parentPromise.then(promiseResult => {
+                if (!promiseResult || !promiseResult.value) {
+                    Util.Reject<void>(reject, listConfig.InternalName,
+                        `List handler parent promise value result is null or undefined for the list with the internal name '${listConfig.InternalName}'!`);
+                } else {
+                    let web = promiseResult.value;
+                    this.processingListConfig(listConfig, web)
+                        .then((listProsssingResult) => { resolve(listProsssingResult); })
+                        .catch((error) => {
+                            Util.Retry(error, listConfig.InternalName,
+                                () => {
+                                    return this.processingListConfig(listConfig, web);
+                                });
+                        });
+                }
             });
         });
     }
 
-    private processingViewConfig(listConfig: IList, parentWeb: Web): Promise<List> {
-        return new Promise<List>((resolve, reject) => {
+    private processingListConfig(listConfig: IList, web: Web): Promise<IPromiseResult<void | List>> {
+        return new Promise<IPromiseResult<void | List>>((resolve, reject) => {
             let processingText = listConfig.ControlOption === ControlOption.Add || listConfig.ControlOption === undefined || listConfig.ControlOption === ""
                 ? "Add" : listConfig.ControlOption;
-            Logger.write(`Processing ${processingText} list: '${listConfig.Title}'`, Logger.LogLevel.Info);
+            Logger.write(`Processing ${processingText} list: '${listConfig.InternalName}'.`, Logger.LogLevel.Info);
 
-            parentWeb.lists.filter(`RootFolder/Name eq '${listConfig.InternalName}'`).select("Id").get()
+            web.lists.filter(`RootFolder/Name eq '${listConfig.InternalName}'`).select("Id").get()
                 .then((listRequestResults) => {
-                    let processingPromise: Promise<List> = undefined;
+                    let rejectOrResolved = false;
+                    let processingPromise: Promise<IPromiseResult<void | List>> = undefined;
                     if (listRequestResults && listRequestResults.length === 1) {
-                        let list = parentWeb.lists.getById(listRequestResults[0].Id);
+                        Logger.write(`Found List with title: '${listConfig.Title}'`);
+                        let list = web.lists.getById(listRequestResults[0].Id);
                         switch (listConfig.ControlOption) {
                             case ControlOption.Update:
                                 processingPromise = this.updateList(listConfig, list);
@@ -37,17 +51,21 @@ export class ListHandler implements ISPObjectHandler {
                                 processingPromise = this.deleteList(listConfig, list);
                                 break;
                             default:
-                                Resolve(resolve, `List with the title '${listConfig.Title}' already exists`, listConfig.Title, list);
+                                Util.Resolve<List>(resolve, listConfig.InternalName, `List with internal name '${listConfig.InternalName}'` +
+                                    ` does not have to be added, because it already exists.`, list);
+                                rejectOrResolved = true;
                                 break;
                         }
                     } else {
                         switch (listConfig.ControlOption) {
-                            case ControlOption.Update:
                             case ControlOption.Delete:
-                                Reject(reject, `List with internal name '${listConfig.InternalName}' does not exists`, listConfig.Title);
+                                Util.Resolve<void>(resolve, listConfig.InternalName, `List with internal name '${listConfig.InternalName}' does not have to be deleted, because it does not exist.`);
+                                rejectOrResolved = true;
                                 break;
+                            case ControlOption.Update:
+                                listConfig.ControlOption = ControlOption.Add;
                             default:
-                                processingPromise = this.addList(listConfig, parentWeb);
+                                processingPromise = this.addList(listConfig, web);
                                 break;
                         }
                     }
@@ -56,45 +74,48 @@ export class ListHandler implements ISPObjectHandler {
                         processingPromise
                             .then((listProcessingResult) => { resolve(listProcessingResult); })
                             .catch((error) => { reject(error); });
-                    } else {
-                        Logger.write("List handler processing promise is undefined!");
+                    } else if (!rejectOrResolved) {
+                        Logger.write("List handler processing promise is undefined!", Logger.LogLevel.Error);
                     }
                 })
-                .catch((error) => { Reject(reject, `Error while requesting list with the internal name '${listConfig.InternalName}': ` + error, listConfig.Title); });
+                .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName, `Error while requesting list with the internal name '${listConfig.InternalName}': ` + error); });
         });
     }
 
-    private addList(listConfig: IList, parentWeb: Web): Promise<List> {
-        return new Promise<List>((resolve, reject) => {
+    private addList(listConfig: IList, web: Web): Promise<IPromiseResult<List>> {
+        return new Promise<IPromiseResult<List>>((resolve, reject) => {
             if (listConfig.TemplateType) {
                 let properties = this.createProperties(listConfig);
-                parentWeb.lists.add(listConfig.InternalName, listConfig.Description, ListTemplates[(listConfig.TemplateType as string)], listConfig.EnableContentTypes, properties)
+                web.lists.add(listConfig.InternalName, listConfig.Description, ListTemplates[(listConfig.TemplateType as string)], listConfig.EnableContentTypes, properties)
                     .then((listAddResult) => {
                         listAddResult.list.update({ Title: listConfig.Title })
-                            .then((listUpdateResult) => { Resolve(resolve, `Added list: '${listConfig.Title}'`, listConfig.Title, listUpdateResult.list); })
-                            .catch((error) => { Reject(reject, `Error while adding and updating list title with the internal name '${listConfig.InternalName}': ` + error, listConfig.Title); });
+                            .then((listUpdateResult) => { Util.Resolve<List>(resolve, listConfig.InternalName, `Added list: '${listConfig.InternalName}'.`, listUpdateResult.list); })
+                            .catch((error) => {
+                                Util.Reject<void>(reject, listConfig.InternalName,
+                                    `Error while adding and updating list title with the internal name '${listConfig.InternalName}': ` + error);
+                            });
                     })
-                    .catch((error) => { Reject(reject, `Error while adding list with the internal name '${listConfig.InternalName}': ` + error, listConfig.Title); });
+                    .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName, `Error while adding list with the internal name '${listConfig.InternalName}': ` + error); });
             } else {
-                Reject(reject, `List template type could not be resolved for the list with the internal name ${listConfig.InternalName}`, listConfig.Title);
+                Util.Reject<void>(reject, listConfig.InternalName, `List template type could not be resolved for the list with the internal name ${listConfig.InternalName}`);
             }
         });
     }
 
-    private updateList(listConfig: IList, list: List): Promise<List> {
-        return new Promise<List>((resolve, reject) => {
+    private updateList(listConfig: IList, list: List): Promise<IPromiseResult<List>> {
+        return new Promise<IPromiseResult<List>>((resolve, reject) => {
             let properties = this.createProperties(listConfig);
             list.update(properties)
-                .then((listUpdateResult) => { Resolve(resolve, `Updated list: '${listConfig.Title}'`, listConfig.Title, listUpdateResult.list); })
-                .catch((error) => { Reject(reject, `Error while updating list with the internal name '${listConfig.InternalName}': ` + error, listConfig.Title); });
+                .then((listUpdateResult) => { Util.Resolve<List>(resolve, listConfig.InternalName, `Updated list: '${listConfig.InternalName}'.`, listUpdateResult.list); })
+                .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName, `Error while updating list with the internal name '${listConfig.InternalName}': ` + error); });
         });
     }
 
-    private deleteList(listConfig: IList, list: List): Promise<List> {
-        return new Promise<List>((resolve, reject) => {
+    private deleteList(listConfig: IList, list: List): Promise<IPromiseResult<void>> {
+        return new Promise<IPromiseResult<void>>((resolve, reject) => {
             list.delete()
-                .then(() => { Resolve(resolve, `Deleted List: '${listConfig.InternalName}'`, listConfig.Title); })
-                .catch((error) => { Reject(reject, `Error while deleting list with the internal name '${listConfig.InternalName}': ` + error, listConfig.Title); });
+                .then(() => { Util.Resolve<void>(resolve, listConfig.InternalName, `Deleted List: '${listConfig.InternalName}'.`); })
+                .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName, `Error while deleting list with the internal name '${listConfig.InternalName}': ` + error); });
         });
     }
 
@@ -109,6 +130,7 @@ export class ListHandler implements ISPObjectHandler {
                 delete parsedObject.Fields;
                 delete parsedObject.EnableContentTypes;
                 delete parsedObject.Views;
+                delete parsedObject.Items;
                 delete parsedObject.TemplateType;
                 delete parsedObject.Files;
                 break;
@@ -119,6 +141,7 @@ export class ListHandler implements ISPObjectHandler {
                 delete parsedObject.Fields;
                 delete parsedObject.Views;
                 delete parsedObject.Title;
+                delete parsedObject.Items;
                 delete parsedObject.Description;
                 delete parsedObject.TemplateType;
                 delete parsedObject.Files;

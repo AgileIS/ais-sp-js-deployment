@@ -1,0 +1,18 @@
+{
+    "User": {
+        "username": "dev\\tuser",
+        "authtype": "Ntlm",
+        "password": "Start@123",
+        "proxyUrl": "http://localhost:8888"
+    },
+    "Sites": [
+        {
+            "Identifier": "insidervz",
+            "Url": "http://dev2013vm3/sites/insidervz",
+            "Title": "Insiderverzeichnis",
+            "Version": "1",
+            "Template": "STS#0",
+            "OwnerAlias": "phasenauer"
+        }
+    ]
+}

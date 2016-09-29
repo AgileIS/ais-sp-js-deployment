@@ -1,3 +1,5 @@
+import { IViewField } from "../Types/IViewField";
+
 export interface IView {
     Title: string;
     Paged: boolean;
@@ -6,7 +8,7 @@ export interface IView {
     RowLimit: number;
     Scope: number;
     SetAsDefaultView: boolean;
-    ViewFields: Array<string>;
+    ViewFields: Array<IViewField>;
     ViewTypeKind: string;
     ControlOption: string;
     ParentListId: any;

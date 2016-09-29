@@ -1,9 +1,8 @@
-import * as PNP from "@agileis/sp-pnp-js";
+import * as PnP from "@agileis/sp-pnp-js";
 import { LibraryConfiguration } from "@agileis/sp-pnp-js/lib/configuration/pnplibconfig";
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
-import { DeploymentConfig } from "./interface/Config/DeploymentConfig";
-import { SiteCollectionConfig } from "./interface/Config/SiteCollectionConfig";
-import { ISPObjectHandler } from "./interface/ObjectHandler/ispobjecthandler";
+import { DeploymentConfig } from "./Interfaces/Config/DeploymentConfig";
+import { ISPObjectHandler } from "./Interfaces/ObjectHandler/ISPObjectHandler";
 import { SiteHandler } from "./ObjectHandler/SiteHandler";
 import { ListHandler } from "./ObjectHandler/ListHandler";
 import { ItemHandler } from "./ObjectHandler/ItemHandler";
@@ -28,7 +27,7 @@ export class DeploymentManager {
         Lists: new ListHandler(),
         Fields: new FieldHandler(),
         Views: new ViewHandler(),
-        ViewFields: new ViewFieldHandler(),
+      //  ViewFields: new ViewFieldHandler(),
         Items: new ItemHandler(),
         Navigation: new NavigationHandler(),
         Files: new FileHandler(),
@@ -36,16 +35,20 @@ export class DeploymentManager {
     private _deployDependencies: Promise<void>;
 
     constructor(deploymentConfig: DeploymentConfig) {
-        this._deploymentConfig = deploymentConfig;
-        this.setupProxy();
-        this.setupPnPJs();
-        this._deployDependencies = NodeJsomHandler.initialize(deploymentConfig);
+        if (deploymentConfig.Sites && deploymentConfig.Sites.length === 1) {
+            this._deploymentConfig = deploymentConfig;
+            this.setupProxy();
+            this.setupPnPJs();
+            this._deployDependencies = NodeJsomHandler.initialize(deploymentConfig);
+        } else {
+            throw new Error("Deployment config site count is not equals 1");
+        }
     }
 
     public deploy(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             this._deployDependencies
-                .then( response => {
+                .then(() => {
                     this.processConfig(this._deploymentConfig)
                         .then(() => {
                             Logger.write("All site collection processed", Logger.LogLevel.Info);
@@ -88,12 +91,8 @@ export class DeploymentManager {
             });
 
             Promise.all(processingPromises)
-                .then(() => {
-                    resolve();
-                })
-                .catch((error) => {
-                    reject(error);
-                });
+                .then(() => { resolve(); })
+                .catch((error) => { reject(error); });
         });
     }
 
@@ -120,7 +119,7 @@ export class DeploymentManager {
                 nodeHttpNtlmClientOptions: {
                     domain: userAndDommain[0],
                     password: userConfig.password,
-                    siteUrl: "",
+                    siteUrl: this._deploymentConfig.Sites[0].Url,
                     username: userAndDommain[1],
                     workstation: userConfig.workstation,
                 },
@@ -129,7 +128,7 @@ export class DeploymentManager {
             pnpConfig = {
                 nodeHttpBasicClientOptions: {
                     password: userConfig.password,
-                    siteUrl: "",
+                    siteUrl: this._deploymentConfig.Sites[0].Url,
                     username: userConfig.username,
                 },
             };
@@ -138,7 +137,7 @@ export class DeploymentManager {
         }
 
         if (pnpConfig) {
-            PNP.setup(pnpConfig);
+            PnP.setup(pnpConfig);
         }
     }
 }

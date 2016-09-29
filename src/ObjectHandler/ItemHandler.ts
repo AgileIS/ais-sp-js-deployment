@@ -1,34 +1,48 @@
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { List } from "@agileis/sp-pnp-js/lib/sharepoint/rest/lists";
 import { Item } from "@agileis/sp-pnp-js/lib/sharepoint/rest/Items";
-import { ISPObjectHandler } from "../interface/ObjectHandler/ispobjecthandler";
-import { IItem } from "../interface/Types/IItem";
+import { ISPObjectHandler } from "../Interfaces/ObjectHandler/ISPObjectHandler";
+import { IItem } from "../Interfaces/Types/IItem";
+import { IPromiseResult } from "../Interfaces/IPromiseResult";
 import { ControlOption } from "../Constants/ControlOption";
-import { Resolve, Reject } from "../Util/Util";
+import { Util } from "../Util/Util";
 
 export class ItemHandler implements ISPObjectHandler {
-    public execute(itemConfig: IItem, parentPromise: Promise<List>): Promise<Item> {
-        return new Promise<Item>((resolve, reject) => {
-            parentPromise.then(parentList => {
-                this.processingViewConfig(itemConfig, parentList)
-                    .then((itemProsssingResult) => { resolve(itemProsssingResult); })
-                    .catch((error) => { reject(error); });
+    public execute(itemConfig: IItem, parentPromise: Promise<IPromiseResult<List>>): Promise<IPromiseResult<void | Item>> {
+        return new Promise<IPromiseResult<void | Item>>((resolve, reject) => {
+            parentPromise.then(promiseResult => {
+                if (!promiseResult || !promiseResult.value) {
+                    Util.Reject<void>(reject, itemConfig.Title,
+                        `Item handler parent promise value result is null or undefined for the item with the title '${itemConfig.Title}'!`);
+                } else {
+                    let list = promiseResult.value;
+                    this.processingItemConfig(itemConfig, list)
+                        .then((itemProsssingResult) => { resolve(itemProsssingResult); })
+                        .catch((error) => {
+                            Util.Retry(error, itemConfig.Title,
+                                () => {
+                                    return this.processingItemConfig(itemConfig, list);
+                                });
+                        });
+                }
             });
         });
     }
 
-    private processingViewConfig(itemConfig: IItem, parentList: List): Promise<Item> {
-        return new Promise<Item>((resolve, reject) => {
+    private processingItemConfig(itemConfig: IItem, list: List): Promise<IPromiseResult<void | Item>> {
+        return new Promise<IPromiseResult<void | Item>>((resolve, reject) => {
             let processingText = itemConfig.ControlOption === ControlOption.Add || itemConfig.ControlOption === undefined || itemConfig.ControlOption === ""
                 ? "Add" : itemConfig.ControlOption;
-            Logger.write(`Processing ${processingText} item: '${itemConfig.Title}'`, Logger.LogLevel.Info);
+            Logger.write(`Processing ${processingText} item: '${itemConfig.Title}'.`, Logger.LogLevel.Info);
 
-            parentList.items.filter(`Title eq '${itemConfig.Title}'`).select("Id").get()
+            list.items.filter(`Title eq '${itemConfig.Title}'`).select("Id").get()
                 .then((itemRequestResults) => {
-                    let processingPromise: Promise<Item> = undefined;
+                    let rejectOrResolved = false;
+                    let processingPromise: Promise<IPromiseResult<void | Item>> = undefined;
 
                     if (itemRequestResults && itemRequestResults.length === 1) {
-                        let item = parentList.items.getById(itemRequestResults[0].Id);
+                        Logger.write(`Found Item with the title: '${itemConfig.Title}'`);
+                        let item = list.items.getById(itemRequestResults[0].Id);
                         switch (itemConfig.ControlOption) {
                             case ControlOption.Update:
                                 processingPromise = this.updateItem(itemConfig, item);
@@ -37,17 +51,20 @@ export class ItemHandler implements ISPObjectHandler {
                                 processingPromise = this.deleteItem(itemConfig, item);
                                 break;
                             default:
-                                Resolve(resolve, `Item with the title '${itemConfig.Title}' already exists`, itemConfig.Title, item);
+                                Util.Resolve<Item>(resolve, itemConfig.Title, `Item with the title '${itemConfig.Title}' does not have to be added, because it already exists.`, item);
+                                rejectOrResolved = true;
                                 break;
                         }
                     } else {
                         switch (itemConfig.ControlOption) {
-                            case ControlOption.Update:
                             case ControlOption.Delete:
-                                Reject(reject, `Item with Title '${itemConfig.Title}' does not exists`, itemConfig.Title);
+                                Util.Resolve<void>(resolve, itemConfig.Title, `Item with Title '${itemConfig.Title}' does not have to be deleted, because it does not exist.`);
+                                rejectOrResolved = true;
                                 break;
+                            case ControlOption.Update:
+                                itemConfig.ControlOption = ControlOption.Add;
                             default:
-                                processingPromise = this.addItem(itemConfig, parentList);
+                                processingPromise = this.addItem(itemConfig, list);
                                 break;
                         }
                     }
@@ -56,37 +73,37 @@ export class ItemHandler implements ISPObjectHandler {
                         processingPromise
                             .then((itemProcessingResult) => { resolve(itemProcessingResult); })
                             .catch((error) => { reject(error); });
-                    } else {
-                        Logger.write("List handler processing promise is undefined!");
+                    } else if (!rejectOrResolved) {
+                        Logger.write("List handler processing promise is undefined!", Logger.LogLevel.Error);
                     }
                 })
-                .catch((error) => { Reject(reject, `Error while requesting item with the title '${itemConfig.Title}': ` + error, itemConfig.Title); });
+                .catch((error) => { Util.Reject<void>(reject, itemConfig.Title, `Error while requesting item with the title '${itemConfig.Title}': ` + error); });
         });
     }
 
-    private addItem(itemConfig: IItem, parentList: List): Promise<Item> {
-        return new Promise<Item>((resolve, reject) => {
+    private addItem(itemConfig: IItem, parentList: List): Promise<IPromiseResult<Item>> {
+        return new Promise<IPromiseResult<Item>>((resolve, reject) => {
             let properties = this.createProperties(itemConfig);
             parentList.items.add(properties)
-                .then((itemAddResult) => { Resolve(resolve, `Added item: '${itemConfig.Title}'`, itemConfig.Title, itemAddResult.item); })
-                .catch((error) => { Reject(reject, `Error while adding item with title '${itemConfig.Title}': ` + error, itemConfig.Title); });
+                .then((itemAddResult) => { Util.Resolve<Item>(resolve, itemConfig.Title, `Added item: '${itemConfig.Title}'.`, itemAddResult.item); })
+                .catch((error) => { Util.Reject<void>(reject, itemConfig.Title, `Error while adding item with title '${itemConfig.Title}': ` + error); });
         });
     }
 
-    private updateItem(itemConfig: IItem, item: Item): Promise<Item> {
-        return new Promise<Item>((resolve, reject) => {
+    private updateItem(itemConfig: IItem, item: Item): Promise<IPromiseResult<Item>> {
+        return new Promise<IPromiseResult<Item>>((resolve, reject) => {
             let properties = this.createProperties(itemConfig);
             item.update(properties)
-                .then((itemUpdateResult) => { Resolve(resolve, `Updated item: '${itemConfig.Title}'`, itemConfig.Title, itemUpdateResult.item); })
-                .catch((error) => { Reject(reject, `Error while updating item with title '${itemConfig.Title}': ` + error, itemConfig.Title); });
+                .then((itemUpdateResult) => { Util.Resolve<Item>(resolve, itemConfig.Title, `Updated item: '${itemConfig.Title}'.`, itemUpdateResult.item); })
+                .catch((error) => { Util.Reject<void>(reject, itemConfig.Title, `Error while updating item with title '${itemConfig.Title}': ` + error); });
         });
     }
 
-    private deleteItem(itemConfig: IItem, item: Item): Promise<Item> {
-        return new Promise<Item>((resolve, reject) => {
+    private deleteItem(itemConfig: IItem, item: Item): Promise<IPromiseResult<void>> {
+        return new Promise<IPromiseResult<void>>((resolve, reject) => {
             item.delete()
-                .then(() => { Resolve(resolve, `Deleted item: '${itemConfig.Title}'`, itemConfig.Title); })
-                .catch((error) => { Reject(reject, `Error while deleting item with title '${itemConfig.Title}': ` + error, itemConfig.Title); });
+                .then(() => { Util.Resolve<void>(resolve, itemConfig.Title, `Deleted item: '${itemConfig.Title}'.`); })
+                .catch((error) => { Util.Reject<void>(reject, itemConfig.Title, `Error while deleting item with title '${itemConfig.Title}': ` + error); });
         });
     }
 
@@ -100,7 +117,6 @@ export class ItemHandler implements ISPObjectHandler {
                 break;
             default:
                 delete parsedObject.ControlOption;
-                delete parsedObject.Title;
                 break;
         }
         stringifiedObject = JSON.stringify(parsedObject);
