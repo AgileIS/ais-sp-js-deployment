@@ -10,7 +10,7 @@ export enum FieldTypeKind {
     Boolean = 8,
     Number = 9,
     Currencyx = 10,
-    URL = 11,
+    Url = 11,
     Computed = 12,
     Threadig = 13,
     Guid = 14,

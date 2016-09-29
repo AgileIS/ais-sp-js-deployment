@@ -146,7 +146,7 @@ export class FieldHandler implements ISPObjectHandler {
                         .then(() => { Util.Reject<void>(reject, fieldConfig.InternalName, `Error while adding field with the internal name '${fieldConfig.InternalName}' - field deleted: ` + error); })
                         .catch(() => {
                             Util.Reject<void>(reject, fieldConfig.InternalName,
-                                `Error while adding field field with the internal name '${fieldConfig.InternalName}' - field not deleted: ` + error);
+                                `Error while adding field with the internal name '${fieldConfig.InternalName}' - field not deleted: ` + error);
                         });
                 });
         });
@@ -172,7 +172,7 @@ export class FieldHandler implements ISPObjectHandler {
                         .then(() => { Util.Reject<void>(reject, fieldConfig.InternalName, `Error while adding field with the internal name '${fieldConfig.InternalName}' - field deleted: ` + error); })
                         .catch(() => {
                             Util.Reject<void>(reject, fieldConfig.InternalName,
-                                `Error while adding field field with the internal name '${fieldConfig.InternalName}' - field not deleted: ` + error);
+                                `Error while adding field with the internal name '${fieldConfig.InternalName}' - field not deleted: ` + error);
                         });
                 });
         });
@@ -322,6 +322,9 @@ export class FieldHandler implements ISPObjectHandler {
                 if (fieldConfig.RelationshipDeleteBehavior) {
                     parsedObject.RelationshipDeleteBehavior = SP.RelationshipDeleteBehaviorType[fieldConfig.RelationshipDeleteBehavior.toLowerCase()];
                 }
+                if (fieldConfig.DisplayFormat) {
+                    parsedObject.DisplayFormat = Types.UrlFieldFormatType[fieldConfig.DisplayFormat];
+                }
                 break;
             default:
                 delete parsedObject.ControlOption;
@@ -335,6 +338,9 @@ export class FieldHandler implements ISPObjectHandler {
                 delete parsedObject.DisplayFormat;
                 parsedObject.FieldTypeKind = FieldTypeKind[parsedObject.FieldType];
                 delete parsedObject.FieldType;
+                if (fieldConfig.DisplayFormat) {
+                    parsedObject.DisplayFormat = Types.UrlFieldFormatType[fieldConfig.DisplayFormat];
+                }
                 break;
         }
 

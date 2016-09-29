@@ -128,12 +128,11 @@ export class ViewHandler implements ISPObjectHandler {
             let viewUrl = view.toUrl();
             let listUrlParts = viewUrl.split("'");
             Logger.write(`Updating all viewfields from view with the title '${viewConfig.Title}' on the list '${listUrlParts[1]}'. `, Logger.LogLevel.Verbose);
-
             let context = SP.ClientContext.get_current();
             let spView: SP.View = context.get_web().get_lists().getByTitle(listUrlParts[1]).get_views().getByTitle(viewConfig.Title);
             let viewFieldCollection = spView.get_viewFields();
             viewFieldCollection.removeAll();
-
+            
             for (let viewField of viewConfig.ViewFields) {
                 let viewFieldName = viewField.InternalName;
                 if (viewField.IsDependentLookup) {
