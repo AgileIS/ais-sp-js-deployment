@@ -127,14 +127,14 @@ export class ViewHandler implements ISPObjectHandler {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             view.fields.removeAll()
                 .then(() => {
-                    Logger.write(`Deleted all viewfields from view with title: '${viewConfig.Title}' - begin adding viewfields `, Logger.LogLevel.Verbose);
                     let viewUrl = view.toUrl();
                     let listUrlParts = viewUrl.split("'");
+                    Logger.write(`Deleted all viewfields from view with title '${viewConfig.Title}' on List '${listUrlParts[1]}' - begin adding viewfields `, Logger.LogLevel.Verbose);
                     let context = SP.ClientContext.get_current();
                     let spView: SP.View = context.get_web().get_lists().getByTitle(listUrlParts[1]).get_views().getByTitle(viewConfig.Title);
                     let viewFieldCollection = spView.get_viewFields();
                     context.load(viewFieldCollection);
-                    for (let value of viewConfig.ViewFields){
+                    for (let value of viewConfig.ViewFields) {
                         viewFieldCollection.add(value.InternalFieldName);
                     }
                     spView.update();
