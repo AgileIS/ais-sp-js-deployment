@@ -10,7 +10,6 @@ import { FileHandler } from "./ObjectHandler/FileHandler";
 import { FieldHandler } from "./ObjectHandler/FieldHandler";
 import { ViewHandler } from "./ObjectHandler/ViewHandler";
 import { FeatureHandler } from "./ObjectHandler/FeatureHandler";
-import { ViewFieldHandler } from "./ObjectHandler/ViewFieldHandler";
 import { ContentTypeHandler } from "./ObjectHandler/ContentTypeHandler";
 import { NavigationHandler } from "./ObjectHandler/NavigationHandler";
 import { AuthenticationType } from "./Constants/AuthenticationType";
@@ -27,7 +26,6 @@ export class DeploymentManager {
         Lists: new ListHandler(),
         Fields: new FieldHandler(),
         Views: new ViewHandler(),
-      //  ViewFields: new ViewFieldHandler(),
         Items: new ItemHandler(),
         Navigation: new NavigationHandler(),
         Files: new FileHandler(),

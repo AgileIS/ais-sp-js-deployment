@@ -1,3 +1,5 @@
 export interface IViewField {
-    InternalFieldName: string;
+    InternalName: string;
+    IsDependentLookup: boolean;
+    LookupListTitle: string;
 }

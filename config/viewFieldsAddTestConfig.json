@@ -22,13 +22,13 @@
                             "PersonalView": false,
                             "ViewFields": [
                                 {
-                                    "InternalFieldName": "Title"
+                                    "InternalName": "Title"
                                 },
                                 {
-                                    "InternalFieldName": "Author"
+                                    "InternalName": "Author"
                                 },
                                 {
-                                    "InternalFieldName": "Created"
+                                    "InternalName": "Created"
                                 }
                             ]
                         },

@@ -125,28 +125,27 @@ export class ViewHandler implements ISPObjectHandler {
 
     private addViewFields(viewConfig: IView, view: View): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
-            view.fields.removeAll()
-                .then(() => {
-                    let viewUrl = view.toUrl();
-                    let listUrlParts = viewUrl.split("'");
-                    Logger.write(`Deleted all viewfields from view with title '${viewConfig.Title}' on List '${listUrlParts[1]}' - begin adding viewfields `, Logger.LogLevel.Verbose);
-                    let context = SP.ClientContext.get_current();
-                    let spView: SP.View = context.get_web().get_lists().getByTitle(listUrlParts[1]).get_views().getByTitle(viewConfig.Title);
-                    let viewFieldCollection = spView.get_viewFields();
-                    context.load(viewFieldCollection);
-                    for (let value of viewConfig.ViewFields) {
-                        viewFieldCollection.add(value.InternalFieldName);
-                    }
-                    spView.update();
-                    context.executeQueryAsync(
-                        (sender, args) => {
-                            resolve();
-                        },
-                        (sender, args) => {
-                            reject();
-                        });
-                })
-                .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while deleting all fields in the view with the title '${viewConfig.Title}': ` + error); });
+            let viewUrl = view.toUrl();
+            let listUrlParts = viewUrl.split("'");
+            Logger.write(`Updating all viewfields from view with the title '${viewConfig.Title}' on the list '${listUrlParts[1]}'. `, Logger.LogLevel.Verbose);
+
+            let context = SP.ClientContext.get_current();
+            let spView: SP.View = context.get_web().get_lists().getByTitle(listUrlParts[1]).get_views().getByTitle(viewConfig.Title);
+            let viewFieldCollection = spView.get_viewFields();
+            viewFieldCollection.removeAll();
+
+            for (let viewField of viewConfig.ViewFields) {
+                let viewFieldName = viewField.InternalName;
+                if (viewField.IsDependentLookup) {
+                    viewFieldName = `${viewField.LookupListTitle}_${viewField.InternalName}`.substr(0, 32);
+                }
+                viewFieldCollection.add(viewFieldName);
+            }
+
+            spView.update();
+            context.executeQueryAsync(
+                (sender, args) => { resolve(); },
+                (sender, args) => { reject(); });
         });
     }
 

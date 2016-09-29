@@ -244,7 +244,10 @@ export class FieldHandler implements ISPObjectHandler {
                     this.updateLookupFieldProperties(fieldConfig, <SP.FieldLookup>context.castTo(lookupField, SP.FieldLookup));
 
                     fieldConfig.DependendFields.forEach(dependendField => {
-                        spFieldCollection.addDependentLookup(`${lookupList.get_title()}:${dependendField.Title}`, lookupField, dependendField.InternalName);
+                        let depFieldInternalName = `${lookupList.get_title()}_${dependendField.InternalName}`.substr(0, 32);
+                        let depField = spFieldCollection.addDependentLookup(depFieldInternalName, lookupField, dependendField.InternalName);
+                        depField.set_title(`${lookupList.get_title()}:${dependendField.Title}`);
+                        depField.update();
                     });
 
                     context.load(lookupField, "Id");
@@ -264,7 +267,18 @@ export class FieldHandler implements ISPObjectHandler {
     private updateField(fieldConfig: IField, field: Field): Promise<IPromiseResult<Field>> {
         return new Promise<IPromiseResult<Field>>((resolve, reject) => {
             let properties = this.createProperties(fieldConfig);
-            field.update(properties, `SP.Field${fieldConfig.FieldType}`)
+
+            let type = `SP.Field${fieldConfig.FieldType}`;
+            switch (fieldConfig.FieldType) {
+                case "Boolean":
+                    type = "SP.Field";
+                    break;
+                case "Note":
+                    type = "SP.FieldMultiLineText";
+                    break;
+            }
+
+            field.update(properties, type)
                 .then((fieldUpdateResult) => {
                     Util.Resolve<Field>(resolve, fieldConfig.InternalName, `Updated field: '${fieldConfig.InternalName}'.`,
                         fieldUpdateResult.field);
@@ -316,10 +330,25 @@ export class FieldHandler implements ISPObjectHandler {
                 delete parsedObject.DateFormat;
                 delete parsedObject.Formula;
                 delete parsedObject.OutputType;
+                delete parsedObject.NumberOfLines;
+                delete parsedObject.AppendOnly;
+                delete parsedObject.DisplayFormat;
                 parsedObject.FieldTypeKind = FieldTypeKind[parsedObject.FieldType];
                 delete parsedObject.FieldType;
                 break;
         }
+
+        if (FieldTypeKind[fieldConfig.FieldType] === FieldTypeKind.DateTime && parsedObject.DisplayFormat) {
+            switch (parsedObject.DisplayFormat) {
+                case "DateOnly":
+                    parsedObject.DisplayFormat = 0;
+                    break;
+                default:
+                    parsedObject.DisplayFormat = 1;
+                    break;
+            }
+        }
+
         stringifiedObject = JSON.stringify(parsedObject);
         return JSON.parse(stringifiedObject);
     }

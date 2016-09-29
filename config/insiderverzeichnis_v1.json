@@ -114,7 +114,7 @@
                     "FieldType": "DateTime",
                     "Group": "HannRe Insiderverzeichnis Columns",
                     "Required": true,
-                    "DateFormat": "DateOnly",
+                    "DisplayFormat": "DateOnly",
                     "ControlOption": ""
                 },
                 {
@@ -300,7 +300,7 @@
                     "Title": "Anlegungsdatum des Projekts",
                     "InternalName": "re_ivz_creationDate",
                     "FieldType": "DateTime",
-                    "DateFormat": "DateOnly",
+                    "DisplayFormat": "DateOnly",
                     "Group": "HannRe Insiderverzeichnis Columns",
                     "Required": true,
                     "ControlOption": ""
@@ -310,7 +310,7 @@
                     "InternalName": "re_ivz_accessDate",
                     "Description": "Alternativ: (Datum der Erlangung des Zugangs zur Insiderinformation)",
                     "FieldType": "DateTime",
-                    "DateFormat": "DateOnly",
+                    "DisplayFormat": "DateOnly",
                     "Group": "HannRe Insiderverzeichnis Columns",
                     "Required": true,
                     "ControlOption": ""
@@ -355,7 +355,7 @@
             ],
             "ContentTypes": [
                 {
-                    "Id": "0x0101FD11F734FB214D58BEEDABFE20ECA03A",
+                    "Id": "0x010100FD11F734FB214D58BEEDABFE20ECA03A",
                     "Name": "Projects",
                     "Description": "Content Type for the Project List",
                     "Group": "HannRe Insiderverzeichnis Content Types",
@@ -385,7 +385,7 @@
                     ]
                 },
                 {
-                    "Id": "0x0101EA388A28FD9E429BACB8AE5CC797EAB4",
+                    "Id": "0x010100EA388A28FD9E429BACB8AE5CC797EAB4",
                     "Name": "Insider",
                     "Description": "Content Type for the Insider List",
                     "Group": "HannRe Insiderverzeichnis Content Types",
@@ -503,7 +503,7 @@
                     ]
                 },
                 {
-                    "Id": "0x010113339EA760B24FB387E5823ACD71F201",
+                    "Id": "0x01010013339EA760B24FB387E5823ACD71F201",
                     "Name": "Insider2Project",
                     "Description": "Content Type for the Insider2Project List",
                     "Group": "HannRe Insiderverzeichnis Content Types",
@@ -526,7 +526,7 @@
                     "TemplateType": "GenericList",
                     "ContentTypeBindings": [
                         {
-                            "ContentTypeId": "0x0101EA388A28FD9E429BACB8AE5CC797EAB4"
+                            "ContentTypeId": "0x010100EA388A28FD9E429BACB8AE5CC797EAB4"
                         }
                     ],
                     "EnableContentTypes": true,
@@ -698,7 +698,7 @@
                     "TemplateType": "GenericList",
                     "ContentTypeBindings": [
                         {
-                            "ContentTypeId": "0x0101FD11F734FB214D58BEEDABFE20ECA03A"
+                            "ContentTypeId": "0x010100FD11F734FB214D58BEEDABFE20ECA03A"
                         }
                     ],
                     "EnableContentTypes": true,
@@ -765,7 +765,7 @@
                     "TemplateType": "GenericList",
                     "ContentTypeBindings": [
                         {
-                            "ContentTypeId": "0x010113339EA760B24FB387E5823ACD71F201"
+                            "ContentTypeId": "0x01010013339EA760B24FB387E5823ACD71F201"
                         }
                     ],
                     "EnableContentTypes": true,
@@ -957,171 +957,171 @@
                                 },
                                 {
                                     "InternalName": "re_ivz_salutation",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_salutationTitle",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_name",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_forename",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_birthname",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_birthday",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_birthplace",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_street",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_zip",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_city",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_country",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_company",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_compStreet",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_compZip",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_compCity",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_compCountry",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_function",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_department",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_staffNumber",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_nationalID",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_phonePrivate",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_mobilePrivate",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_phoneBusiness",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_fax",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_email",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_compReceived",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_signed",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_remarkCapture",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "Created",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "Modified",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Insider"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
                                 },
                                 {
                                     "InternalName": "re_ivz_projectlookup"
                                 },
                                 {
                                     "InternalName": "re_ivz_creationDate",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Projekte"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Projekte"
                                 },
                                 {
                                     "InternalName": "Created",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Projekte"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Projekte"
                                 },
                                 {
                                     "InternalName": "Modified",
-                                    "DependentLookup": "true",
-                                    "LookupList": "Projekte"
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Projekte"
                                 },
                                 {
                                     "InternalName": "re_ivz_accessStart"
