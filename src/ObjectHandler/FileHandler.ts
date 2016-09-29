@@ -1,7 +1,7 @@
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
 import { Folders, Folder } from "@agileis/sp-pnp-js/lib/sharepoint/rest/folders";
-import { Files, File} from "@agileis/sp-pnp-js/lib/sharepoint/rest/files";
+import { Files, File, NodeFile } from "@agileis/sp-pnp-js/lib/sharepoint/rest/files";
 import { List } from "@agileis/sp-pnp-js/lib/sharepoint/rest/lists";
 import { Item } from "@agileis/sp-pnp-js/lib/sharepoint/rest/items";
 import { ISPObjectHandler } from "../interfaces/ObjectHandler/ispobjecthandler";
@@ -15,21 +15,21 @@ import * as fs from "fs";
 import * as mime from "mime";
 
 export class FileHandler implements ISPObjectHandler {
-    public execute(fileFolderConfig: IFile | IFolder, parentPromise: Promise<IPromiseResult<Web | Folder | List>>): Promise<IPromiseResult<File | Folder>> {
-        return new Promise<IPromiseResult<File | Folder>>((resolve, reject) => {
+    public execute(fileFolderConfig: IFile | IFolder, parentPromise: Promise<IPromiseResult<Web | Folder | List>>): Promise<IPromiseResult<File | Folder | void>> {
+        return new Promise<IPromiseResult<File | Folder | void>>((resolve, reject) => {
             parentPromise.then(parentResult => {
                 parentResult.value.get()
                     .then(parentRequestResult => {
                         let parent = parentResult.value;
-                        if (parentResult instanceof Web) {
+                        if (parentResult.value instanceof Web) {
                             parent = new Folder(parentResult.value.toUrl(), (fileFolderConfig as IFile).Src ? "" : `GetFolderByServerRelativeUrl('${fileFolderConfig.Name}')`);
                              Util.Resolve<Folder>(resolve, fileFolderConfig.Name, `'${fileFolderConfig.Name}' is RootFolder`, parent as Folder);
                         } else {
-                            if (parentResult instanceof List) {
+                            if (parentResult.value instanceof List) {
                                 parent = new Folder(parentRequestResult.RootFolder.__deferred.uri);
                             }
 
-                            let processing: Promise<IPromiseResult<File | Folder>>;
+                            let processing: Promise<IPromiseResult<File | Folder | void>>;
                             if ((fileFolderConfig as IFile).Src) {
                                 processing = this.processingFileConfig(fileFolderConfig as IFile, (parent as Folder).files);
                             } else {
@@ -160,8 +160,11 @@ export class FileHandler implements ISPObjectHandler {
 
     private addFile(fileConfig: IFile, parentFolder: Files): Promise<IPromiseResult<File>> {
         return new Promise<IPromiseResult<File>>((resolve, reject) => {
-            let file = fs.readFileSync(fileConfig.Src);
-            parentFolder.add(fileConfig.Name, file, mime.lookup(fileConfig.Name))
+            let file: NodeFile = {
+                data: fs.readFileSync(fileConfig.Src),
+                mime: mime.lookup(fileConfig.Name),
+            };
+            parentFolder.add(fileConfig.Name, file)
                 .then((fileAddResult) => { Util.Resolve<File>(resolve, fileConfig.Name, `Added file: '${fileConfig.Name}'`, fileAddResult.file); })
                 .catch((error) => { Util.Reject<void>(reject, fileConfig.Name, `Error while adding folder with name '${fileConfig.Name}': ` + error); });
         });
