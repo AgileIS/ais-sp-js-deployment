@@ -36,6 +36,7 @@ export interface IField {
     Multivalue: boolean;
     RelationshipDeleteBehavior: string;
     DependendFields: Array<IFieldDependendLookup>;
+    DisplayFormat: string;
 }
 
 export interface IFieldDependendLookup {
