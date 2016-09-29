@@ -1,3 +1,5 @@
+import { IFieldLink } from "./IFieldLink.ts";
+
 export interface IContentType {
     Id: string;
     Name: string;
@@ -14,6 +16,6 @@ export interface IContentType {
     JSLink: string;
     Sealed: boolean;
     ReadOnly: boolean;
-    FieldLinks: Array<string>;
+    FieldLinks: Array<IFieldLink>;
     ControlOption: string;
 }

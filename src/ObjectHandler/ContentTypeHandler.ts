@@ -160,26 +160,30 @@ export class ContentTypeHandler implements ISPObjectHandler {
     }
 
     private setContentTypeFieldLinks(contentTypeConfig: IContentType, contentType: SP.ContentType, web: SP.Web) {
-        let currentFieldLinks: Array<string> = new Array<string>();
-        let fieldLinks = contentType.get_fieldLinks();
-        let fieldLinksEnumarator = fieldLinks.getEnumerator();
-        while (fieldLinksEnumarator.moveNext()) {
-            let fieldLink = fieldLinksEnumarator.get_current();
-            currentFieldLinks.push(fieldLink.get_name());
-        }
-
         if (contentTypeConfig.FieldLinks && contentTypeConfig.FieldLinks.length > 0) {
-            contentTypeConfig.FieldLinks.forEach((fieldInternalName, index, array) => {
-                if (currentFieldLinks.indexOf(fieldInternalName) < 0) {
-                    let fieldLink = new SP.FieldLinkCreationInformation();
-                    let field = web.get_availableFields().getByInternalNameOrTitle(fieldInternalName);
-                    fieldLink.set_field(field);
-                    fieldLinks.add(fieldLink);
+            let currentFieldLinksInternalNames: Array<string> = new Array<string>();
+            let fieldLinks = contentType.get_fieldLinks();
+
+            contentTypeConfig.FieldLinks.forEach((fieldLink, index, array) => {
+                let fieldLinkCreationInfo = new SP.FieldLinkCreationInformation();
+                let field = web.get_availableFields().getByInternalNameOrTitle(fieldLink.InternalName);
+                fieldLinkCreationInfo.set_field(field);
+                let spfieldLink = fieldLinks.add(fieldLinkCreationInfo);
+
+                if (fieldLink.Required) {
+                    spfieldLink.set_required(fieldLink.Required === true ? fieldLink.Required : false);
                 }
+
+                if (fieldLink.Hidden) {
+                    spfieldLink.set_hidden(fieldLink.Hidden === true ? fieldLink.Hidden : false);
+                }
+
+                currentFieldLinksInternalNames.push(fieldLink.InternalName);
             });
+
+            fieldLinks.reorder(currentFieldLinksInternalNames);
         }
 
-        fieldLinks.reorder(contentTypeConfig.FieldLinks);
     }
 
     private getContentTypeCreationInfo(contentTypeConfig: IContentType): SP.ContentTypeCreationInformation {

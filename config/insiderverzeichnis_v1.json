@@ -16,7 +16,7 @@
                     "Scope": "Site"
                 }
             ],
-            "Naviation": {
+            "Navigation": {
                 "UseShared": false,
                 "ReCreateQuicklaunch": true,
                 "QuickLaunch": [
@@ -24,49 +24,49 @@
                         "Title": "Neuer Insider",
                         "Url": "Lists/Insider/NewForm.aspx",
                         "Children": [],
-                        "IsExternal": false,
+                        "IsExternal": true,
                         "ControlOption": ""
                     },
                     {
                         "Title": "Neues Projekt",
                         "Url": "Lists/Projekte/NewForm.aspx",
                         "Children": [],
-                        "IsExternal": false,
+                        "IsExternal": true,
                         "ControlOption": ""
                     },
                     {
                         "Title": "Zuordnung",
                         "Url": "Lists/Projekt zu Insider/NewForm.aspx",
                         "Children": [],
-                        "IsExternal": false,
+                        "IsExternal": true,
                         "ControlOption": ""
                     },
                     {
                         "Title": "Reports",
                         "Url": "Reports",
                         "Children": [],
-                        "IsExternal": false,
+                        "IsExternal": true,
                         "ControlOption": ""
                     },
                     {
                         "Title": "Insider",
                         "Url": "Lists/Insider",
                         "Children": [],
-                        "IsExternal": false,
+                        "IsExternal": true,
                         "ControlOption": ""
                     },
                     {
                         "Title": "Projekte",
                         "Url": "Lists/Projekte",
                         "Children": [],
-                        "IsExternal": false,
+                        "IsExternal": true,
                         "ControlOption": ""
                     },
                     {
                         "Title": "Projekt zu Insider",
                         "Url": "Lists/Projekt zu Insider",
                         "Children": [],
-                        "IsExternal": false,
+                        "IsExternal": true,
                         "ControlOption": ""
                     }
                 ]
@@ -362,9 +362,6 @@
                     "ControlOption": "",
                     "FieldLinks": [
                         {
-                            "InternalName": "re_ivz_creationDate"
-                        },
-                        {
                             "InternalName": "Title"
                         },
                         {
@@ -399,34 +396,34 @@
                         },
                         {
                             "InternalName": "re_ivz_forename",
-                            "Required": "true"
+                            "Required": true
                         },
                         {
                             "InternalName": "re_ivz_name",
-                            "Required": "true"
+                            "Required": true
                         },
                         {
                             "InternalName": "re_ivz_birthname"
                         },
                         {
                             "InternalName": "re_ivz_company",
-                            "Required": "true"
+                            "Required": true
                         },
                         {
                             "InternalName": "re_ivz_compStreet",
-                            "Required": "true"
+                            "Required": true
                         },
                         {
                             "InternalName": "re_ivz_compZip",
-                            "Required": "true"
+                            "Required": true
                         },
                         {
                             "InternalName": "re_ivz_compCity",
-                            "Required": "true"
+                            "Required": true
                         },
                         {
                             "InternalName": "re_ivz_compCountry",
-                            "Required": "true"
+                            "Required": true
                         },
                         {
                             "InternalName": "re_ivz_function"
@@ -460,11 +457,11 @@
                         },
                         {
                             "InternalName": "re_ivz_birthday",
-                            "Required": "true"
+                            "Required": true
                         },
                         {
                             "InternalName": "re_ivz_birthplace",
-                            "Required": "true"
+                            "Required": true
                         },
                         {
                             "InternalName": "re_ivz_nationalID"
@@ -477,19 +474,19 @@
                         },
                         {
                             "InternalName": "re_ivz_street",
-                            "Required": "true"
+                            "Required": true
                         },
                         {
                             "InternalName": "re_ivz_zip",
-                            "Required": "true"
+                            "Required": true
                         },
                         {
                             "InternalName": "re_ivz_city",
-                            "Required": "true"
+                            "Required": true
                         },
                         {
                             "InternalName": "re_ivz_country",
-                            "Required": "true"
+                            "Required": true
                         },
                         {
                             "InternalName": "re_ivz_compReceived"
