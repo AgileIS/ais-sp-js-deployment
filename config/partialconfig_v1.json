@@ -85,33 +85,37 @@
                             ]
                         }
                     ],
-                     "Items": [
+                    "Items": [
                         {
                             "ControlOption": "",
                             "Title": "List1TestTitle"
-                        },{
+                        },
+                        {
                             "ControlOption": "",
                             "Title": "List1TestTitle1"
-                        },{
+                        },
+                        {
                             "ControlOption": "",
                             "Title": "List1TestTitle23"
-                        },{
+                        },
+                        {
                             "ControlOption": "",
                             "Title": "List1TestTitle35"
-                        },{
+                        },
+                        {
                             "ControlOption": "",
                             "Title": "List1TestTitle36"
                         },
-                         {
+                        {
                             "ControlOption": "",
                             "Title": "List1TestTitle2"
                         },
-                         {
+                        {
                             "ControlOption": "",
                             "Title": "List1TestTitle3",
                             "AIS_TestList1Field1": 10
                         },
-                         {
+                        {
                             "ControlOption": "Update",
                             "Title": "List1TestTitle555",
                             "AIS_TestList1Field1": 1000
@@ -184,16 +188,16 @@
                             ]
                         }
                     ],
-                     "Items": [
+                    "Items": [
                         {
                             "ControlOption": "",
                             "Title": "List2TestTitle"
                         },
-                         {
+                        {
                             "ControlOption": "",
                             "Title": "List2TestTitle2"
                         },
-                         {
+                        {
                             "ControlOption": "",
                             "Title": "List2TestTitle3",
                             "AIS_TestList2Field2": "Test ItemEntry"
@@ -209,17 +213,23 @@
                     "EnableContentTypes": true,
                     "Files": [
                         {
-                            "Name": "gulpfile.js",
-                            "Src": "./gulpfile.js",
-                            "Overwrite": true
+                            "Name": "Lorem.xlsx",
+                            "Src": "./Lorem.xlsx",
+                            "ControlOption": "Update",
+                            "Properties": {
+                                "Discription": "hallo"
+                            }
                         },
                         {
                             "Name": "Test",
                             "Files": [
                                 {
-                                    "Name": "gulpfile.js",
-                                    "Src": "./gulpfile.js",
-                                    "Overwrite": true
+                                    "Name": "Lorem.xlsx",
+                                    "Src": "./Lorem.xlsx",
+                                    "Properties": {
+                                        "AIS_TestList2Field1": 12,
+                                        "Discription": "asdf"
+                                    }
                                 }
                             ]
                         }
@@ -316,15 +326,15 @@
                                     "Name": "Test",
                                     "Files": [
                                         {
-                                            "Name": "Dokument0.pdf",
-                                            "Src": "./Dokument0.pdf",
+                                            "Name": "Lorem.pdf",
+                                            "Src": "./Lorem.pdf",
                                             "Overwrite": true
                                         }
                                     ]
                                 },
                                 {
-                                    "Name": "Anhang_1_Vorlage_1.xlsx",
-                                    "Src": "./Anhang_1_Vorlage_1.xlsx",
+                                    "Name": "Lorem.xlsx",
+                                    "Src": "./Lorem.xlsx",
                                     "Overwrite": true
                                 }
                             ]
