@@ -7,6 +7,7 @@ import { ISPObjectHandler } from "./interface/ObjectHandler/ispobjecthandler";
 import { SiteHandler } from "./ObjectHandler/SiteHandler";
 import { ListHandler } from "./ObjectHandler/ListHandler";
 import { ItemHandler } from "./ObjectHandler/ItemHandler";
+import { FileHandler } from "./ObjectHandler/FileHandler";
 import { FieldHandler } from "./ObjectHandler/FieldHandler";
 import { ViewHandler } from "./ObjectHandler/ViewHandler";
 import { FeatureHandler } from "./ObjectHandler/FeatureHandler";
@@ -30,6 +31,7 @@ export class DeploymentManager {
         ViewFields: new ViewFieldHandler(),
         Items: new ItemHandler(),
         Navigation: new NavigationHandler(),
+        Files: new FileHandler(),
     };
     private _deployDependencies: Promise<void>;
 

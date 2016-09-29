@@ -7,7 +7,7 @@
                     "Title": "TestListe1",
                     "Description": "",
                     "ControlOption": "",
-                    "TemplateType": 100,
+                    "TemplateType": "GenericList",
                     "InternalName": "AIS_TestList1",
                     "EnableContentTypes": true,
                     "Fields": [
@@ -90,7 +90,7 @@
                     "Title": "TestListe2",
                     "Description": "",
                     "ControlOption": "",
-                    "TemplateType": 100,
+                    "TemplateType": "GenericList",
                     "InternalName": "AIS_TestList2",
                     "EnableContentTypes": true,
                     "Fields": [
@@ -148,6 +148,31 @@
                                 },
                                 {
                                     "InternalFieldName": "ID"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "Title": "TestListe3",
+                    "Description": "",
+                    "ControlOption": "",
+                    "TemplateType": "DocumentLibrary",
+                    "InternalName": "AIS_TestList3",
+                    "EnableContentTypes": true,
+                    "Files": [
+                        {
+                            "Name": "gulpfile.js",
+                            "Src": "./gulpfile.js",
+                            "Overwrite": true
+                        },
+                        {
+                            "Name": "Test",
+                            "Files": [
+                                {
+                                    "Name": "gulpfile.js",
+                                    "Src": "./gulpfile.js",
+                                    "Overwrite": true
                                 }
                             ]
                         }
@@ -231,6 +256,33 @@
                     "FieldType": "Number",
                     "Group": "AISGroup",
                     "ControlOption": ""
+                }
+            ],
+            "Files": [
+                {
+                    "Name": "_catalogs/masterpage",
+                    "Files": [
+                        {
+                            "Name": "TestTest",
+                            "Files": [
+                                {
+                                    "Name": "Test",
+                                    "Files": [
+                                        {
+                                            "Name": "Dokument0.pdf",
+                                            "Src": "./Dokument0.pdf",
+                                            "Overwrite": true
+                                        }
+                                    ]
+                                },
+                                {
+                                    "Name": "Anhang_1_Vorlage_1.xlsx",
+                                    "Src": "./Anhang_1_Vorlage_1.xlsx",
+                                    "Overwrite": true
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }

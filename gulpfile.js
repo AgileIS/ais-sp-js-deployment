@@ -17,7 +17,8 @@ const assignments = {
   Fields: 'InternalName',
   Views: 'Title',
   Sites: 'RelativeUrl',
-  Features: 'ID'
+  Features: 'ID',
+  Files: 'Name'
 };
 
 function merge(target, source) {
