@@ -36,24 +36,27 @@ export namespace Util {
         return normalizedUrl;
     }
 
-    export function Retry(error: any, configNodeIdentifier: string, retryFunction: () => Promise<IPromiseResult<any>>) {
+    function getErrorMessage(error: any): any{
         let errorMessage = error;
-        if (typeof error === "object") {
-            if ((error as Object).hasOwnProperty("message")) { errorMessage = error.message; }
+        if (typeof error === "object") { if ((error as Object).hasOwnProperty("message")) { errorMessage = error.message; }
         }
-        Logger.write(`Retry process for '${configNodeIdentifier}' because Error: ${errorMessage}`);
+        return errorMessage;
+    }
+
+    export function Retry(error: any, configNodeIdentifier: string, retryFunction: () => Promise<IPromiseResult<any>>) {
+        Logger.write(`Retry process for '${configNodeIdentifier}' because Error: ${getErrorMessage(error)}`);
         setTimeout(() => {
             Logger.write(`Retry first time: '${configNodeIdentifier}'`);
             retryFunction().then((result) => {
                 return Promise.resolve(result);
             }).catch((firstRetryError) => {
                 setTimeout(() => {
-                    Logger.write(`Retry failed first time for '${configNodeIdentifier}' - ${firstRetryError}`);
+                    Logger.write(`Retry failed first time for '${configNodeIdentifier}' - ${getErrorMessage(firstRetryError)}`);
                     retryFunction().then((result) => {
                         return Promise.resolve(result);
                     }).catch((secondRetryError) => {
                         Logger.write(`Retry failed second time: '${configNodeIdentifier}' - Reject`);
-                        return Promise.reject(secondRetryError);
+                        return Promise.reject(getErrorMessage(secondRetryError));
                     });
                 }, 3000);
             });
