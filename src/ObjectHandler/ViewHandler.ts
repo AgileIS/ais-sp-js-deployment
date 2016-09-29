@@ -143,8 +143,12 @@ export class ViewHandler implements ISPObjectHandler {
 
             spView.update();
             context.executeQueryAsync(
-                (sender, args) => { resolve(); },
-                (sender, args) => { reject(); });
+                (sender, args) => {
+                    resolve();
+                },
+                (sender, args) => {
+                    reject(args.get_message());
+                });
         });
     }
 
