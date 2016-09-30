@@ -268,7 +268,7 @@ export class FieldHandler implements ISPObjectHandler {
         return new Promise<IPromiseResult<Field>>((resolve, reject) => {
             let properties = this.createProperties(fieldConfig);
 
-            let type = `SP.Field${fieldConfig.FieldType}`;
+            let type = `SP.Field${fieldConfig.FieldType ? fieldConfig.FieldType : ""}`;
             switch (fieldConfig.FieldType) {
                 case "Boolean":
                     type = "SP.Field";
