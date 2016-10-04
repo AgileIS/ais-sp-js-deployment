@@ -94,7 +94,7 @@ export class ListHandler implements ISPObjectHandler {
                             .then((listUpdateResult) => { Util.Resolve<List>(resolve, listConfig.InternalName, `Added list: '${listConfig.InternalName}'.`, listUpdateResult.value); })
                             .catch((error) => {
                                 Util.Reject<void>(reject, listConfig.InternalName,
-                                    `Error while adding and updating list title with the internal name '${listConfig.InternalName}': ` + error);
+                                    `Error while adding and updating list with the internal name '${listConfig.InternalName}': ` + error);
                             });
                     })
                     .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName, `Error while adding list with the internal name '${listConfig.InternalName}': ` + error); });

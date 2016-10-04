@@ -164,6 +164,7 @@ export class ContentTypeHandler implements ISPObjectHandler {
             let currentFieldLinksInternalNames: Array<string> = new Array<string>();
             let fieldLinks = contentType.get_fieldLinks();
 
+            this.updateTitleFieldLink(contentTypeConfig, fieldLinks);
             contentTypeConfig.FieldLinks.forEach((fieldLink, index, array) => {
                 let fieldLinkCreationInfo = new SP.FieldLinkCreationInformation();
                 let field = web.get_availableFields().getByInternalNameOrTitle(fieldLink.InternalName);
@@ -184,6 +185,19 @@ export class ContentTypeHandler implements ISPObjectHandler {
             fieldLinks.reorder(currentFieldLinksInternalNames);
         }
 
+    }
+
+    private updateTitleFieldLink(contentTypeConfig: IContentType, fieldLinks: SP.FieldLinkCollection): void {
+        let item = contentTypeConfig.FieldLinks.filter( (fLink, fIndex) => { return fLink.InternalName === "Title"; });
+            contentTypeConfig.FieldLinks.splice(contentTypeConfig.FieldLinks.indexOf(item[0]), 1);
+            let e = fieldLinks.getEnumerator();
+            while (e.moveNext()) {
+                let current = e.get_current();
+                if (current.get_name() === "Title") {
+                    current.set_required(item[0] ? (item[0].Required ? item[0].Required : false) : false);
+                    current.set_hidden(item[0] ? (item[0].Hidden ? item[0].Hidden : false) : true);
+                }
+            }
     }
 
     private getContentTypeCreationInfo(contentTypeConfig: IContentType): SP.ContentTypeCreationInformation {

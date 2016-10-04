@@ -48,6 +48,7 @@ export class DeploymentManager {
             this._deployDependencies
                 .then(() => {
                     this.processConfig(this._deploymentConfig)
+                    // this.processSeq(this._deploymentConfig, Promise.resolve())
                         .then(() => {
                             Logger.write("All site collection processed", Logger.LogLevel.Info);
                             resolve();
@@ -60,6 +61,44 @@ export class DeploymentManager {
                 .catch(error => {
                     reject(error);
                 });
+        });
+    }
+
+    private processSeq(config: any, prev: Promise<any>, parentPromise?: Promise<any>): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            prev.then(prevResult => {
+                for (let nodeKey in config) {
+                    Logger.write("Processing node " + nodeKey, 0);
+                    let handler = this._objectHandlers[nodeKey];
+                    if (handler) {
+                        Logger.write(`Found handler ${handler.constructor.name} for node ${nodeKey}`, Logger.LogLevel.Verbose);
+                        if (config[nodeKey] instanceof Array) {
+                            while (config[nodeKey].length > 0) {
+                                let subNode = config[nodeKey].shift();
+                                Logger.write("Call the handler " + handler.constructor.name + " for the node:" + JSON.stringify(subNode), Logger.LogLevel.Verbose);
+                                let handlerPromise = handler.execute(subNode, parentPromise);
+                                // return this.processSeq(subNode, handlerPromise, handlerPromise);
+                                return this.processSeq(config, this.processSeq(subNode, handlerPromise, handlerPromise), parentPromise);
+                            };
+                            if (config[nodeKey].length === 0) {
+                                delete config[nodeKey];
+                            }
+                        } else {
+                            Logger.write("Call the handler " + handler.constructor.name + " for the node:" + JSON.stringify(config[nodeKey]), Logger.LogLevel.Verbose);
+                            let handlerPromise = handler.execute(config[nodeKey], parentPromise);
+                            delete config[nodeKey];
+                            return this.processSeq(config, handlerPromise, parentPromise);
+                        }
+                    } else {
+                        delete config[nodeKey];
+                    }
+                };
+                if (Object.keys(config).length === 0) {
+                    resolve();
+                }
+            }).catch((error) => {
+                return this.processSeq(config, Promise.resolve(), parentPromise);
+            });
         });
     }
 
