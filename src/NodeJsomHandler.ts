@@ -59,7 +59,7 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                 requestOptions.headers = options.headers || {};
                 requestOptions.headers.connection = "keep-alive";
                 if (!requestOptions.url) {
-                    requestOptions.url = Util.UrlJoin([options.protocol, options.host, options.path]);
+                    requestOptions.url = Util.JoinAndNormalizeUrl([options.protocol, options.host, options.path]);
                 }
                 if (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) {
                     requestOptions.agent = NodeJsomHandlerImpl._agents[requestOptions.url.split("/_")[0]];
@@ -114,7 +114,7 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
 
     private setupSiteContext(siteUrl: string): Promise<void> {
         const lib = siteUrl.indexOf("https") > -1 ? https : http;
-        let reqUrl = Util.UrlJoin([siteUrl, "_api/web/title"]);
+        let reqUrl = Util.JoinAndNormalizeUrl([siteUrl, "_api/web/title"]);
         let parsedUrl = url.parse(reqUrl as string);
         let authValue = NodeJsomHandlerImpl._authOptions;
         if (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) {
@@ -225,7 +225,7 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                     return new Promise((res, rej) => {
                         const lib = siteUrl.indexOf("https") > -1 ? https : http;
 
-                        let reqUrl = Util.UrlJoin([siteUrl, currentValue]);
+                        let reqUrl = Util.JoinAndNormalizeUrl([siteUrl, currentValue]);
                         let parsedUrl = url.parse(reqUrl as string);
                         let authValue = NodeJsomHandlerImpl._authOptions;
                         let options = {

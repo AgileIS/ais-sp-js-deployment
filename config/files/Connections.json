@@ -1,0 +1,19 @@
+{
+    "connections": [
+        {
+            "ViewID": "42ed9c8c-83b9-4bb0-82f1-320c8ab7fc03",
+            "ListID": "1c02650d-2c61-4099-898b-538a3f52f281",
+            "File": ".\\LibraryFiles\\Anhang_1_Vorlage_1.xlsx"
+        },
+        {
+            "ViewID": "42ed9c8c-83b9-4bb0-82f1-320c8ab7fc03",
+            "ListID": "1c02650d-2c61-4099-898b-538a3f52f281",
+            "File": ".\\LibraryFiles\\Anhang_1_Vorlage_2.xlsx"
+        },
+        {
+            "ViewID": "42ed9c8c-83b9-4bb0-82f1-320c8ab7fc03",
+            "ListID": "1c02650d-2c61-4099-898b-538a3f52f281",
+            "File": ".\\LibraryFiles\\Anhang_2.xlsx"
+        }
+    ]
+}

@@ -21,6 +21,13 @@
                 "ReCreateQuicklaunch": true,
                 "QuickLaunch": [
                     {
+                        "Title": "Home",
+                        "Url": "~replaceSite",
+                        "Children": [],
+                        "IsExternal": false,
+                        "ControlOption": ""
+                    },
+                    {
                         "Title": "Neuer Insider",
                         "Url": "Lists/Insider/NewForm.aspx",
                         "Children": [],
@@ -67,6 +74,13 @@
                         "Url": "Lists/Projekt zu Insider",
                         "Children": [],
                         "IsExternal": true,
+                        "ControlOption": ""
+                    },
+                    {
+                        "Title": "Site Contents",
+                        "Url": "~replaceSite/_layouts/15/viewlsts.aspx",
+                        "Children": [],
+                        "IsExternal": false,
                         "ControlOption": ""
                     }
                 ]
@@ -1149,7 +1163,35 @@
                     "TemplateType": "DocumentLibrary",
                     "EnableContentTypes": false,
                     "EnableVersioning": true,
-                    "ControlOption": ""
+                    "ControlOption": "",
+                    "Files": []
+                }
+            ]
+        }
+    ],
+    "Files": [
+        {
+            "Name": "_catalogs/masterpage",
+            "Files": [
+                {
+                    "Name": "HannRe.Insiderverzeichnis",
+                    "Files": [
+                        {
+                            "Name": "Scripts",
+                            "Files": [
+                                {
+                                    "Name": "reInsiderverzeichnisLookupSelect2Bundle.js",
+                                    "Src": "./config/Layouts/reInsiderverzeichnisLookupSelect2Bundle.js",
+                                    "Overwrite": true
+                                },
+                                {
+                                    "Name": "reInsiderverzeichnisLookupSelect2Bundle.js.map",
+                                    "Src": "./config/Layouts/reInsiderverzeichnisLookupSelect2Bundle.js.map",
+                                    "Overwrite": true
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }
