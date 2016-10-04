@@ -132,7 +132,6 @@ export class ViewHandler implements ISPObjectHandler {
             let spView: SP.View = context.get_web().get_lists().getByTitle(listUrlParts[1]).get_views().getByTitle(viewConfig.Title);
             let viewFieldCollection = spView.get_viewFields();
             viewFieldCollection.removeAll();
-            
             for (let viewField of viewConfig.ViewFields) {
                 let viewFieldName = viewField.InternalName;
                 if (viewField.IsDependentLookup) {
