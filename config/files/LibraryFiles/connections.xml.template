@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<connections xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+	<connection id="1" odcFile="C:\src\Insiderverzeichnis\LibraryFiles\Insider.iqy" keepAlive="1" name="Insider" type="5" refreshedVersion="5" minRefreshableVersion="3" saveData="1">
+		<dbPr connection="Provider=Microsoft.Office.List.OLEDB.2.0;Data Source=&quot;&quot;;ApplicationName=Excel;Version=12.0.0.0" command="&lt;LIST&gt;&lt;VIEWGUID&gt;__Insider__View__&lt;/VIEWGUID&gt;&lt;LISTNAME&gt;__Insider__List__&lt;/LISTNAME&gt;&lt;LISTWEB&gt;__Insider__WebUrl__/_vti_bin&lt;/LISTWEB&gt;&lt;LISTSUBWEB&gt;&lt;/LISTSUBWEB&gt;&lt;ROOTFOLDER&gt;__Insider__RootFolderURL__&lt;/ROOTFOLDER&gt;&lt;/LIST&gt;" commandType="5"/>
+	</connection>
+	<connection id="2" odcFile="C:\src\Insiderverzeichnis\LibraryFiles\Insider2Projekte.iqy" keepAlive="1" name="Insider2Projekte" type="5" refreshedVersion="5" minRefreshableVersion="3" saveData="1">
+		<dbPr connection="Provider=Microsoft.Office.List.OLEDB.2.0;Data Source=&quot;&quot;;ApplicationName=Excel;Version=12.0.0.0" command="&lt;LIST&gt;&lt;VIEWGUID&gt;__Projekt zu Insider__View__&lt;/VIEWGUID&gt;&lt;LISTNAME&gt;__Projekt zu Insider__List__&lt;/LISTNAME&gt;&lt;LISTWEB&gt;__Projekt zu Insider__WebUrl__/_vti_bin&lt;/LISTWEB&gt;&lt;LISTSUBWEB&gt;&lt;/LISTSUBWEB&gt;&lt;ROOTFOLDER&gt;__Projekt zu Insider__RootFolderURL__&lt;/ROOTFOLDER&gt;&lt;/LIST&gt;" commandType="5"/>
+	</connection>
+	<connection id="3" odcFile="C:\src\Insiderverzeichnis\LibraryFiles\Projekte.iqy" keepAlive="1" name="Projekte" type="5" refreshedVersion="5" minRefreshableVersion="3" saveData="1">
+		<dbPr connection="Provider=Microsoft.Office.List.OLEDB.2.0;Data Source=&quot;&quot;;ApplicationName=Excel;Version=12.0.0.0" command="&lt;LIST&gt;&lt;VIEWGUID&gt;__Projekte__View__&lt;/VIEWGUID&gt;&lt;LISTNAME&gt;__Projekte__List__&lt;/LISTNAME&gt;&lt;LISTWEB&gt;__Projekte__WebUrl__/_vti_bin&lt;/LISTWEB&gt;&lt;LISTSUBWEB&gt;&lt;/LISTSUBWEB&gt;&lt;ROOTFOLDER&gt;__Projekte__RootFolderURL__&lt;/ROOTFOLDER&gt;&lt;/LIST&gt;" commandType="5"/>
+	</connection>
+</connections>

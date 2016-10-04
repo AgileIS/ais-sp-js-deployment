@@ -21,6 +21,13 @@
                 "ReCreateQuicklaunch": true,
                 "QuickLaunch": [
                     {
+                        "Title": "Home",
+                        "Url": "~replaceSite",
+                        "Children": [],
+                        "IsExternal": false,
+                        "ControlOption": ""
+                    },
+                    {
                         "Title": "Neuer Insider",
                         "Url": "Lists/Insider/NewForm.aspx",
                         "Children": [],
@@ -67,6 +74,13 @@
                         "Url": "Lists/Projekt zu Insider",
                         "Children": [],
                         "IsExternal": true,
+                        "ControlOption": ""
+                    },
+                    {
+                        "Title": "Site Contents",
+                        "Url": "~replaceSite/_layouts/15/viewlsts.aspx",
+                        "Children": [],
+                        "IsExternal": false,
                         "ControlOption": ""
                     }
                 ]
@@ -355,7 +369,7 @@
             ],
             "ContentTypes": [
                 {
-                    "Id": "0x0100A4FD11F734FB214D58BEEDABFE20ECA03A",
+                    "Id": "0x0100857c6968908e4d4489874c403eaf4c17",
                     "Name": "Projects",
                     "Description": "Content Type for the Project List",
                     "Group": "HannRe Insiderverzeichnis Content Types",
@@ -382,7 +396,7 @@
                     ]
                 },
                 {
-                    "Id": "0x010079EA388A28FD9E429BACB8AE5CC797EAB4",
+                    "Id": "0x01006e70806411d04c3ead92073c4bff72f0",
                     "Name": "Insider",
                     "Description": "Content Type for the Insider List",
                     "Group": "HannRe Insiderverzeichnis Content Types",
@@ -500,7 +514,7 @@
                     ]
                 },
                 {
-                    "Id": "0x0100B513339EA760B24FB387E5823ACD71F201",
+                    "Id": "0x0100a52c10d83afd405da551bee706bc686e",
                     "Name": "Insider2Project",
                     "Description": "Content Type for the Insider2Project List",
                     "Group": "HannRe Insiderverzeichnis Content Types",
@@ -527,7 +541,7 @@
                             "Delete": true
                         },
                         {
-                            "ContentTypeId": "0x010079EA388A28FD9E429BACB8AE5CC797EAB4"
+                            "ContentTypeId": "0x01006e70806411d04c3ead92073c4bff72f0"
                         }
                     ],
                     "EnableContentTypes": true,
@@ -703,7 +717,7 @@
                             "Delete": true
                         },
                         {
-                            "ContentTypeId": "0x0100A4FD11F734FB214D58BEEDABFE20ECA03A"
+                            "ContentTypeId": "0x0100857c6968908e4d4489874c403eaf4c17"
                         }
                     ],
                     "EnableContentTypes": true,
@@ -774,7 +788,7 @@
                             "Delete": true
                         },
                         {
-                            "ContentTypeId": "0x0100B513339EA760B24FB387E5823ACD71F201"
+                            "ContentTypeId": "0x0100a52c10d83afd405da551bee706bc686e"
                         }
                     ],
                     "EnableContentTypes": true,
@@ -1149,7 +1163,35 @@
                     "TemplateType": "DocumentLibrary",
                     "EnableContentTypes": false,
                     "EnableVersioning": true,
-                    "ControlOption": ""
+                    "ControlOption": "",
+                    "Files": []
+                }
+            ],
+            "Files": [
+                {
+                    "Name": "_catalogs/masterpage",
+                    "Files": [
+                        {
+                            "Name": "HannRe.Insiderverzeichnis",
+                            "Files": [
+                                {
+                                    "Name": "Scripts",
+                                    "Files": [
+                                        {
+                                            "Name": "reInsiderverzeichnisLookupSelect2Bundle.js",
+                                            "Src": "./config/files/Layouts/reInsiderverzeichnisLookupSelect2Bundle.js",
+                                            "Overwrite": true
+                                        },
+                                        {
+                                            "Name": "reInsiderverzeichnisLookupSelect2Bundle.js.map",
+                                            "Src": "./config/files/Layouts/reInsiderverzeichnisLookupSelect2Bundle.js.map",
+                                            "Overwrite": true
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }

@@ -23,7 +23,7 @@ export namespace Util {
         reject(new PromiseResult<T>(promiseResultMessage, promiseResultValue));
     }
 
-    export function UrlJoin(urlParts: Array<string>): string {
+    export function JoinAndNormalizeUrl(urlParts: Array<string>): string {
         let normalizedUrl = urlParts.join("/");
         let parts = normalizedUrl.split("/");
         parts[0] = parts[0].concat(":").replace("::", ":");
@@ -36,7 +36,7 @@ export namespace Util {
         return normalizedUrl;
     }
 
-    function getErrorMessage(error: any): any{
+    function getErrorMessage(error: any): any {
         let errorMessage = error;
         if (typeof error === "object") { if ((error as Object).hasOwnProperty("message")) { errorMessage = error.message; }
         }
