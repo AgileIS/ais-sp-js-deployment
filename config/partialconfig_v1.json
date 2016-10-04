@@ -1,7 +1,7 @@
 {
     "Sites": [
         {
-            "RelativeUrl": "demo",
+            "Identifier": "insidervz",
             "Lists": [
                 {
                     "Title": "TestListe1",
@@ -46,25 +46,25 @@
                             "PersonalView": false,
                             "ViewFields": [
                                 {
-                                    "InternalFieldName": "Title"
+                                    "InternalName": "Title"
                                 },
                                 {
-                                    "InternalFieldName": "Author"
+                                    "InternalName": "Author"
                                 },
                                 {
-                                    "InternalFieldName": "Created"
+                                    "InternalName": "Created"
                                 },
                                 {
-                                    "InternalFieldName": "AIS_TestList1Field4"
+                                    "InternalName": "AIS_TestList1Field4"
                                 },
                                 {
-                                    "InternalFieldName": "AIS_TestList1Field3"
+                                    "InternalName": "AIS_TestList1Field3"
                                 },
                                 {
-                                    "InternalFieldName": "AIS_TestList1Field2"
+                                    "InternalName": "AIS_TestList1Field2"
                                 },
                                 {
-                                    "InternalFieldName": "AIS_TestList1Field1"
+                                    "InternalName": "AIS_TestList1Field1"
                                 }
                             ]
                         },
@@ -74,13 +74,13 @@
                             "PersonalView": false,
                             "ViewFields": [
                                 {
-                                    "InternalFieldName": "Title"
+                                    "InternalName": "Title"
                                 },
                                 {
-                                    "InternalFieldName": "Author"
+                                    "InternalName": "Author"
                                 },
                                 {
-                                    "InternalFieldName": "AIS_TestList1Field3"
+                                    "InternalName": "AIS_TestList1Field3"
                                 }
                             ]
                         }
@@ -174,16 +174,16 @@
                             "PersonalView": false,
                             "ViewFields": [
                                 {
-                                    "InternalFieldName": "Title"
+                                    "InternalName": "Title"
                                 },
                                 {
-                                    "InternalFieldName": "Author"
+                                    "InternalName": "Author"
                                 },
                                 {
-                                    "InternalFieldName": "Created"
+                                    "InternalName": "Created"
                                 },
                                 {
-                                    "InternalFieldName": "ID"
+                                    "InternalName": "ID"
                                 }
                             ]
                         }
@@ -201,37 +201,6 @@
                             "ControlOption": "",
                             "Title": "List2TestTitle3",
                             "AIS_TestList2Field2": "Test ItemEntry"
-                        }
-                    ]
-                },
-                {
-                    "Title": "TestListe3",
-                    "Description": "",
-                    "ControlOption": "",
-                    "TemplateType": "DocumentLibrary",
-                    "InternalName": "AIS_TestList3",
-                    "EnableContentTypes": true,
-                    "Files": [
-                        {
-                            "Name": "Lorem.xlsx",
-                            "Src": "./Lorem.xlsx",
-                            "ControlOption": "Update",
-                            "Properties": {
-                                "Discription": "hallo"
-                            }
-                        },
-                        {
-                            "Name": "Test",
-                            "Files": [
-                                {
-                                    "Name": "Lorem.xlsx",
-                                    "Src": "./Lorem.xlsx",
-                                    "Properties": {
-                                        "AIS_TestList2Field1": 12,
-                                        "Discription": "asdf"
-                                    }
-                                }
-                            ]
                         }
                     ]
                 }
@@ -313,33 +282,6 @@
                     "FieldType": "Number",
                     "Group": "AISGroup",
                     "ControlOption": ""
-                }
-            ],
-            "Files": [
-                {
-                    "Name": "_catalogs/masterpage",
-                    "Files": [
-                        {
-                            "Name": "TestTest",
-                            "Files": [
-                                {
-                                    "Name": "Test",
-                                    "Files": [
-                                        {
-                                            "Name": "Lorem.pdf",
-                                            "Src": "./Lorem.pdf",
-                                            "Overwrite": true
-                                        }
-                                    ]
-                                },
-                                {
-                                    "Name": "Lorem.xlsx",
-                                    "Src": "./Lorem.xlsx",
-                                    "Overwrite": true
-                                }
-                            ]
-                        }
-                    ]
                 }
             ]
         }

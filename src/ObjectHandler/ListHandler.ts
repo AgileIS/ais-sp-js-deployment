@@ -109,12 +109,16 @@ export class ListHandler implements ISPObjectHandler {
             let properties = this.createProperties(listConfig);
             list.update(properties)
                 .then((listUpdateResult) => {
-                    this.updateListContentTypes(listConfig, list)
-                        .then((contentTypesUpdateResult) => { Util.Resolve<List>(resolve, listConfig.InternalName, `Updated list: '${listConfig.InternalName}'.`, listUpdateResult.list); })
-                        .catch((error) => {
-                            Util.Reject<void>(reject, listConfig.InternalName,
-                                `Error while updating list title with the internal name '${listConfig.InternalName}': ` + error);
-                        });
+                    if (listConfig.ContentTypeBindings && listConfig.ContentTypeBindings.length > 0) {
+                        this.updateListContentTypes(listConfig, list)
+                            .then((contentTypesUpdateResult) => { Util.Resolve<List>(resolve, listConfig.InternalName, `Updated list: '${listConfig.InternalName}'.`, listUpdateResult.list); })
+                            .catch((error) => {
+                                Util.Reject<void>(reject, listConfig.InternalName,
+                                    `Error while updating list title with the internal name '${listConfig.InternalName}': ` + error);
+                            });
+                    } else {
+                        Util.Resolve<List>(resolve, listConfig.InternalName, `Updated list: '${listConfig.InternalName}'.`, listUpdateResult.list);
+                    }
                 })
                 .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName, `Error while updating list with the internal name '${listConfig.InternalName}': ` + error); });
         });
