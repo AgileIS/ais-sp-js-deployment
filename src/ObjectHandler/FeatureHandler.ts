@@ -34,9 +34,7 @@ export class FeatureHandler implements ISPObjectHandler {
 
     private processingFeatureConfig(featureConfig: IFeature, clientContext: SP.ClientContext): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
-            let processingCrlOption = featureConfig.ControlOption === ControlOption.Delete
-                ? "Deactivate" : featureConfig.ControlOption === ControlOption.Update
-                    ? featureConfig.ControlOption : "Active";
+            let processingCrlOption = featureConfig.Deactivate ? "Deactivate" : "Active";
             Logger.write(`Processing ${processingCrlOption} feature: '${featureConfig.Id}'.`, Logger.LogLevel.Info);
 
             let featureCollection = clientContext.get_site().get_features();
@@ -52,29 +50,18 @@ export class FeatureHandler implements ISPObjectHandler {
                     let processingPromise: Promise<IPromiseResult<void>> = undefined;
                     if (!feature.get_serverObjectIsNull()) {
                         Logger.write(`Found Feature with id: '${featureConfig.Id}'`);
-                        switch (featureConfig.ControlOption) {
-                            case ControlOption.Update:
-                                processingPromise = this.updateFeature(featureConfig, featureCollection);
-                                break;
-                            case ControlOption.Delete:
-                                processingPromise = this.deactivateFeature(featureConfig, featureCollection);
-                                break;
-                            default:
-                                Util.Resolve<void>(resolve, featureConfig.Id, `Feature with the id '${featureConfig.Id}' does not have to be added, because it already exists.`);
-                                rejectOrResolved = true;
-                                break;
+                        if (featureConfig.Deactivate) {
+                            processingPromise = this.deactivateFeature(featureConfig, featureCollection);
+                        } else {
+                            Util.Resolve<void>(resolve, featureConfig.Id, `Feature with the id '${featureConfig.Id}' does not have to be added, because it already exists.`);
+                            rejectOrResolved = true;
                         }
                     } else {
-                        switch (featureConfig.ControlOption) {
-                            case ControlOption.Delete:
-                                Util.Resolve<void>(resolve, featureConfig.Id, `Feature with id '${featureConfig.Id}' does not have to be deactivated, because it was not activated.`);
-                                rejectOrResolved = true;
-                                break;
-                            case ControlOption.Update:
-                                featureConfig.ControlOption = ControlOption.Add;
-                            default:
-                                processingPromise = this.activateFeature(featureConfig, featureCollection);
-                                break;
+                        if (featureConfig.Deactivate) {
+                            Util.Resolve<void>(resolve, featureConfig.Id, `Feature with id '${featureConfig.Id}' does not have to be deactivated, because it was not activated.`);
+                            rejectOrResolved = true;
+                        } else {
+                            processingPromise = this.activateFeature(featureConfig, featureCollection);
                         }
                     }
 
@@ -106,12 +93,6 @@ export class FeatureHandler implements ISPObjectHandler {
                 (sender, args) => {
                     Util.Reject<void>(reject, featureConfig.Id, `Error while activating feature with the id '${featureConfig.Id}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
                 });
-        });
-    }
-
-    private updateFeature(featureConfig: IFeature, featureCollection: SP.FeatureCollection): Promise<IPromiseResult<void>> {
-        return new Promise<IPromiseResult<void>>((resolve, reject) => {
-            Util.Reject<void>(reject, featureConfig.Id, "Updating feature is not possible.");
         });
     }
 
