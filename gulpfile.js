@@ -18,7 +18,7 @@ const assignments = {
   Fields: 'InternalName',
   Views: 'Title',
   Sites: 'Identifier',
-  Features: 'ID',
+  Features: 'Id',
   ContentTypes: 'Id',
   QuickLaunch: 'Title',
   Files: 'Name'

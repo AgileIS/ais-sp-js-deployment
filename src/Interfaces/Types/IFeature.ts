@@ -3,5 +3,4 @@ export interface IFeature {
     Deactivate: boolean;
     Description: string;
     Scope: SP.FeatureDefinitionScope;
-    ControlOption: string;
 }

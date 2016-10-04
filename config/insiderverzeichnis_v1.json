@@ -355,7 +355,7 @@
             ],
             "ContentTypes": [
                 {
-                    "Id": "0x010100FD11F734FB214D58BEEDABFE20ECA03A",
+                    "Id": "0x0100A4FD11F734FB214D58BEEDABFE20ECA03A",
                     "Name": "Projects",
                     "Description": "Content Type for the Project List",
                     "Group": "HannRe Insiderverzeichnis Content Types",
@@ -382,7 +382,7 @@
                     ]
                 },
                 {
-                    "Id": "0x010100EA388A28FD9E429BACB8AE5CC797EAB4",
+                    "Id": "0x010079EA388A28FD9E429BACB8AE5CC797EAB4",
                     "Name": "Insider",
                     "Description": "Content Type for the Insider List",
                     "Group": "HannRe Insiderverzeichnis Content Types",
@@ -500,7 +500,7 @@
                     ]
                 },
                 {
-                    "Id": "0x01010013339EA760B24FB387E5823ACD71F201",
+                    "Id": "0x0100B513339EA760B24FB387E5823ACD71F201",
                     "Name": "Insider2Project",
                     "Description": "Content Type for the Insider2Project List",
                     "Group": "HannRe Insiderverzeichnis Content Types",
@@ -523,7 +523,11 @@
                     "TemplateType": "GenericList",
                     "ContentTypeBindings": [
                         {
-                            "ContentTypeId": "0x010100EA388A28FD9E429BACB8AE5CC797EAB4"
+                            "ContentTypeName": "Item",
+                            "Delete": true
+                        },
+                        {
+                            "ContentTypeId": "0x010079EA388A28FD9E429BACB8AE5CC797EAB4"
                         }
                     ],
                     "EnableContentTypes": true,
@@ -609,7 +613,7 @@
                         {
                             "Title": "Active Insider",
                             "PersonalView": false,
-                            "Query": "<Where><Eq><FieldRef Name='re_ivz_archived'<Value Type='Boolean'>0</Value></Eq></Where>",
+                            "ViewQuery": "\"<Where><Eq><FieldRef Name='re_ivz_archived'<Value Type='Boolean'>0</Value></Eq></Where>\"",
                             "ControlOption": "",
                             "ViewFields": [
                                 {
@@ -695,7 +699,11 @@
                     "TemplateType": "GenericList",
                     "ContentTypeBindings": [
                         {
-                            "ContentTypeId": "0x010100FD11F734FB214D58BEEDABFE20ECA03A"
+                            "ContentTypeName": "Item",
+                            "Delete": true
+                        },
+                        {
+                            "ContentTypeId": "0x0100A4FD11F734FB214D58BEEDABFE20ECA03A"
                         }
                     ],
                     "EnableContentTypes": true,
@@ -762,7 +770,11 @@
                     "TemplateType": "GenericList",
                     "ContentTypeBindings": [
                         {
-                            "ContentTypeId": "0x01010013339EA760B24FB387E5823ACD71F201"
+                            "ContentTypeName": "Item",
+                            "Delete": true
+                        },
+                        {
+                            "ContentTypeId": "0x0100B513339EA760B24FB387E5823ACD71F201"
                         }
                     ],
                     "EnableContentTypes": true,
@@ -1131,7 +1143,7 @@
                     ]
                 },
                 {
-                    "InternalName": "Projekte",
+                    "InternalName": "Reports",
                     "Title": "Reports",
                     "Description": "",
                     "TemplateType": "DocumentLibrary",
