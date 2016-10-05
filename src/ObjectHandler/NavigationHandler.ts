@@ -7,17 +7,8 @@ import { INavigationNode } from "../Interfaces/Types/INavigationNode";
 import { ControlOption } from "../Constants/ControlOption";
 import { Util } from "../Util/Util";
 
-declare var window: Window;
-interface Window {
-    _spPageContextInfo: any;
-}
-
-
 export class NavigationHandler implements ISPObjectHandler {
-    private SiteUrl: string;
-
     public execute(navigationConfig: INavigation, parentPromise: Promise<IPromiseResult<Web>>): Promise<IPromiseResult<void>> {
-        this.SiteUrl = window._spPageContextInfo.webAbsoluteUrl;
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             parentPromise.then(promiseResult => {
                 if (!promiseResult || !promiseResult.value) {
@@ -120,7 +111,7 @@ export class NavigationHandler implements ISPObjectHandler {
                     if (nodeConfig.Title && nodeConfig.Url) {
                         let nodeCreationInfo = new SP.NavigationNodeCreationInformation();
                         nodeCreationInfo.set_title(nodeConfig.Title);
-                        nodeCreationInfo.set_url(this.replaceUrlStrings(nodeConfig.Url));
+                        nodeCreationInfo.set_url(nodeConfig.Url);
                         let IsExternal = nodeConfig.IsExternal === true;
                         nodeCreationInfo.set_isExternal(IsExternal);
                         nodeCreationInfo.set_asLastNode(true);
@@ -201,10 +192,5 @@ export class NavigationHandler implements ISPObjectHandler {
                             Resolve(resolve, "Updated quicklaunch", "Navigation > Quicklaunch");
                         }*/
         });
-    }
-
-    private replaceUrlStrings(url: string): string {
-        url = url.replace("~replaceSite", this.SiteUrl);
-        return url;
     }
 }

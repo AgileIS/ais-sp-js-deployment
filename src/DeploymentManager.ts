@@ -15,6 +15,7 @@ import { NavigationHandler } from "./ObjectHandler/NavigationHandler";
 import { AuthenticationType } from "./Constants/AuthenticationType";
 import { NodeHttpProxy } from "./NodeHttpProxy";
 import { NodeJsomHandler } from "./NodeJsomHandler";
+import { Util } from "./Util/Util";
 import * as url from "url";
 
 export class DeploymentManager {
@@ -34,7 +35,8 @@ export class DeploymentManager {
 
     constructor(deploymentConfig: DeploymentConfig) {
         if (deploymentConfig.Sites && deploymentConfig.Sites.length === 1) {
-            this._deploymentConfig = deploymentConfig;
+            this._deploymentConfig = <DeploymentConfig>JSON.parse(
+                Util.replaceUrlTokens(JSON.stringify(deploymentConfig), Util.getRelativeUrl(deploymentConfig.Sites[0].Url), `_layouts/${deploymentConfig.Sites[0].LayoutsHive}`));
             this.setupProxy();
             this.setupPnPJs();
             this._deployDependencies = NodeJsomHandler.initialize(deploymentConfig);
@@ -48,7 +50,7 @@ export class DeploymentManager {
             this._deployDependencies
                 .then(() => {
                     this.processConfig(this._deploymentConfig)
-                    // this.processSeq(this._deploymentConfig, Promise.resolve())
+                        // this.processSeq(this._deploymentConfig, Promise.resolve())
                         .then(() => {
                             Logger.write("All site collection processed", Logger.LogLevel.Info);
                             resolve();
