@@ -126,9 +126,9 @@ export class ListHandler implements ISPObjectHandler {
 
     private updateListContentTypes(listConfig: IList, list: List): Promise<IPromiseResult<List>> {
         return new Promise<IPromiseResult<List>>((resolve, reject) => {
-            listConfig.ContentTypeBindings.reduce((dependentPromise, contentTypeBinding, index, array) => {
+            listConfig.ContentTypeBindings.reduce((dependentPromise, contentTypeBinding, index, array): Promise<any> => {
                 return dependentPromise.then(() => {
-                    let processingPromis;
+                    let processingPromis: Promise<any>;
 
                     if (contentTypeBinding.Delete) {
                         processingPromis = this.deleteListContentType(contentTypeBinding, listConfig, list);

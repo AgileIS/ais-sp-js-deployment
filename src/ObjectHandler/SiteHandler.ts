@@ -15,7 +15,7 @@ export class SiteHandler implements ISPObjectHandler {
                     })
                     .catch((error) => { Util.Reject<void>(reject, siteConfig.Url, `Error while requesting web with the url '${siteConfig.Url}': ` + error); });
             } else {
-                Util.Reject<void>(reject, siteConfig.Url, `Error while processing site with the url '${siteConfig.Url}': site url is undefined.`);
+                Util.Reject<void>(reject, "Unknown site", `Error while processing site: site url is undefined.`);
             }
         });
     };
