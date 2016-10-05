@@ -136,57 +136,62 @@ export class ListHandler implements ISPObjectHandler {
 
     private updateListContentTypes(listConfig: IList, list: List): Promise<IPromiseResult<List>> {
         return new Promise<IPromiseResult<List>>((resolve, reject) => {
-            let processingPromises: Array<Promise<any>> = [];
-            listConfig.ContentTypeBindings.forEach(element => {
-                if (element.Delete) {
-                    processingPromises.push(this.deleteListContentType(element, listConfig, list));
-                } else {
-                    processingPromises.push(list.contentTypes.addById(element.ContentTypeId));
-                }
-            });
-            Promise.all(processingPromises)
-                .then(() => { Util.Resolve<List>(resolve, listConfig.InternalName, `Updated List ContentTypes: '${listConfig.InternalName}'.`); })
-                .catch((error) => {
-                    Util.Reject<void>(reject, listConfig.InternalName, `Error while updating list contenttypes, list internal name '${listConfig.InternalName}': ` + Util.getErrorMessage(error));
+
+            listConfig.ContentTypeBindings.reduce((dependentPromise, contentTypeBinding, index, array) => {
+                return dependentPromise.then(() => {
+                    let processingPromis;
+
+                    if (contentTypeBinding.Delete) {
+                        processingPromis = this.deleteListContentType(contentTypeBinding, listConfig, list);
+                    } else {
+                        processingPromis = list.contentTypes.addById(contentTypeBinding.ContentTypeId);
+                    }
+
+                    return processingPromis;
                 });
+            }, Promise.resolve())
+                .then(() => { Util.Resolve<List>(resolve, listConfig.InternalName, `Updated list content types: '${listConfig.InternalName}'.`); })
+                .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName,
+                    `Error while updating content types on the list internal the name '${listConfig.InternalName}': ` + Util.getErrorMessage(error)); });
         });
     }
 
-    private deleteListContentType(ctBinding: IContentTypeBinding, listConfig: IList, list: List): Promise<IPromiseResult<void>> {
+    private deleteListContentType(contentTypeBinding: IContentTypeBinding, listConfig: IList, list: List): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
-            if (ctBinding.ContentTypeName) {
-                list.contentTypes.filter(`Name+eq+'${ctBinding.ContentTypeName}'`).select("Id").get()
-                    .then((ctRequestResults) => {
-                        if (ctRequestResults && ctRequestResults.length === 1) {
-                            list.contentTypes.getById(ctRequestResults[0].Id.StringValue).delete()
-                                .then(() => {
-                                    Util.Resolve<void>(resolve, listConfig.InternalName,
-                                        `Deleted List ContentType: '${ctBinding.ContentTypeName}'from list: '${listConfig.InternalName}'.`);
-                                })
-                                .catch((error) => {
-                                    Util.Reject<void>(reject, listConfig.InternalName,
-                                        `Error while deleting list contenttype '${ctBinding.ContentTypeName}', list internal name '${listConfig.InternalName}': ` + error);
-                                });
-                        } else {
-                            Util.Reject<void>(reject, ctBinding.ContentTypeName,
-                                `Error while deleting list contenttype '${ctBinding.ContentTypeName}', list internal name '${listConfig.InternalName}': `);
-                        }
-                    })
-                    .catch((error) => {
-                        Util.Reject<void>(reject, listConfig.InternalName,
-                            `Error while requesting list contenttypes, list internal name '${listConfig.InternalName}': ` + error);
-                    });
-            } else {
-                list.contentTypes.getById(ctBinding.ContentTypeId).delete()
-                    .then(() => {
-                        Util.Resolve<void>(resolve, listConfig.InternalName,
-                            `Deleted List ContentType: '${ctBinding.ContentTypeId}'from list: '${listConfig.InternalName}'.`);
-                    })
-                    .catch((error) => {
-                        Util.Reject<void>(reject, listConfig.InternalName,
-                            `Error while deleting list contenttype '${ctBinding.ContentTypeId}', list internal name '${listConfig.InternalName}': ` + error);
-                    });
+            let identifierValue = contentTypeBinding.ContentTypeName;
+            let identifierPropertyName = "Name";
+
+            Logger.write(`Deleting list content type with the ${identifierPropertyName.toLocaleLowerCase()} '${identifierValue}' on the list: '${listConfig.InternalName}'.`, Logger.LogLevel.Info);
+
+            if (contentTypeBinding.ContentTypeId) {
+                identifierValue = contentTypeBinding.ContentTypeId;
+                identifierPropertyName = "Id";
             }
+
+            list.contentTypes.filter(`${identifierPropertyName}+eq+'${identifierValue}'`).select("Id").get()
+                .then((ctRequestResults) => {
+                    if (ctRequestResults && ctRequestResults.length === 1) {
+                        list.contentTypes.getById(ctRequestResults[0].Id.StringValue).delete()
+                            .then(() => {
+                                Util.Resolve<void>(resolve, listConfig.InternalName,
+                                    `Deleted list content type: '${identifierValue}' on the list: '${listConfig.InternalName}'.`);
+                            })
+                            .catch((error) => {
+                                Util.Reject<void>(reject, listConfig.InternalName,
+                                    `Error while deleting list content type with the ${identifierPropertyName.toLocaleLowerCase()} '${identifierValue}'`
+                                    + `on the list with the internal name '${listConfig.InternalName}': ` + error);
+                            });
+                    } else {
+                        Util.Resolve<void>(resolve, listConfig.InternalName,
+                            `Error while deleting list content type with the ${identifierPropertyName.toLocaleLowerCase()} '${identifierValue}'`
+                            + `on the list with the internal name '${listConfig.InternalName}', because it does not exist.`);
+                    }
+                })
+                .catch((error) => {
+                    Util.Reject<void>(reject, listConfig.InternalName,
+                        `Error while deleting list content type with the ${identifierPropertyName.toLocaleLowerCase()} '${identifierValue}'`
+                        + `on the list with the internal name '${listConfig.InternalName}': ` + error);
+                });
         });
     };
 

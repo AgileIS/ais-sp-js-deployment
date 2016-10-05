@@ -1,4 +1,5 @@
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
+import * as url from "url";
 import { IPromiseResult } from "../Interfaces/IPromiseResult";
 import { PromiseResult } from "../PromiseResult";
 
@@ -38,7 +39,8 @@ export namespace Util {
 
     export function getErrorMessage(error: any): any {
         let errorMessage = error;
-        if (typeof error === "object") { if ((error as Object).hasOwnProperty("message")) { errorMessage = error.message; }
+        if (typeof error === "object") {
+            if ((error as Object).hasOwnProperty("message")) { errorMessage = error.message; }
         }
         return errorMessage;
     }
@@ -61,5 +63,74 @@ export namespace Util {
                 }, 5000);
             });
         }, 2500);
+    }
+
+    export function getRelativeUrl(absoluteUrl: string): string {
+        let urlObject = url.parse(absoluteUrl, true, true);
+
+        let relativeUrl = urlObject.pathname;
+
+        if (urlObject.search) {
+            relativeUrl += urlObject.search;
+        }
+
+        if (urlObject.hash) {
+            relativeUrl += urlObject.hash;
+        }
+
+        return relativeUrl;
+    }
+
+    export function trimEnd(content: string, trimEndChar: string): string {
+        if (trimEndChar.length > 1) {
+            throw new Error("Argument 'trimEndChar' value is invalid. Length is greater then one!");
+        }
+
+        return content.charAt(content.length - 1) === trimEndChar ? content.substring(0, content.length - 1) : content;
+    }
+
+    export function trimStart(content: string, trimStarChar: string): string {
+        if (trimStarChar.length > 1) {
+            throw new Error("Argument 'trimStarChar' value is invalid. Length is greater then one!");
+        }
+
+        return content.charAt(0) === trimStarChar ? content.substring(1, content.length) : content;
+    }
+
+    function replaceSiteToken(content: string, siteRelativeUrl: string): string {
+        return content.replace(/~replaceSite/g, siteRelativeUrl);
+    }
+
+    function replaceLayoutsToken(content: string, siteRelativeUrlWithLayouts: string): string {
+        return content.replace(/~replaceLayouts/g, siteRelativeUrlWithLayouts);
+    }
+
+    function replaceEncodeSiteToken(content: string, siteRelativeUrl: string): string {
+        return content.replace(/~replaceEncodeSite/g, encodeURIComponent(siteRelativeUrl));
+    }
+
+    function replaceEncodedLayoutsToken(content: string, siteRelativeUrlWithLayouts: string): string {
+        return content.replace(/~replaceEncodeLayouts/g, siteRelativeUrlWithLayouts);
+    }
+
+    export function replaceUrlTokens(content: string, siteRelativeUrl: string, layoutsUrlPart: string): string {
+        if (!layoutsUrlPart) {
+            throw new Error("Argument 'layoutsUrlPart' value is undefined");
+        }
+
+        if (!siteRelativeUrl) {
+            throw new Error("Argument 'siteRelativeUrl' value is undefined");
+        }
+
+        let relativeUrl = trimEnd(siteRelativeUrl, "/");
+        let relativeUrlWithLayouts = `${relativeUrl}/${trimEnd(trimStart(layoutsUrlPart, "/"), "/")}`;
+
+        let outputContent = replaceSiteToken(content, relativeUrl);
+        outputContent = replaceLayoutsToken(outputContent, relativeUrlWithLayouts);
+
+        outputContent = replaceEncodeSiteToken(outputContent, relativeUrl);
+        outputContent = replaceEncodedLayoutsToken(outputContent, relativeUrlWithLayouts);
+
+        return outputContent;
     }
 }

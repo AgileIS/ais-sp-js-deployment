@@ -9,7 +9,6 @@ import { DeploymentConfig } from "./Interfaces/Config/DeploymentConfig";
 import { AuthenticationType } from "./Constants/AuthenticationType";
 import { Util } from "./Util/Util";
 
-declare var hash: any;
 declare var global: NodeJS.Global;
 declare namespace NodeJS {
     interface Global {
@@ -166,16 +165,7 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
         global.window = global;
         global.window.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
         let urlObject = url.parse(siteUrl, true, true);
-
-        let relativeUrl = urlObject.pathname;
-
-        if (urlObject.search) {
-            relativeUrl += urlObject.search;
-        }
-
-        if (urlObject.hash) {
-            relativeUrl += hash;
-        }
+        let relativeUrl = Util.getRelativeUrl(siteUrl);
 
         global.window._spPageContextInfo = {
             webAbsoluteUrl: siteUrl,
