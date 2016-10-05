@@ -162,14 +162,26 @@ export class ContentTypeHandler implements ISPObjectHandler {
     private setContentTypeFieldLinks(contentTypeConfig: IContentType, contentType: SP.ContentType, web: SP.Web) {
         if (contentTypeConfig.FieldLinks && contentTypeConfig.FieldLinks.length > 0) {
             let currentFieldLinksInternalNames: Array<string> = new Array<string>();
+            let existingFieldLinks: { [internalName: string]: SP.Guid } = {};
             let fieldLinks = contentType.get_fieldLinks();
 
-            this.updateTitleFieldLink(contentTypeConfig, fieldLinks);
+            let existingFieldLinksEnumerator = fieldLinks.getEnumerator();
+            while (existingFieldLinksEnumerator.moveNext()) {
+                let fieldlink = existingFieldLinksEnumerator.get_current();
+                existingFieldLinks[fieldlink.get_name()] = fieldlink.get_id();
+            }
+
             contentTypeConfig.FieldLinks.forEach((fieldLink, index, array) => {
-                let fieldLinkCreationInfo = new SP.FieldLinkCreationInformation();
-                let field = web.get_availableFields().getByInternalNameOrTitle(fieldLink.InternalName);
-                fieldLinkCreationInfo.set_field(field);
-                let spfieldLink = fieldLinks.add(fieldLinkCreationInfo);
+                let spfieldLink: SP.FieldLink = undefined;
+
+                if (existingFieldLinks[fieldLink.InternalName]) {
+                    spfieldLink = fieldLinks.getById(existingFieldLinks[fieldLink.InternalName]);
+                } else {
+                    let fieldLinkCreationInfo = new SP.FieldLinkCreationInformation();
+                    let field = web.get_availableFields().getByInternalNameOrTitle(fieldLink.InternalName);
+                    fieldLinkCreationInfo.set_field(field);
+                    spfieldLink = fieldLinks.add(fieldLinkCreationInfo);
+                }
 
                 if (fieldLink.Required) {
                     spfieldLink.set_required(fieldLink.Required === true ? fieldLink.Required : false);
@@ -184,20 +196,6 @@ export class ContentTypeHandler implements ISPObjectHandler {
 
             fieldLinks.reorder(currentFieldLinksInternalNames);
         }
-
-    }
-
-    private updateTitleFieldLink(contentTypeConfig: IContentType, fieldLinks: SP.FieldLinkCollection): void {
-        let item = contentTypeConfig.FieldLinks.filter( (fLink, fIndex) => { return fLink.InternalName === "Title"; });
-            contentTypeConfig.FieldLinks.splice(contentTypeConfig.FieldLinks.indexOf(item[0]), 1);
-            let e = fieldLinks.getEnumerator();
-            while (e.moveNext()) {
-                let current = e.get_current();
-                if (current.get_name() === "Title") {
-                    current.set_required(item[0] ? (item[0].Required ? item[0].Required : false) : false);
-                    current.set_hidden(item[0] ? (item[0].Hidden ? item[0].Hidden : false) : true);
-                }
-            }
     }
 
     private getContentTypeCreationInfo(contentTypeConfig: IContentType): SP.ContentTypeCreationInformation {

@@ -403,6 +403,10 @@
                     "ControlOption": "",
                     "FieldLinks": [
                         {
+                            "InternalName": "Title",
+                            "Hidden": true
+                        },
+                        {
                             "InternalName": "re_ivz_salutation"
                         },
                         {
@@ -520,6 +524,10 @@
                     "Group": "HannRe Insiderverzeichnis Content Types",
                     "ControlOption": "",
                     "FieldLinks": [
+                        {
+                            "InternalName": "Title",
+                            "Hidden": true
+                        },
                         {
                             "InternalName": "re_ivz_accessStart"
                         },
