@@ -137,8 +137,8 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                 firstResponse.on("data", () => null);
                 firstResponse.on("end", () => {
                     if (firstResponse.statusCode === 401) {
-                         let type2msg = NTLM.parseType2Message(firstResponse.headers["www-authenticate"], error => {
-                            reject(error);
+                        let type2msg = NTLM.parseType2Message(firstResponse.headers["www-authenticate"], error => {
+                            Util.Reject<void>(reject, "NodeJsom", `JSOM Ntlm initialize error: cannot generate Ntlm type 2 message` + error);
                         });
                         let type3msg = NTLM.createType3Message(type2msg, NodeJsomHandlerImpl._authOptions);
                         options.headers.Authorization = type3msg;
@@ -146,18 +146,20 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                             secondResponse.on("data", () => null);
                             secondResponse.on("end", () => {
                                 if (secondResponse.statusCode !== 200) {
-                                    reject(secondResponse.statusCode + ": after handshake!");
+                                    Util.Reject<void>(reject, "NodeJsom", `JSOM Ntlm initialize error: ${secondResponse.statusCode} after handshake!` + secondResponse.statusMessage);
                                 }
                                 resolve();
                             });
                         });
-                    } else if (firstResponse.statusCode === 200)  {
+                    } else if (firstResponse.statusCode === 200) {
                         resolve();
                     } else {
-                        reject("JSOM Ntlm initialize error.");
+                        Util.Reject<void>(reject, "NodeJsom", "JSOM Ntlm initialize error: " + firstResponse.statusMessage);
                     }
                 });
-            }).on("error", error => reject(error));
+            }).on("error", error => {
+                Util.Reject<void>(reject, "NodeJsom", "JSOM Ntlm initialize error: " + error);
+            });
         });
     }
 
@@ -224,7 +226,7 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                             url: reqUrl,
                             method: "GET",
                             headers: (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) ?
-                            { connection: "keep-alive" } : { "Authorization": authValue },
+                                { connection: "keep-alive" } : { "Authorization": authValue },
                             agent: (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) ? NodeJsomHandlerImpl._agents[siteUrl] : false,
                         };
 
@@ -233,7 +235,7 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                             response.on("data", (chunk) => body.push(chunk));
                             response.on("end", () => res(body.join("")));
                         });
-                        request.on("error", (err) => reject(err));
+                        request.on("error", (error) => { Util.Reject<void>(reject, "NodeJsom", "JSOM Ntlm initialize error: " + error); });
                     });
                 });
             }, Promise.resolve()).then((loadedScript: string) => {
@@ -246,7 +248,7 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                 context.executeQueryAsync((sender, args) => {
                     resolve();
                 }, (sender, args) => {
-                    reject(`Error while initialize JSOM: ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject<void>(reject, "NodeJsom", `Error while initialize JSOM: ${args.get_message()} '\n' ${args.get_stackTrace()}`);
                 });
             });
         });
