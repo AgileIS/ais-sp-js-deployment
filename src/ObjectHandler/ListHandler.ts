@@ -123,7 +123,8 @@ export class ListHandler implements ISPObjectHandler {
                             .then((contentTypesUpdateResult) => { Util.Resolve<List>(resolve, listConfig.InternalName, `Updated list: '${listConfig.InternalName}'.`, listUpdateResult.list); })
                             .catch((error) => {
                                 Util.Reject<void>(reject, listConfig.InternalName,
-                                    `Error while updating list title with the internal name '${listConfig.InternalName}': ` + Util.getErrorMessage(error));
+
+                                    `Error while updating list with the internal name '${listConfig.InternalName}': ` + Util.getErrorMessage(error));
                             });
                     } else {
                         Util.Resolve<List>(resolve, listConfig.InternalName, `Updated list: '${listConfig.InternalName}'.`, listUpdateResult.list);
@@ -144,7 +145,7 @@ export class ListHandler implements ISPObjectHandler {
                     if (contentTypeBinding.Delete) {
                         processingPromis = this.deleteListContentType(contentTypeBinding, listConfig, list);
                     } else {
-                        processingPromis = list.contentTypes.addById(contentTypeBinding.ContentTypeId);
+                        processingPromis = this.addListContentType(contentTypeBinding, listConfig, list);
                     }
 
                     return processingPromis;
@@ -153,6 +154,22 @@ export class ListHandler implements ISPObjectHandler {
                 .then(() => { Util.Resolve<List>(resolve, listConfig.InternalName, `Updated list content types: '${listConfig.InternalName}'.`); })
                 .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName,
                     `Error while updating content types on the list internal the name '${listConfig.InternalName}': ` + Util.getErrorMessage(error)); });
+        });
+    }
+
+    private addListContentType(contentTypeBinding: IContentTypeBinding, listConfig: IList, list: List): Promise<IPromiseResult<void>> {
+        return new Promise<IPromiseResult<void>>((resolve, reject) => {
+            Logger.write(`Adding list content type with the id '${contentTypeBinding.ContentTypeId}' on the list: '${listConfig.InternalName}'.`, Logger.LogLevel.Info);
+            list.contentTypes.addById(contentTypeBinding.ContentTypeId)
+                .then(() => {
+                    Util.Resolve<void>(resolve, listConfig.InternalName,
+                        `Deleted list content type: '${contentTypeBinding.ContentTypeId}' on the list: '${listConfig.InternalName}'.`);
+                })
+                .catch((error) => {
+                    Util.Reject<void>(reject, listConfig.InternalName,
+                        `Error while adding list content type with the id '${contentTypeBinding.ContentTypeId}'`
+                        + `on the list with the internal name '${listConfig.InternalName}': ` + error);
+                });
         });
     }
 
