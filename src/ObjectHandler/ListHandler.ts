@@ -167,7 +167,7 @@ export class ListHandler implements ISPObjectHandler {
                 .catch((error) => {
                     Util.Reject<void>(reject, listConfig.InternalName,
                         `Error while adding list content type with the id '${contentTypeBinding.ContentTypeId}'`
-                        + `on the list with the internal name '${listConfig.InternalName}': ` + error);
+                        + `on the list with the internal name '${listConfig.InternalName}': ` + Util.getErrorMessage(error));
                 });
         });
     }
