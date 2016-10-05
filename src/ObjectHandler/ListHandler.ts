@@ -79,7 +79,8 @@ export class ListHandler implements ISPObjectHandler {
                         Logger.write("List handler processing promise is undefined!", Logger.LogLevel.Error);
                     }
                 })
-                .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName, `Error while requesting list with the internal name '${listConfig.InternalName}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName,
+                        `Error while requesting list with the internal name '${listConfig.InternalName}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -123,7 +124,6 @@ export class ListHandler implements ISPObjectHandler {
                             .then((contentTypesUpdateResult) => { Util.Resolve<List>(resolve, listConfig.InternalName, `Updated list: '${listConfig.InternalName}'.`, listUpdateResult.list); })
                             .catch((error) => {
                                 Util.Reject<void>(reject, listConfig.InternalName,
-
                                     `Error while updating list with the internal name '${listConfig.InternalName}': ` + Util.getErrorMessage(error));
                             });
                     } else {
@@ -147,7 +147,6 @@ export class ListHandler implements ISPObjectHandler {
                     } else {
                         processingPromis = this.addListContentType(contentTypeBinding, listConfig, list);
                     }
-
                     return processingPromis;
                 });
             }, Promise.resolve())
@@ -196,7 +195,7 @@ export class ListHandler implements ISPObjectHandler {
                             .catch((error) => {
                                 Util.Reject<void>(reject, listConfig.InternalName,
                                     `Error while deleting list content type with the ${identifierPropertyName.toLocaleLowerCase()} '${identifierValue}'`
-                                    + `on the list with the internal name '${listConfig.InternalName}': ` + error);
+                                    + `on the list with the internal name '${listConfig.InternalName}': ` + Util.getErrorMessage(error));
                             });
                     } else {
                         Util.Resolve<void>(resolve, listConfig.InternalName,
@@ -207,7 +206,7 @@ export class ListHandler implements ISPObjectHandler {
                 .catch((error) => {
                     Util.Reject<void>(reject, listConfig.InternalName,
                         `Error while deleting list content type with the ${identifierPropertyName.toLocaleLowerCase()} '${identifierValue}'`
-                        + `on the list with the internal name '${listConfig.InternalName}': ` + error);
+                        + `on the list with the internal name '${listConfig.InternalName}': ` + Util.getErrorMessage(error));
                 });
         });
     };
@@ -216,7 +215,8 @@ export class ListHandler implements ISPObjectHandler {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             list.delete()
                 .then(() => { Util.Resolve<void>(resolve, listConfig.InternalName, `Deleted List: '${listConfig.InternalName}'.`); })
-                .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName, `Error while deleting list with the internal name '${listConfig.InternalName}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName,
+                        `Error while deleting list with the internal name '${listConfig.InternalName}': ` + Util.getErrorMessage(error)); });
         });
     }
 
