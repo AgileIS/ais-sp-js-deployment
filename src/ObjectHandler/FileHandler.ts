@@ -11,8 +11,14 @@ import { IItem } from "../interfaces/Types/IItem";
 import { ControlOption } from "../Constants/ControlOption";
 import { IPromiseResult } from "../interfaces/IPromiseResult";
 import { Util } from "../Util/Util";
+import { spawn } from "child_process";
 import * as fs from "fs";
 import * as mime from "mime";
+
+declare var window: Window;
+interface Window {
+    _spPageContextInfo: any;
+}
 
 export class FileHandler implements ISPObjectHandler {
     public execute(fileFolderConfig: IFile | IFolder, parentPromise: Promise<IPromiseResult<Web | Folder | List>>): Promise<IPromiseResult<File | Folder | void>> {
@@ -104,7 +110,7 @@ export class FileHandler implements ISPObjectHandler {
                             processingPromise = this.deleteFile(fileConfig, file);
                             break;
                         case ControlOption.Update:
-                            processingPromise = this.addFile(fileConfig, parentFolder, true);
+                            processingPromise = this.addFile(fileConfig, parentFolder, true, this.resolvePreTask(fileConfig));
                             break;
                         default:
                             Util.Resolve<File>(resolve, fileConfig.Name, `File with the name '${fileConfig.Name}' already exists in '${parentFolder.toUrl()}'`, file);
@@ -127,7 +133,7 @@ export class FileHandler implements ISPObjectHandler {
                                 break;
                             case ControlOption.Update:
                             default: // tslint:disable-line
-                                this.addFile(fileConfig, parentFolder)
+                                this.addFile(fileConfig, parentFolder, fileConfig.Overwrite === true, this.resolvePreTask(fileConfig))
                                     .then((folderProcessingResult) => {
                                         resolve(folderProcessingResult);
                                     })
@@ -157,28 +163,32 @@ export class FileHandler implements ISPObjectHandler {
         });
     }
 
-    private addFile(fileConfig: IFile, parentFolder: Files, overwrite?: boolean): Promise<IPromiseResult<File>> {
+    private addFile(fileConfig: IFile, parentFolder: Files, overwrite: boolean, preTask: Promise<any> = Promise.resolve()): Promise<IPromiseResult<File>> {
         return new Promise<IPromiseResult<File>>((resolve, reject) => {
-            let file: NodeFile = {
-                data: fs.readFileSync(fileConfig.Src),
-                mime: mime.lookup(fileConfig.Name),
-            };
-            parentFolder.add(fileConfig.Name, file, overwrite)
-                .then((fileAddResult) => {
-                    if (fileConfig.Properties) {
-                        this.updateFileProperties(fileConfig, fileAddResult.file)
-                            .then((fileUpdateResult) => {
+            preTask
+                .then(() => {
+                    let file: NodeFile = {
+                        data: fs.readFileSync(fileConfig.Src),
+                        mime: mime.lookup(fileConfig.Name),
+                    };
+                    parentFolder.add(fileConfig.Name, file, overwrite)
+                        .then((fileAddResult) => {
+                            if (fileConfig.Properties) {
+                                this.updateFileProperties(fileConfig, fileAddResult.file)
+                                    .then((fileUpdateResult) => {
+                                        Util.Resolve<File>(resolve, fileConfig.Name, `Added file: '${fileConfig.Name}'`, fileAddResult.file);
+                                    })
+                                    .catch((error) => {
+                                        Util.Reject<void>(reject, fileConfig.Name, `Error while updating file item fields with name '${fileConfig.Name}': ` + error);
+                                    });
+                            } else {
                                 Util.Resolve<File>(resolve, fileConfig.Name, `Added file: '${fileConfig.Name}'`, fileAddResult.file);
-                            })
-                            .catch((error) => {
-                                Util.Reject<void>(reject, fileConfig.Name, `Error while updating file item fields with name '${fileConfig.Name}': ` + error);
-                            });
-                    } else {
-                        Util.Resolve<File>(resolve, fileConfig.Name, `Added file: '${fileConfig.Name}'`, fileAddResult.file);
-                    }
+                            }
 
+                        })
+                        .catch((error) => { Util.Reject<void>(reject, fileConfig.Name, `Error while adding file with name '${fileConfig.Name}': ` + error); });
                 })
-                .catch((error) => { Util.Reject<void>(reject, fileConfig.Name, `Error while adding file with name '${fileConfig.Name}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, fileConfig.Name, `Error while proccesing preTask for file with name '${fileConfig.Name}': ` + error); });
         });
     }
 
@@ -204,6 +214,16 @@ export class FileHandler implements ISPObjectHandler {
         });
     }
 
+    private resolvePreTask(fileConfig: IFile): Promise<any> {
+        let promise = Promise.resolve();
+
+        if (fileConfig.DataConnections) {
+            promise = this.updateDataConnection(fileConfig);
+        }
+
+        return promise;
+    }
+
     private createProperties(itemConfig: IItem) {
         let stringifiedObject: string;
         stringifiedObject = JSON.stringify(itemConfig);
@@ -211,8 +231,67 @@ export class FileHandler implements ISPObjectHandler {
 
         delete parsedObject.ControlOption;
         delete parsedObject.Name;
+        delete parsedObject.DataConnections;
 
         stringifiedObject = JSON.stringify(parsedObject);
         return JSON.parse(stringifiedObject);
     }
+
+    //#region "Pre Tasks"
+    private updateDataConnection(fileConfig: IFile): Promise<IPromiseResult<void>> {
+        return new Promise<IPromiseResult<void>>((resolve, reject) => {
+            let connections = [];
+            let context = SP.ClientContext.get_current();
+            let lists = context.get_web().get_lists();
+            for (let connConf of fileConfig.DataConnections) {
+                let connection = {
+                    ListName: connConf.List,
+                    ListId: lists.getByTitle(connConf.List),
+                    ListRootFolderUrl: lists.getByTitle(connConf.List).get_rootFolder(),
+                    ViewName: connConf.View,
+                    ViewId: lists.getByTitle(connConf.List).get_views().getByTitle(connConf.View),
+                    WebUrl: window._spPageContextInfo.webAbsoluteUrl,
+                };
+                connections.push(connection);
+                context.load(connection.ListId);
+                context.load(connection.ListRootFolderUrl);
+                context.load(connection.ViewId);
+            }
+            context.executeQueryAsync(
+                (sender, args) => {
+                    for (let connection of connections) {
+                        connection.ListId = connection.ListId.get_id().toString("B");
+                        connection.ListRootFolderUrl = connection.ListRootFolderUrl.get_serverRelativeUrl();
+                        connection.ViewId = connection.ViewId.get_id().toString("B");
+                    }
+                    fs.writeFileSync(`${fileConfig.Src}.json`, JSON.stringify(connections));
+                    let ps = spawn("powershell.exe",
+                        [
+                            ".\\config\\files\\LibraryFiles\\UpdateDataConnection.ps1",
+                            "-File",
+                            fileConfig.Src,
+                            "-ConnectionTemplate",
+                            fileConfig.DataConnectionTemplate,
+                        ]);
+                    ps.stdout.on("data", (data) => {
+                        Logger.write(`Processing data connection for file '${fileConfig.Name}': '${data}'`, Logger.LogLevel.Info);
+                    });
+                    ps.stderr.on("data", (data) => {
+                        Util.Reject<void>(reject, fileConfig.Name,
+                            `Error while updating data connection for '${fileConfig.Name}':  ${data}`);
+                    });
+                    ps.on("exit", () => {
+                        fs.unlinkSync(`${fileConfig.Src}.json`);
+                        resolve();
+                    });
+                    ps.stdin.end();
+                },
+                (sender, args) => {
+                    Util.Reject<void>(reject, fileConfig.Name,
+                        `Error while updating data connection for '${fileConfig.Name}':  ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                }
+            );
+        });
+    }
+    //#endregion "Pre Tasks"
 }
