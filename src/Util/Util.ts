@@ -37,7 +37,7 @@ export namespace Util {
         return normalizedUrl;
     }
 
-    function getErrorMessage(error: any): any {
+    export function getErrorMessage(error: any): any {
         let errorMessage = error;
         if (typeof error === "object") {
             if ((error as Object).hasOwnProperty("message")) { errorMessage = error.message; }
