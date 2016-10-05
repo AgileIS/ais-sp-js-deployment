@@ -1172,7 +1172,68 @@
                     "EnableContentTypes": false,
                     "EnableVersioning": true,
                     "ControlOption": "",
-                    "Files": []
+                    "Files": [
+                        {
+                            "Name": "Anhang_1_Vorlage_1.xlsx",
+                            "Src": "./config/files/LibraryFiles/Anhang_1_Vorlage_1.xlsx",
+                            "Overwrite": true,
+                            "DataConnectionTemplate": "./config/files/LibraryFiles/connections.xml.template",
+                            "DataConnections": [
+                                {
+                                    "List": "Projekt zu Insider",
+                                    "View": "ZuordnungToExcel"
+                                },
+                                {
+                                    "List": "Projekte",
+                                    "View": "ProjekteToExcel"
+                                },
+                                {
+                                    "List": "Insider",
+                                    "View": "InsiderToExcel"
+                                }
+                            ]
+                        },
+                        {
+                            "Name": "Anhang_1_Vorlage_2.xlsx",
+                            "Src": "./config/files/LibraryFiles/Anhang_1_Vorlage_2.xlsx",
+                            "Overwrite": true,
+                            "DataConnectionTemplate": "./config/files/LibraryFiles/connections.xml.template",
+                            "DataConnections": [
+                                {
+                                    "List": "Projekt zu Insider",
+                                    "View": "ZuordnungToExcel"
+                                },
+                                {
+                                    "List": "Projekte",
+                                    "View": "ProjekteToExcel"
+                                },
+                                {
+                                    "List": "Insider",
+                                    "View": "InsiderToExcel"
+                                }
+                            ]
+                        },
+                        {
+                            "Name": "Anhang_2.xlsx",
+                            "Src": "./config/files/LibraryFiles/Anhang_2.xlsx",
+                            "Overwrite": true,
+                            "DataConnectionTemplate": "./config/files/LibraryFiles/connections.xml.template",
+                            "DataConnections": [
+                                {
+                                    "List": "Projekt zu Insider",
+                                    "View": "ZuordnungToExcel"
+                                },
+                                {
+                                    "List": "Projekte",
+                                    "View": "ProjekteToExcel"
+                                },
+                                {
+                                    "List": "Insider",
+                                    "View": "InsiderToExcel"
+                                }
+                            ]
+                        }
+                    ]
                 }
             ],
             "Files": [

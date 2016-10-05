@@ -38,7 +38,7 @@ export class FeatureHandler implements ISPObjectHandler {
             Logger.write(`Processing ${processingCrlOption} feature: '${featureConfig.Id}'.`, Logger.LogLevel.Info);
 
             let featureCollection = clientContext.get_site().get_features();
-            if (featureConfig.Scope === SP.FeatureDefinitionScope.web) {
+            if (featureConfig.Scope === SP.FeatureDefinitionScope.web.toString()) {
                 featureCollection = clientContext.get_web().get_features();
             }
 
@@ -82,7 +82,7 @@ export class FeatureHandler implements ISPObjectHandler {
 
     private activateFeature(featureConfig: IFeature, featureCollection: SP.FeatureCollection): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
-            let scope = featureConfig.Scope ? SP.FeatureDefinitionScope[featureConfig.Scope] : SP.FeatureDefinitionScope.none;
+            let scope = featureConfig.Scope ? SP.FeatureDefinitionScope[featureConfig.Scope.toLowerCase()] : SP.FeatureDefinitionScope.none;
             scope = scope === SP.FeatureDefinitionScope.web ? SP.FeatureDefinitionScope.none : scope;
             // scope = scope === SP.FeatureDefinitionScope.site ? SP.FeatureDefinitionScope.farm : scope;
             featureCollection.add(new SP.Guid(featureConfig.Id), false, scope as SP.FeatureDefinitionScope);

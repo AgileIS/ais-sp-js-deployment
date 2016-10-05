@@ -79,7 +79,8 @@ export class ListHandler implements ISPObjectHandler {
                         Logger.write("List handler processing promise is undefined!", Logger.LogLevel.Error);
                     }
                 })
-                .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName, `Error while requesting list with the internal name '${listConfig.InternalName}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName,
+                        `Error while requesting list with the internal name '${listConfig.InternalName}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -93,11 +94,20 @@ export class ListHandler implements ISPObjectHandler {
                         this.updateList(listConfig, listAddResult.list)
                             .then((listUpdateResult) => { Util.Resolve<List>(resolve, listConfig.InternalName, `Added list: '${listConfig.InternalName}'.`, listUpdateResult.value); })
                             .catch((error) => {
-                                Util.Reject<void>(reject, listConfig.InternalName,
-                                    `Error while adding and updating list with the internal name '${listConfig.InternalName}': ` + error);
+                                this.tryToDeleteCorruptedList(listConfig, web)
+                                    .then(() => { Util.Reject<void>(reject, listConfig.InternalName,
+                                        `Error while adding and updating list with the internal name '${listConfig.InternalName}' - corrupted list deleted: ` + Util.getErrorMessage(error)); } )
+                                    .catch(() => { Util.Reject<void>(reject, listConfig.InternalName,
+                                         `Error while adding and updating list with the internal name '${listConfig.InternalName}'- corrupted list not deleted:: ` + Util.getErrorMessage(error)); });
                             });
                     })
-                    .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName, `Error while adding list with the internal name '${listConfig.InternalName}': ` + error); });
+                    .catch((error) => {
+                        this.tryToDeleteCorruptedList(listConfig, web)
+                            .then(() => Util.Reject<void>(reject, listConfig.InternalName,
+                                `Error while adding list with the internal name '${listConfig.InternalName}' - corrupted List deleted`))
+                            .catch(() => Util.Reject<void>(reject, listConfig.InternalName,
+                                `Error while adding list with the internal name '${listConfig.InternalName}' - corrupted List not deleted`));
+                    });
             } else {
                 Util.Reject<void>(reject, listConfig.InternalName, `List template type could not be resolved for the list with the internal name ${listConfig.InternalName}`);
             }
@@ -114,13 +124,14 @@ export class ListHandler implements ISPObjectHandler {
                             .then((contentTypesUpdateResult) => { Util.Resolve<List>(resolve, listConfig.InternalName, `Updated list: '${listConfig.InternalName}'.`, listUpdateResult.list); })
                             .catch((error) => {
                                 Util.Reject<void>(reject, listConfig.InternalName,
-                                    `Error while updating list with the internal name '${listConfig.InternalName}': ` + error);
+                                    `Error while updating list with the internal name '${listConfig.InternalName}': ` + Util.getErrorMessage(error));
                             });
                     } else {
                         Util.Resolve<List>(resolve, listConfig.InternalName, `Updated list: '${listConfig.InternalName}'.`, listUpdateResult.list);
                     }
                 })
-                .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName, `Error while updating list with the internal name '${listConfig.InternalName}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName,
+                     `Error while updating list with the internal name '${listConfig.InternalName}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -135,12 +146,12 @@ export class ListHandler implements ISPObjectHandler {
                     } else {
                         processingPromis = this.addListContentType(contentTypeBinding, listConfig, list);
                     }
-
                     return processingPromis;
                 });
             }, Promise.resolve())
                 .then(() => { Util.Resolve<List>(resolve, listConfig.InternalName, `Updated list content types: '${listConfig.InternalName}'.`); })
-                .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName, `Error while updating content types on the list internal the name '${listConfig.InternalName}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName,
+                    `Error while updating content types on the list internal the name '${listConfig.InternalName}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -183,7 +194,7 @@ export class ListHandler implements ISPObjectHandler {
                             .catch((error) => {
                                 Util.Reject<void>(reject, listConfig.InternalName,
                                     `Error while deleting list content type with the ${identifierPropertyName.toLocaleLowerCase()} '${identifierValue}'`
-                                    + `on the list with the internal name '${listConfig.InternalName}': ` + error);
+                                    + `on the list with the internal name '${listConfig.InternalName}': ` + Util.getErrorMessage(error));
                             });
                     } else {
                         Util.Resolve<void>(resolve, listConfig.InternalName,
@@ -194,7 +205,7 @@ export class ListHandler implements ISPObjectHandler {
                 .catch((error) => {
                     Util.Reject<void>(reject, listConfig.InternalName,
                         `Error while deleting list content type with the ${identifierPropertyName.toLocaleLowerCase()} '${identifierValue}'`
-                        + `on the list with the internal name '${listConfig.InternalName}': ` + error);
+                        + `on the list with the internal name '${listConfig.InternalName}': ` + Util.getErrorMessage(error));
                 });
         });
     };
@@ -203,7 +214,25 @@ export class ListHandler implements ISPObjectHandler {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             list.delete()
                 .then(() => { Util.Resolve<void>(resolve, listConfig.InternalName, `Deleted List: '${listConfig.InternalName}'.`); })
-                .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName, `Error while deleting list with the internal name '${listConfig.InternalName}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, listConfig.InternalName,
+                        `Error while deleting list with the internal name '${listConfig.InternalName}': ` + Util.getErrorMessage(error)); });
+        });
+    }
+
+    private tryToDeleteCorruptedList(listConfig: IList, web: Web): Promise<IPromiseResult<any>> {
+        return new Promise<IPromiseResult<void>>((resolve, reject) => {
+            web.lists.filter(`RootFolder/Name eq '${listConfig.InternalName}'`).select("Id").get()
+                .then((listRequestResults) => {
+                    if (listRequestResults && listRequestResults.length === 1) {
+                        let list = web.lists.getById(listRequestResults[0].Id);
+                        list.delete()
+                            .then(() => resolve())
+                            .catch(() => reject());
+                    } else {
+                        resolve();
+                    }
+                })
+                .catch((error) => { reject(error); });
         });
     }
 

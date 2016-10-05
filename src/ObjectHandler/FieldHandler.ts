@@ -93,7 +93,8 @@ export class FieldHandler implements ISPObjectHandler {
                         Logger.write("Field handler processing promise is undefined!", Logger.LogLevel.Error);
                     }
                 })
-                .catch((error) => { Util.Reject<void>(reject, fieldConfig.InternalName, `Error while requesting field with the internal name '${fieldConfig.InternalName}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, fieldConfig.InternalName, 
+                        `Error while requesting field with the internal name '${fieldConfig.InternalName}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -138,15 +139,16 @@ export class FieldHandler implements ISPObjectHandler {
                         })
                         .catch((error) => {
                             Util.Reject<void>(reject, fieldConfig.InternalName,
-                                `Error while adding and updating field with the internal name '${fieldConfig.InternalName}': ` + error);
+                                `Error while adding and updating field with the internal name '${fieldConfig.InternalName}': ` + Util.getErrorMessage(error));
                         });
                 })
                 .catch((error) => {
                     this.tryToDeleteCorruptedField(fieldConfig, fieldCollection)
-                        .then(() => { Util.Reject<void>(reject, fieldConfig.InternalName, `Error while adding field with the internal name '${fieldConfig.InternalName}' - field deleted: ` + error); })
+                        .then(() => { Util.Reject<void>(reject, fieldConfig.InternalName,
+                                `Error while adding field with the internal name '${fieldConfig.InternalName}' - field deleted: ` + Util.getErrorMessage(error)); })
                         .catch(() => {
                             Util.Reject<void>(reject, fieldConfig.InternalName,
-                                `Error while adding field with the internal name '${fieldConfig.InternalName}' - field not deleted: ` + error);
+                                `Error while adding field with the internal name '${fieldConfig.InternalName}' - field not deleted: ` + Util.getErrorMessage(error));
                         });
                 });
         });
@@ -164,15 +166,16 @@ export class FieldHandler implements ISPObjectHandler {
                         })
                         .catch((error) => {
                             Util.Reject<void>(reject, fieldConfig.InternalName,
-                                `Error while adding and updating field with the internal name '${fieldConfig.InternalName}': ` + error);
+                                `Error while adding and updating field with the internal name '${fieldConfig.InternalName}': ` + Util.getErrorMessage(error));
                         });
                 })
                 .catch((error) => {
                     this.tryToDeleteCorruptedField(fieldConfig, fieldCollection)
-                        .then(() => { Util.Reject<void>(reject, fieldConfig.InternalName, `Error while adding field with the internal name '${fieldConfig.InternalName}' - field deleted: ` + error); })
+                        .then(() => { Util.Reject<void>(reject, fieldConfig.InternalName,
+                             `Error while adding field with the internal name '${fieldConfig.InternalName}' - field deleted: ` + Util.getErrorMessage(error)); })
                         .catch(() => {
                             Util.Reject<void>(reject, fieldConfig.InternalName,
-                                `Error while adding field with the internal name '${fieldConfig.InternalName}' - field not deleted: ` + error);
+                                `Error while adding field with the internal name '${fieldConfig.InternalName}' - field not deleted: ` + Util.getErrorMessage(error));
                         });
                 });
         });
@@ -283,7 +286,8 @@ export class FieldHandler implements ISPObjectHandler {
                     Util.Resolve<Field>(resolve, fieldConfig.InternalName, `Updated field: '${fieldConfig.InternalName}'.`,
                         fieldUpdateResult.field);
                 })
-                .catch((error) => { Util.Reject<void>(reject, fieldConfig.InternalName, `Error while updating field with internal name '${fieldConfig.InternalName}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, fieldConfig.InternalName,
+                     `Error while updating field with internal name '${fieldConfig.InternalName}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -293,7 +297,7 @@ export class FieldHandler implements ISPObjectHandler {
                 .then(() => { Util.Resolve<void>(resolve, fieldConfig.InternalName, `Deleted field: '${fieldConfig.InternalName}'.`); })
                 .catch((error) => {
                     Util.Reject<void>(reject, fieldConfig.InternalName,
-                        `Error while deleting field with internal name '${fieldConfig.InternalName}': ` + error);
+                        `Error while deleting field with internal name '${fieldConfig.InternalName}': ` + Util.getErrorMessage(error));
                 });
         });
     }
