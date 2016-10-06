@@ -640,7 +640,7 @@
                             ]
                         },
                         {
-                            "Title": "Active Insider",
+                            "Title": "Aktive Insider",
                             "PersonalView": false,
                             "ViewQuery": "\"<Where><Eq><FieldRef Name='re_ivz_archived'<Value Type='Boolean'>0</Value></Eq></Where>\"",
                             "ControlOption": "",
