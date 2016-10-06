@@ -192,7 +192,8 @@ export class FieldHandler implements ISPObjectHandler {
                 let listId = (urlParts[1] as string).split("'")[1];
                 spFieldCollection = context.get_web().get_lists().getById(listId).get_fields();
             } else {
-                spFieldCollection = context.get_web().get_fields();
+                let listName = (urlParts[1] as string).split("'")[1];
+                spFieldCollection = context.get_web().get_lists().getByTitle(listName).get_fields();
             }
 
             context.load(lookupList);

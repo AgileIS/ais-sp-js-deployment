@@ -268,6 +268,13 @@
                     "ControlOption": ""
                 },
                 {
+                    "Title": "dienstlische Mobilfunknummer",
+                    "InternalName": "re_mobileBusiness",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
                     "Title": "Fax",
                     "InternalName": "re_ivz_fax",
                     "FieldType": "Text",
@@ -320,11 +327,10 @@
                     "ControlOption": ""
                 },
                 {
-                    "Title": "Datum (der Erlangung des Zugangs zur Insiderinformation)",
+                    "Title": "Datum",
                     "InternalName": "re_ivz_accessDate",
-                    "Description": "Alternativ: (Datum der Erlangung des Zugangs zur Insiderinformation)",
+                    "Description": "Datum der Erlangung des Zugangs zur Insiderinformation",
                     "FieldType": "DateTime",
-                    "DisplayFormat": "DateOnly",
                     "Group": "HannRe Insiderverzeichnis Columns",
                     "Required": true,
                     "ControlOption": ""
@@ -424,6 +430,12 @@
                             "InternalName": "re_ivz_birthname"
                         },
                         {
+                            "InternalName": "re_ivz_phoneBusiness"
+                        },
+                        {
+                            "InternalName": "re_mobileBusiness"
+                        },
+                        {
                             "InternalName": "re_ivz_company",
                             "Required": true
                         },
@@ -463,9 +475,6 @@
                         },
                         {
                             "InternalName": "re_ivz_staffNumber"
-                        },
-                        {
-                            "InternalName": "re_ivz_phoneBusiness"
                         },
                         {
                             "InternalName": "re_ivz_fax"
@@ -581,13 +590,14 @@
                             "Title": "Vollständiger Name",
                             "FieldType": "Calculated",
                             "Formula": "=CONCATENATE([Vorname], \" \",[Name]",
-                            "OutputType": "Type",
+                            "OutputType": "Text",
                             "ControlOption": ""
                         }
                     ],
                     "Views": [
                         {
                             "Title": "All Items",
+                            "NewTitle": "Alle Insider",
                             "PersonalView": false,
                             "ControlOption": "",
                             "ViewFields": [
@@ -633,9 +643,9 @@
                             ]
                         },
                         {
-                            "Title": "Active Insider",
+                            "Title": "Aktive Insider",
                             "PersonalView": false,
-                            "ViewQuery": "\"<Where><Eq><FieldRef Name='re_ivz_archived'<Value Type='Boolean'>0</Value></Eq></Where>\"",
+                            "ViewQuery": "<Where><Eq><FieldRef Name='re_ivz_archived' /><Value Type='Boolean'>0</Value></Eq></Where>",
                             "ControlOption": "",
                             "ViewFields": [
                                 {
@@ -711,6 +721,113 @@
                                     "InternalName": "re_ivz_country"
                                 }
                             ]
+                        },
+                        {
+                            "Title": "InsiderToExcel",
+                            "PersonalView": false,
+                            "Hidden": true,
+                            "ControlOption": "",
+                            "ViewFields": [
+                                {
+                                    "InternalName": "ID"
+                                },
+                                {
+                                    "InternalName": "re_ivz_salutation"
+                                },
+                                {
+                                    "InternalName": "re_ivz_salutationTitle"
+                                },
+                                {
+                                    "InternalName": "re_ivz_name"
+                                },
+                                {
+                                    "InternalName": "re_ivz_forename"
+                                },
+                                {
+                                    "InternalName": "re_ivz_phoneBusiness"
+                                },
+                                {
+                                    "InternalName": "re_ivz_phonePrivate"
+                                },
+                                {
+                                    "InternalName": "Created"
+                                },
+                                {
+                                    "InternalName": "Modified"
+                                },
+                                {
+                                    "InternalName": "re_ivz_remarkCapture"
+                                },
+                                {
+                                    "InternalName": "re_ivz_department"
+                                },
+                                {
+                                    "InternalName": "re_mobileBusiness"
+                                },
+                                {
+                                    "InternalName": "re_ivz_function"
+                                },
+                                {
+                                    "InternalName": "re_ivz_birthday"
+                                },
+                                {
+                                    "InternalName": "re_ivz_birthname"
+                                },
+                                {
+                                    "InternalName": "re_ivz_birthplace"
+                                },
+                                {
+                                    "InternalName": "re_ivz_street"
+                                },
+                                {
+                                    "InternalName": "re_ivz_zip"
+                                },
+                                {
+                                    "InternalName": "re_ivz_city"
+                                },
+                                {
+                                    "InternalName": "re_ivz_country"
+                                },
+                                {
+                                    "InternalName": "re_ivz_company"
+                                },
+                                {
+                                    "InternalName": "re_ivz_compStreet"
+                                },
+                                {
+                                    "InternalName": "re_ivz_compZip"
+                                },
+                                {
+                                    "InternalName": "re_ivz_compCity"
+                                },
+                                {
+                                    "InternalName": "re_ivz_compCountry"
+                                },
+                                {
+                                    "InternalName": "re_ivz_staffNumber"
+                                },
+                                {
+                                    "InternalName": "re_ivz_nationalID"
+                                },
+                                {
+                                    "InternalName": "re_ivz_mobilePrivate"
+                                },
+                                {
+                                    "InternalName": "re_ivz_phoneBusiness"
+                                },
+                                {
+                                    "InternalName": "re_ivz_fax"
+                                },
+                                {
+                                    "InternalName": "re_ivz_email"
+                                },
+                                {
+                                    "InternalName": "re_ivz_compReceived"
+                                },
+                                {
+                                    "InternalName": "re_ivz_signed"
+                                }
+                            ]
                         }
                     ]
                 },
@@ -751,6 +868,7 @@
                     "Views": [
                         {
                             "Title": "All Items",
+                            "NewTitle": "Alle Projekte",
                             "PersonalView": false,
                             "ControlOption": "",
                             "ViewFields": [
@@ -777,6 +895,36 @@
                                 },
                                 {
                                     "InternalName": "Editor"
+                                },
+                                {
+                                    "InternalName": "Modified"
+                                }
+                            ]
+                        },
+                        {
+                            "Title": "ProjekteToExcel",
+                            "PersonalView": false,
+                            "ViewQuery": "<Where><Neq><FieldRef Name='re_ivz_archived' /><Value Type='Boolean'>1</Value></Neq></Where>",
+                            "Hidden": true,
+                            "ControlOption": "",
+                            "ViewFields": [
+                                {
+                                    "InternalName": "ID"
+                                },
+                                {
+                                    "InternalName": "Title"
+                                },
+                                {
+                                    "InternalName": "re_ivz_creationDate"
+                                },
+                                {
+                                    "InternalName": "re_ivz_toInsiderDate"
+                                },
+                                {
+                                    "InternalName": "re_ivz_end"
+                                },
+                                {
+                                    "InternalName": "re_ivz_archived"
                                 },
                                 {
                                     "InternalName": "Modified"
@@ -816,6 +964,10 @@
                             "ControlOption": "",
                             "DependendFields": [
                                 {
+                                    "Title": "ID",
+                                    "InternalName": "ID"
+                                },
+                                {
                                     "Title": "Name",
                                     "InternalName": "re_ivz_name"
                                 },
@@ -844,7 +996,7 @@
                                     "InternalName": "re_ivz_birthplace"
                                 },
                                 {
-                                    "Title": "Stra&#223;e",
+                                    "Title": "Straße",
                                     "InternalName": "re_ivz_street"
                                 },
                                 {
@@ -864,7 +1016,7 @@
                                     "InternalName": "re_ivz_company"
                                 },
                                 {
-                                    "Title": "Stra&#223;e (Firma)",
+                                    "Title": "Straße (Firma)",
                                     "InternalName": "re_ivz_compStreet"
                                 },
                                 {
@@ -916,7 +1068,7 @@
                                     "InternalName": "re_ivz_email"
                                 },
                                 {
-                                    "Title": "Complianceerkl&#228;rung erhalten",
+                                    "Title": "Complianceerklärung erhalten",
                                     "InternalName": "re_ivz_compReceived"
                                 },
                                 {
@@ -936,7 +1088,7 @@
                                     "InternalName": "Created"
                                 },
                                 {
-                                    "Title": "Letzte &#196;nderung am",
+                                    "Title": "Letzte Änderung am",
                                     "InternalName": "Modified"
                                 }
                             ]
@@ -954,6 +1106,10 @@
                             "ControlOption": "",
                             "DependendFields": [
                                 {
+                                    "Title": "ID",
+                                    "InternalName": "ID"
+                                },
+                                {
                                     "Title": "Entstehungsdatum",
                                     "InternalName": "re_ivz_creationDate"
                                 },
@@ -970,16 +1126,12 @@
                                     "InternalName": "Modified"
                                 }
                             ]
-                        },
-                        {
-                            "InternalName": "Modified",
-                            "Title": "Letzte Änderung am",
-                            "ControlOption": ""
                         }
                     ],
                     "Views": [
                         {
                             "Title": "All Items",
+                            "NewTitle": "Alle Zuordungen",
                             "PersonalView": false,
                             "ControlOption": "",
                             "ViewFields": [
@@ -1159,6 +1311,33 @@
                                 },
                                 {
                                     "InternalName": "re_ivz_accessEnd"
+                                }
+                            ]
+                        },
+                        {
+                            "Title": "ZuordnungToExcel",
+                            "PersonalView": false,
+                            "Hidden": true,
+                            "ControlOption": "",
+                            "ViewFields": [
+                                {
+                                    "InternalName": "ID",
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Insider"
+                                },
+                                {
+                                    "InternalName": "ID",
+                                    "IsDependentLookup": "true",
+                                    "LookupListTitle": "Projekte"
+                                },
+                                {
+                                    "InternalName": "re_ivz_accessStart"
+                                },
+                                {
+                                    "InternalName": "re_ivz_accessEnd"
+                                },
+                                {
+                                    "InternalName": "Modified"
                                 }
                             ]
                         }

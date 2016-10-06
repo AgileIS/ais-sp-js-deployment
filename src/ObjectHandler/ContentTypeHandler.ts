@@ -35,7 +35,7 @@ export class ContentTypeHandler implements ISPObjectHandler {
                                     });
                             });
                     } else {
-                        Util.Reject<void>(reject, contentTypeConfig.Id, `Error while processing content type with the id '${contentTypeConfig.Id}': Content type id or/and name are undefined.`);
+                        Util.Reject<void>(reject, "Unknow content type", `Error while processing content type: Content type id or/and name are undefined.`);
                     }
                 }
             });

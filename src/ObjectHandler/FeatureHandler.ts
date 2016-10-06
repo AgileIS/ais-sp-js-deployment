@@ -25,7 +25,7 @@ export class FeatureHandler implements ISPObjectHandler {
                                     });
                             });
                     } else {
-                        Util.Reject<void>(reject, featureConfig.Id, `Error while processing feature with the id '${featureConfig.Id}': Feature id is undefined.`);
+                        Util.Reject<void>(reject, "Unknow feature", `Error while processing feature: Feature id is undefined.`);
                     }
                 }
             });
