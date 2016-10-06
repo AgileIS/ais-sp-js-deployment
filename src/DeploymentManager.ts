@@ -50,132 +50,107 @@ export class DeploymentManager {
     }
 
     public deploy(): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            Promise.all(this._deployDependencies)
+        return Promise.all(this._deployDependencies).then(() => {
+            return this.processDeploymentConfig()
                 .then(() => {
-                    this.processDeploymentConfig()
-                        .then(() => {
-                            Logger.write("All site collection processed", Logger.LogLevel.Info);
-                            resolve();
-                        })
-                        .catch((error) => {
-                            Logger.write("Error occured while processing site collections - " + Util.getErrorMessage(error), Logger.LogLevel.Info);
-                            reject(error);
-                        });
+                    Logger.write("All site collection processed", Logger.LogLevel.Info);
                 })
-                .catch(error => {
-                    reject(error);
+                .catch((error) => {
+                    Logger.write("Error occured while processing site collections - " + Util.getErrorMessage(error), Logger.LogLevel.Info);
                 });
         });
+    }
+
+    private processDeploymentConfig(): Promise<any> {
+        let siteProcessingPromise = this._objectHandlers.Sites.execute(this._deploymentConfig.Sites[0], Promise.resolve());
+
+        let nodeProcessingOrder: string[] = ["Features", "Fields", "ContentTypes", "Lists", "Navigation", "Files"];
+        let existingSiteNodes = Object.keys(this._deploymentConfig.Sites[0]);
+
+        return nodeProcessingOrder.reduce((dependentPromise, processingKey, proecssingIndex, array): Promise<any> => {
+            return dependentPromise
+                .then(() => {
+                    let processingConfig = (<any>this._deploymentConfig.Sites[0])[processingKey];
+                    let processingHandler = this._objectHandlers[processingKey];
+                    let prossingPromise: Promise<any> = Promise.resolve();
+
+                    if (existingSiteNodes.indexOf(processingKey) > -1 && processingHandler) {
+                        if (processingKey === "Fields" || processingKey === "Files") {
+                            prossingPromise = this.processDeploymentConfigNodesParallel(processingHandler, processingConfig, siteProcessingPromise);
+                        } else if (processingKey === "Features" || processingKey === "ContentTypes") {
+                            prossingPromise = this.processDeploymentConfigNodesSequential(processingHandler, processingConfig, siteProcessingPromise);
+                        } else if (processingKey === "Lists") {
+                            prossingPromise = this.processListsDeploymentConfig(processingHandler, this._deploymentConfig.Sites[0].Lists, siteProcessingPromise);
+                        } else if (processingKey === "Navigation") {
+                            prossingPromise = processingHandler.execute(processingConfig, siteProcessingPromise);
+                        }
+                    }
+
+                    return prossingPromise;
+                });
+        }, siteProcessingPromise);
     }
 
     private processListsDeploymentConfig(listProcessingHandler: ISPObjectHandler, listsDeploymentConfig: IList[], sitePromise: Promise<IPromiseResult<Web>>): Promise<any> {
         let listPromiseDictionary: { [internalName: string]: Promise<any> } = {};
         let listProcessingPromises: Promise<any>[] = new Array();
 
-        listsDeploymentConfig.forEach(
-            (listConfig, index, array) => {
-                let processingPromise = listProcessingHandler.execute(listConfig, sitePromise);
-                listPromiseDictionary[listConfig.InternalName] = processingPromise;
-                listProcessingPromises.push(processingPromise);
-            }
-        );
+        listsDeploymentConfig.forEach((listConfig, index, array) => {
+            let processingPromise = listProcessingHandler.execute(listConfig, sitePromise);
+            listPromiseDictionary[listConfig.InternalName] = processingPromise;
+            listProcessingPromises.push(processingPromise);
+        });
 
-        return Promise.all(listsDeploymentConfig)
-            .then(() => {
-                return listsDeploymentConfig.reduce((dependentPromise, listConfig, listIndex, listsArray) => {
-                    let listPromise = listPromiseDictionary[listConfig.InternalName];
-
-                    return dependentPromise.then(() => {
-                        let fieldsProcessingPromise = undefined;
-                        if (listConfig.Fields && listConfig.Fields instanceof Array && listConfig.Fields.length > 0) {
-                            fieldsProcessingPromise = this.processDeploymentConfigNodesSequential(this._objectHandlers.Fields, listConfig.Fields, listPromise);
-                        } else {
-                            fieldsProcessingPromise = Promise.resolve();
-                        }
-
-                        return fieldsProcessingPromise;
-                    }).then(() => {
-                        let viewProcessingPromise: Promise<any> = undefined;
-                        if (listConfig.Views && listConfig.Views instanceof Array && listConfig.Views.length > 0) {
-                            viewProcessingPromise = this.processDeploymentConfigNodesParallel(this._objectHandlers.Views, listConfig.Views, listPromise);
-                        } else {
-                            viewProcessingPromise = Promise.resolve();
-                        }
-
-                        let itemsProcessingPromise: Promise<any> = undefined;
-                        if (listConfig.Items && listConfig.Items instanceof Array && listConfig.Items.length > 0) {
-                            itemsProcessingPromise = this.processDeploymentConfigNodesParallel(this._objectHandlers.Items, listConfig.Items, listPromise);
-                        } else {
-                            itemsProcessingPromise = Promise.resolve();
-                        }
-
-                        let filesProcessingPromise: Promise<any> = undefined;
-                        if (listConfig.Files && listConfig.Files instanceof Array && listConfig.Files.length > 0) {
-                            filesProcessingPromise = this.processDeploymentConfigNodesParallel(this._objectHandlers.Files, listConfig.Files, listPromise);
-                        } else {
-                            filesProcessingPromise = Promise.resolve();
-                        }
-
-                        return Promise.all([viewProcessingPromise, itemsProcessingPromise, filesProcessingPromise]);
+        return Promise.all(listProcessingPromises).then(() => {
+            return listsDeploymentConfig.reduce((dependentPromise, listConfig, listIndex, listsArray) => {
+                let listPromise = listPromiseDictionary[listConfig.InternalName];
+                return dependentPromise
+                    .then(() => {
+                        return this.processDeploymentConfigNodesSequential(this._objectHandlers.Fields, listConfig.Fields, listPromise);
+                    })
+                    .then(() => {
+                        return Promise.all([
+                            this.processDeploymentConfigNodesParallel(this._objectHandlers.Views, listConfig.Views, listPromise),
+                            this.processDeploymentConfigNodesParallel(this._objectHandlers.Items, listConfig.Items, listPromise),
+                            this.processDeploymentConfigNodesParallel(this._objectHandlers.Files, listConfig.Files, listPromise)]
+                        );
                     });
-                }, Promise.resolve());
-            });
+            }, Promise.resolve());
+        });
     };
 
     private processDeploymentConfigNodesParallel(processingHandler: ISPObjectHandler, deploymentConfigNodes: Array<any>, dependentPromise: Promise<any>): Promise<any> {
-        let processingPromisses: Array<Promise<any>> = new Array();
-        deploymentConfigNodes.forEach(
-            (processingConfig, proecssingIndex, array) => {
-                processingPromisses.push(processingHandler.execute(processingConfig, dependentPromise));
-            });
+        let processingPromisses: Array<Promise<any>> = [Promise.resolve()];
+
+        if (processingHandler && deploymentConfigNodes && deploymentConfigNodes instanceof Array && deploymentConfigNodes.length > 0) {
+            deploymentConfigNodes.forEach(
+                (processingConfig, proecssingIndex, array) => {
+                    processingPromisses.push(processingHandler.execute(processingConfig, dependentPromise));
+                });
+        } if (!processingHandler) {
+            Logger.write("Processing object handler is undefined while processing deployment config nodes parallel.", Logger.LogLevel.Error);
+            processingPromisses.push(Promise.reject(undefined));
+        }
 
         return Promise.all(processingPromisses);
     }
 
     private processDeploymentConfigNodesSequential(processingHandler: ISPObjectHandler, deploymentConfigNodes: Array<any>, dependentPromise: Promise<any>): Promise<any> {
-        return deploymentConfigNodes.reduce(
-            (previousPromise, processingConfig, proecssingIndex, array) => {
-                return previousPromise.then(() => {
-                    return processingHandler.execute(processingConfig, dependentPromise);
-                });
-            }, dependentPromise);
-    }
+        let processingPromise: Promise<any> = Promise.resolve();
 
-    private processDeploymentConfig(): Promise<any> {
-        let siteObjectHandlerKey = "Sites";
-        let siteProcessingPromise: Promise<IPromiseResult<Web>> = this._objectHandlers[siteObjectHandlerKey].execute(this._deploymentConfig.Sites[0], Promise.resolve());
-
-        let nodeProcessingOrder: string[] = ["Features", "Fields", "ContentTypes", "Lists", "Navigation", "Files"];
-        let existingSiteNodes = Object.keys(this._deploymentConfig.Sites[0]);
-
-        return nodeProcessingOrder.reduce(
-            (dependentPromise, processingKey, proecssingIndex, array): Promise<any> => {
-                return dependentPromise
-                    .then(() => {
-                        let processingConfig = (<any>this._deploymentConfig.Sites[0])[processingKey];
-                        let processingHandler = this._objectHandlers[processingKey];
-                        let prossingPromise: Promise<any> = undefined;
-
-                        if ((existingSiteNodes.indexOf(processingKey) === -1)
-                            || (processingConfig instanceof Array && processingConfig.length === 0)
-                            || processingHandler === undefined) {
-                            prossingPromise = Promise.resolve();
-                        } else {
-                            if (processingKey === "Fields" || processingKey === "Files") {
-                                prossingPromise = this.processDeploymentConfigNodesParallel(processingHandler, processingConfig, siteProcessingPromise);
-                            } else if (processingKey === "Features" || processingKey === "ContentTypes") {
-                                prossingPromise = this.processDeploymentConfigNodesSequential(processingHandler, processingConfig, siteProcessingPromise);
-                            } else if (processingKey === "Lists") {
-                                prossingPromise = this.processListsDeploymentConfig(processingHandler, this._deploymentConfig.Sites[0].Lists, siteProcessingPromise);
-                            } else if (processingKey === "Navigation") {
-                                prossingPromise = processingHandler.execute(processingConfig, siteProcessingPromise);
-                            }
-                        }
-
-                        return prossingPromise;
+        if (processingHandler && deploymentConfigNodes && deploymentConfigNodes instanceof Array && deploymentConfigNodes.length > 0) {
+            processingPromise = deploymentConfigNodes.reduce(
+                (previousPromise, processingConfig, proecssingIndex, array) => {
+                    return previousPromise.then(() => {
+                        return processingHandler.execute(processingConfig, dependentPromise);
                     });
-            }, siteProcessingPromise);
+                }, dependentPromise);
+        } if (!processingHandler) {
+            Logger.write("Processing object handler is undefined while processing deployment config nodes sequential.", Logger.LogLevel.Error);
+            processingPromise = Promise.reject(undefined);
+        }
+
+        return processingPromise;
     }
 
     private setupProxy(): void {
