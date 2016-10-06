@@ -2,7 +2,6 @@ import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
 import { ISPObjectHandler } from "../Interfaces/ObjectHandler/ISPObjectHandler";
 import { IFeature } from "../Interfaces/Types/IFeature";
-import { ControlOption } from "../Constants/ControlOption";
 import { IPromiseResult } from "../Interfaces/IPromiseResult";
 import { Util } from "../Util/Util";
 

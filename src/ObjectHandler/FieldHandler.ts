@@ -93,7 +93,7 @@ export class FieldHandler implements ISPObjectHandler {
                         Logger.write("Field handler processing promise is undefined!", Logger.LogLevel.Error);
                     }
                 })
-                .catch((error) => { Util.Reject<void>(reject, fieldConfig.InternalName, 
+                .catch((error) => { Util.Reject<void>(reject, fieldConfig.InternalName,
                         `Error while requesting field with the internal name '${fieldConfig.InternalName}': ` + Util.getErrorMessage(error)); });
         });
     }

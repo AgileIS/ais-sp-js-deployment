@@ -48,7 +48,7 @@ export class FileHandler implements ISPObjectHandler {
 
                     })
                     .catch(error => {
-                        Util.Reject<void>(reject, fileFolderConfig.Name, 
+                        Util.Reject<void>(reject, fileFolderConfig.Name,
                             `Error while requesting parent ('${parentResult.value.toUrl()}') for element: '${fileFolderConfig.Name}': ` + Util.getErrorMessage(error));
                     });
             });
@@ -90,7 +90,7 @@ export class FileHandler implements ISPObjectHandler {
                                 break;
                         }
                     } else {
-                        Util.Reject<void>(reject, folderConfig.Name, 
+                        Util.Reject<void>(reject, folderConfig.Name,
                             `Error while requesting folder with the title '${folderConfig.Name}' from parent '${folder.parentFolder}': ` + Util.getErrorMessage(error));
                     }
                 });
@@ -143,7 +143,7 @@ export class FileHandler implements ISPObjectHandler {
                                 break;
                         }
                     } else {
-                        Util.Reject<void>(reject, fileConfig.Name, 
+                        Util.Reject<void>(reject, fileConfig.Name,
                             `Error while requesting file with the title '${fileConfig.Name}' from parent '${parentFolder.toUrl()}': ` + Util.getErrorMessage(error));
                     }
                 });

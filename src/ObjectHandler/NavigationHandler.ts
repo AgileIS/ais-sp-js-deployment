@@ -4,7 +4,6 @@ import { ISPObjectHandler } from "../Interfaces/ObjectHandler/ISPObjectHandler";
 import { IPromiseResult } from "../Interfaces/IPromiseResult";
 import { INavigation } from "../Interfaces/Types/INavigation";
 import { INavigationNode } from "../Interfaces/Types/INavigationNode";
-import { ControlOption } from "../Constants/ControlOption";
 import { Util } from "../Util/Util";
 
 export class NavigationHandler implements ISPObjectHandler {
