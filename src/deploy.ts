@@ -3,22 +3,31 @@
 import * as FileSystem from "fs";
 import * as minimist from "minimist";
 import * as promptly from "promptly";
+import * as childProcess from "child_process";
+import * as path from "path";
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { MyConsoleLogger } from "./Logger/MyConsoleLogger";
 import { GlobalDeploymentConfig } from "./Interfaces/Config/GlobalDeploymentConfig";
 import { SiteDeploymentConfig } from "./Interfaces/Config/SiteDeploymentConfig";
-import { DeploymentManager } from "./DeploymentManager";
 
-function processGlobalDeploymentConfig(globalDeploymentConfig: GlobalDeploymentConfig) {
+function processGlobalDeploymentConfig(globalDeploymentConfig: GlobalDeploymentConfig, loglevel: Logger.LogLevel) {
     if (globalDeploymentConfig.Sites && globalDeploymentConfig.Sites instanceof Array && globalDeploymentConfig.Sites.length > 0) {
         globalDeploymentConfig.Sites.forEach((siteCollection, index, array) => {
-            //todo: create child process
-            let siteDeploymentConfig: SiteDeploymentConfig = {
-                User: globalDeploymentConfig.User,
-                Site: siteCollection,
+            let forkOptions: childProcess.ForkOptions = { silent: false, execArgv: ["--debug-brk=5858"] };
+            //todo: define interface and use it in child process file
+            let forkArgs = {
+                siteDeploymentConfig: {
+                    User: globalDeploymentConfig.User,
+                    Site: siteCollection,
+                },
+                loglevel: loglevel,
             };
-            let deploymentManager = new DeploymentManager(siteDeploymentConfig);
-            deploymentManager.deploy();
+            let child = childProcess.fork(__dirname + path.sep + "DeploySiteConfigProcessModule.js", [JSON.stringify(forkArgs)], forkOptions);
+            child.on('disconnect', function (e) {
+                //todo: kill child process on end and kill all child process on parent child process kill
+                Logger.write('child disconnect ' + this.pid + ' killing...', Logger.LogLevel.Info);
+                this.kill();
+            });
         });
     } else {
         Logger.write("None sites defined in deployment config.", Logger.LogLevel.Info);
@@ -62,13 +71,13 @@ if (clArgs.deploymentConfigPath) {
             promptly.password("Password:", (error, password) => {
                 if (password) {
                     globalDeploymentConfig.User.password = password;
-                    processGlobalDeploymentConfig(globalDeploymentConfig);
+                    processGlobalDeploymentConfig(globalDeploymentConfig, Logger.activeLogLevel);
                 } else {
                     throw new Error(`Requesting user password failed. ${error}`);
                 }
             });
         } else {
-            processGlobalDeploymentConfig(globalDeploymentConfig);
+            processGlobalDeploymentConfig(globalDeploymentConfig, Logger.activeLogLevel);
         }
     }
 } else {
