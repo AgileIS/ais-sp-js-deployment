@@ -5,7 +5,7 @@ import * as http from "http";
 import * as https from "https";
 import * as url from "url";
 import * as vm from "vm";
-import { DeploymentConfig } from "./Interfaces/Config/DeploymentConfig";
+import { SiteDeploymentConfig } from "./Interfaces/Config/SiteDeploymentConfig";
 import { AuthenticationType } from "./Constants/AuthenticationType";
 import { Util } from "./Util/Util";
 
@@ -17,7 +17,7 @@ declare namespace NodeJS {
 }
 
 interface NodeJsomHandler {
-    initialize(config: DeploymentConfig): Promise<void>;
+    initialize(siteDeploymentConfig: SiteDeploymentConfig): Promise<void>;
 }
 
 interface NtlmOptions {
@@ -77,38 +77,31 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
         NodeJsomHandlerImpl.instance = this;
     }
 
-    public initialize(config: DeploymentConfig): Promise<void> {
+    public initialize(siteDeploymentConfig: SiteDeploymentConfig): Promise<void> {
         this._httpSavedRequest = http.request;
         http.request = NodeJsomHandlerImpl.httpRequest;
         this._httpsSavedRequest = https.request;
         https.request = NodeJsomHandlerImpl.httpsRequest;
 
         let promises = new Array<Promise<void>>();
-        NodeJsomHandlerImpl._authType = config.User.authtype;
+        NodeJsomHandlerImpl._authType = siteDeploymentConfig.User.authtype;
 
         if (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) {
             NodeJsomHandlerImpl._authOptions = {
-                domain: config.User.username.split("\\")[0],
-                password: config.User.password,
-                username: config.User.username.split("\\")[1],
-                workstation: config.User.workstation ? config.User.workstation : "",
+                domain: siteDeploymentConfig.User.username.split("\\")[0],
+                password: siteDeploymentConfig.User.password,
+                username: siteDeploymentConfig.User.username.split("\\")[1],
+                workstation: siteDeploymentConfig.User.workstation ? siteDeploymentConfig.User.workstation : "",
             };
-            config.Sites.forEach(site => {
-                promises.push(this.setupSiteContext(site.Url));
-            });
+            promises.push(this.setupSiteContext(siteDeploymentConfig.Site.Url));
         } else {
-            NodeJsomHandlerImpl._authOptions = `Basic ${new Buffer(`${config.User.username}:${config.User.password}`).toString("base64")}`;
+            NodeJsomHandlerImpl._authOptions = `Basic ${new Buffer(`${siteDeploymentConfig.User.username}:${siteDeploymentConfig.User.password}`).toString("base64")}`;
         }
 
-        return new Promise<void>((resolve, reject) => {
-            Promise.all(promises)
-                .then(() => {
-                    this.loadJsom(config.Sites[0].Url)
-                        .then(() => { resolve(); })
-                        .catch(error => { reject(error); });
-                })
-                .catch(error => { reject(error); });
-        });
+        return Promise.all(promises)
+            .then(() => {
+                return this.loadJsom(siteDeploymentConfig.Site.Url);
+            });
     }
 
     private setupSiteContext(siteUrl: string): Promise<void> {

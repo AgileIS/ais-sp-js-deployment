@@ -4,7 +4,7 @@ import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { Folder } from "@agileis/sp-pnp-js/lib/sharepoint/rest/folders";
 import { List } from "@agileis/sp-pnp-js/lib/sharepoint/rest/lists";
-import { DeploymentConfig } from "./Interfaces/Config/DeploymentConfig";
+import { SiteDeploymentConfig } from "./Interfaces/Config/SiteDeploymentConfig";
 import { ISPObjectHandler } from "./Interfaces/ObjectHandler/ISPObjectHandler";
 import { ISPObjectHandlerCollection } from "./Interfaces/ObjectHandler/ISPObjectHandlerCollection";
 import { IList } from "./Interfaces/Types/IList";
@@ -27,7 +27,7 @@ import { Util } from "./Util/Util";
 import * as url from "url";
 
 export class DeploymentManager {
-    private _deploymentConfig: DeploymentConfig;
+    private _siteDeploymentConfig: SiteDeploymentConfig;
     private _deployDependencies: Array<Promise<any>> = new Array();
     private _objectHandlers: ISPObjectHandlerCollection = {
         Features: new FeatureHandler(),
@@ -41,15 +41,15 @@ export class DeploymentManager {
         Files: new FileHandler(),
     };
 
-    constructor(deploymentConfig: DeploymentConfig) {
-        if (deploymentConfig.Sites && deploymentConfig.Sites.length === 1) {
-            this._deploymentConfig = <DeploymentConfig>JSON.parse(
-                Util.replaceUrlTokens(JSON.stringify(deploymentConfig), Util.getRelativeUrl(deploymentConfig.Sites[0].Url), `_layouts/${deploymentConfig.Sites[0].LayoutsHive}`));
+    constructor(siteDeploymentConfig: SiteDeploymentConfig) {
+        if (siteDeploymentConfig.Site && siteDeploymentConfig.Site.Url) {
+            this._siteDeploymentConfig = <SiteDeploymentConfig>JSON.parse(
+                Util.replaceUrlTokens(JSON.stringify(siteDeploymentConfig), Util.getRelativeUrl(siteDeploymentConfig.Site.Url), `_layouts/${siteDeploymentConfig.Site.LayoutsHive}`));
             this.setupProxy();
             this.setupPnPJs();
-            this._deployDependencies.push(NodeJsomHandler.initialize(deploymentConfig));
+            this._deployDependencies.push(NodeJsomHandler.initialize(siteDeploymentConfig));
         } else {
-            throw new Error("Deployment config site count is not equals 1");
+            throw new Error("Deployment config site or site url is undefined");
         }
     }
 
@@ -66,15 +66,15 @@ export class DeploymentManager {
     }
 
     private processDeploymentConfig(): Promise<any> {
-        let siteProcessingPromise = this._objectHandlers.Sites.execute(this._deploymentConfig.Sites[0], Promise.resolve());
+        let siteProcessingPromise = this._objectHandlers.Sites.execute(this._siteDeploymentConfig.Site, Promise.resolve());
 
         let nodeProcessingOrder: string[] = ["Features", "Fields", "ContentTypes", "Lists", "Navigation", "Files"];
-        let existingSiteNodes = Object.keys(this._deploymentConfig.Sites[0]);
+        let existingSiteNodes = Object.keys(this._siteDeploymentConfig.Site);
 
         return nodeProcessingOrder.reduce((dependentPromise, processingKey, proecssingIndex, array): Promise<any> => {
             return dependentPromise
                 .then(() => {
-                    let processingConfig = (<any>this._deploymentConfig.Sites[0])[processingKey];
+                    let processingConfig = (<any>this._siteDeploymentConfig.Site)[processingKey];
                     let processingHandler = this._objectHandlers[processingKey];
                     let processingPromise: Promise<any> = Promise.resolve();
 
@@ -180,14 +180,14 @@ export class DeploymentManager {
     }
 
     private setupProxy(): void {
-        if (this._deploymentConfig.User.proxyUrl) {
-            NodeHttpProxy.url = url.parse(this._deploymentConfig.User.proxyUrl);
+        if (this._siteDeploymentConfig.User.proxyUrl) {
+            NodeHttpProxy.url = url.parse(this._siteDeploymentConfig.User.proxyUrl);
             NodeHttpProxy.activate();
         }
     }
 
     private setupPnPJs(): void {
-        let userConfig = this._deploymentConfig.User;
+        let userConfig = this._siteDeploymentConfig.User;
         Logger.write("Setup pnp-core-js", Logger.LogLevel.Info);
         Logger.write(`pnp-core-js authentication type: ${userConfig.authtype}`, Logger.LogLevel.Info);
 
@@ -202,7 +202,7 @@ export class DeploymentManager {
                 nodeHttpNtlmClientOptions: {
                     domain: userAndDommain[0],
                     password: userConfig.password,
-                    siteUrl: this._deploymentConfig.Sites[0].Url,
+                    siteUrl: this._siteDeploymentConfig.Site.Url,
                     username: userAndDommain[1],
                     workstation: userConfig.workstation,
                 },
@@ -211,7 +211,7 @@ export class DeploymentManager {
             pnpConfig = {
                 nodeHttpBasicClientOptions: {
                     password: userConfig.password,
-                    siteUrl: this._deploymentConfig.Sites[0].Url,
+                    siteUrl: this._siteDeploymentConfig.Site.Url,
                     username: userConfig.username,
                 },
             };
