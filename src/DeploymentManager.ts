@@ -4,6 +4,7 @@ import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { DeploymentConfig } from "./Interfaces/Config/DeploymentConfig";
 import { ISPObjectHandler } from "./Interfaces/ObjectHandler/ISPObjectHandler";
+import { ISPObjectHandlerCollection } from "./Interfaces/ObjectHandler/ISPObjectHandlerCollection";
 import { IList } from "./Interfaces/Types/IList";
 import { IPromiseResult } from "./Interfaces/IPromiseResult";
 import { SiteHandler } from "./ObjectHandler/SiteHandler";
@@ -23,7 +24,8 @@ import * as url from "url";
 
 export class DeploymentManager {
     private _deploymentConfig: DeploymentConfig;
-    private _objectHandlers: { [id: string]: ISPObjectHandler } = {
+    private _deployDependencies: Array<Promise<any>> = new Array();
+    private _objectHandlers: ISPObjectHandlerCollection = {
         Features: new FeatureHandler(),
         Sites: new SiteHandler(),
         ContentTypes: new ContentTypeHandler(),
@@ -34,7 +36,6 @@ export class DeploymentManager {
         Navigation: new NavigationHandler(),
         Files: new FileHandler(),
     };
-    private _deployDependencies: Promise<void>;
 
     constructor(deploymentConfig: DeploymentConfig) {
         if (deploymentConfig.Sites && deploymentConfig.Sites.length === 1) {
@@ -42,7 +43,7 @@ export class DeploymentManager {
                 Util.replaceUrlTokens(JSON.stringify(deploymentConfig), Util.getRelativeUrl(deploymentConfig.Sites[0].Url), `_layouts/${deploymentConfig.Sites[0].LayoutsHive}`));
             this.setupProxy();
             this.setupPnPJs();
-            this._deployDependencies = NodeJsomHandler.initialize(deploymentConfig);
+            this._deployDependencies.push(NodeJsomHandler.initialize(deploymentConfig));
         } else {
             throw new Error("Deployment config site count is not equals 1");
         }
@@ -50,7 +51,7 @@ export class DeploymentManager {
 
     public deploy(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            this._deployDependencies
+            Promise.all(this._deployDependencies)
                 .then(() => {
                     this.processDeploymentConfig()
                         .then(() => {
@@ -83,63 +84,40 @@ export class DeploymentManager {
         return Promise.all(listsDeploymentConfig)
             .then(() => {
                 return listsDeploymentConfig.reduce((dependentPromise, listConfig, listIndex, listsArray) => {
+                    let listPromise = listPromiseDictionary[listConfig.InternalName];
+
                     return dependentPromise.then(() => {
                         let fieldsProcessingPromise = undefined;
                         if (listConfig.Fields && listConfig.Fields instanceof Array && listConfig.Fields.length > 0) {
-                            let fieldObjectHandlerKey = "Fields";
-                            let fieldObjectHandler = this._objectHandlers[fieldObjectHandlerKey];
-                            let listPromise = listPromiseDictionary[listConfig.InternalName];
-
-                            fieldsProcessingPromise = listConfig.Fields.reduce((previousPromise, fieldConfig, fieldIndex, fieldsArray) => {
-                                return previousPromise.then(() => {
-                                    return fieldObjectHandler.execute(fieldConfig, listPromise);
-                                });
-                            }, listPromise);
+                            fieldsProcessingPromise = this.processDeploymentConfigNodesSequential(this._objectHandlers.Fields, listConfig.Fields, listPromise);
                         } else {
                             fieldsProcessingPromise = Promise.resolve();
                         }
 
                         return fieldsProcessingPromise;
                     }).then(() => {
-                        let listPromise = listPromiseDictionary[listConfig.InternalName];
-                        let viewProcessingPromise: Promise<any>[] = new Array();
-
+                        let viewProcessingPromise: Promise<any> = undefined;
                         if (listConfig.Views && listConfig.Views instanceof Array && listConfig.Views.length > 0) {
-                            let viewObjectHandlerKey = "Views";
-                            let viewObjectHandler = this._objectHandlers[viewObjectHandlerKey];
-
-                            listConfig.Views.forEach((viewConfig, viewIndex, viewsArray) => {
-                                return viewProcessingPromise.push(viewObjectHandler.execute(viewConfig, listPromise));
-                            });
+                            viewProcessingPromise = this.processDeploymentConfigNodesParallel(this._objectHandlers.Views, listConfig.Views, listPromise);
                         } else {
-                            viewProcessingPromise.push(Promise.resolve());
+                            viewProcessingPromise = Promise.resolve();
                         }
 
-                        let itemsProcessingPromise: Promise<any>[] = new Array();
+                        let itemsProcessingPromise: Promise<any> = undefined;
                         if (listConfig.Items && listConfig.Items instanceof Array && listConfig.Items.length > 0) {
-                            let itemsObjectHandlerKey = "Items";
-                            let itemsObjectHandler = this._objectHandlers[itemsObjectHandlerKey];
-
-                            listConfig.Items.forEach((itemConfig, itemIndex, itemsArray) => {
-                                itemsProcessingPromise.push(itemsObjectHandler.execute(itemConfig, listPromise));
-                            });
+                            itemsProcessingPromise = this.processDeploymentConfigNodesParallel(this._objectHandlers.Items, listConfig.Items, listPromise);
                         } else {
-                            itemsProcessingPromise.push(Promise.resolve());
+                            itemsProcessingPromise = Promise.resolve();
                         }
 
-                        let filesProcessingPromise: Promise<any>[] = new Array();
+                        let filesProcessingPromise: Promise<any> = undefined;
                         if (listConfig.Files && listConfig.Files instanceof Array && listConfig.Files.length > 0) {
-                            let filesObjectHandlerKey = "Files";
-                            let filesObjectHandler = this._objectHandlers[filesObjectHandlerKey];
-
-                            listConfig.Files.forEach((filesConfig, filesIndex, filesArray) => {
-                                filesProcessingPromise.push(filesObjectHandler.execute(filesConfig, listPromise));
-                            });
+                            filesProcessingPromise = this.processDeploymentConfigNodesParallel(this._objectHandlers.Files, listConfig.Files, listPromise);
                         } else {
-                            filesProcessingPromise.push(Promise.resolve());
+                            filesProcessingPromise = Promise.resolve();
                         }
 
-                        return Promise.all(new Array().concat(viewProcessingPromise, itemsProcessingPromise, filesProcessingPromise));
+                        return Promise.all([viewProcessingPromise, itemsProcessingPromise, filesProcessingPromise]);
                     });
                 }, Promise.resolve());
             });
@@ -176,7 +154,7 @@ export class DeploymentManager {
                 return dependentPromise
                     .then(() => {
                         let processingConfig = (<any>this._deploymentConfig.Sites[0])[processingKey];
-                        let processingHandler = this._objectHandlers[processingKey]
+                        let processingHandler = this._objectHandlers[processingKey];
                         let prossingPromise: Promise<any> = undefined;
 
                         if ((existingSiteNodes.indexOf(processingKey) === -1)
