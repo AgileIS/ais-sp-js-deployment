@@ -99,30 +99,24 @@ export class DeploymentManager {
                             fieldsProcessingPromise = Promise.resolve();
                         }
 
-                        return fieldsProcessingPromise.then(() => {
-                            let listViewProcessingPromises: Promise<any>[] = new Array();
+                        return fieldsProcessingPromise;
+                    }).then(() => {
+                        let viewProcessingPromise: Promise<any>[] = new Array();
+                        if (listConfig.Views && listConfig.Views instanceof Array && listConfig.Views.length > 0) {
+                            let viewObjectHandlerKey = "Views";
+                            let viewObjectHandler = this._objectHandlers[viewObjectHandlerKey];
+                            let listPromise = listPromiseDictionary[listConfig.InternalName];
 
-                            listsDeploymentConfig.forEach((listConfig, listIndex, listsArray) => {
-                                let viewProcessingPromise: Promise<any>[] = new Array();
-                                if (listConfig.Views && listConfig.Views instanceof Array && listConfig.Views.length > 0) {
-                                    let viewObjectHandlerKey = "Views";
-                                    let viewObjectHandler = this._objectHandlers[viewObjectHandlerKey];
-                                    let listPromise = listPromiseDictionary[listConfig.InternalName];
+                            viewProcessingPromise.push(listConfig.Views.reduce((previousPromise, viewConfig, viewIndex, viewsArray) => {
+                                return previousPromise.then(() => {
+                                    return viewObjectHandler.execute(viewConfig, listPromise);
+                                });
+                            }, Promise.resolve()));
+                        } else {
+                            viewProcessingPromise.push(Promise.resolve());
+                        }
 
-                                    viewProcessingPromise.push(listConfig.Views.reduce((previousPromise, viewConfig, viewIndex, viewsArray) => {
-                                        return previousPromise.then(() => {
-                                            return viewObjectHandler.execute(viewConfig, listPromise);
-                                        });
-                                    }, Promise.resolve()));
-                                } else {
-                                    listViewProcessingPromises.push(Promise.resolve());
-                                }
-
-                                return Promise.all(viewProcessingPromise);
-                            });
-
-                            return Promise.all(listViewProcessingPromises);
-                        });
+                        return Promise.all(viewProcessingPromise);
                     });
                 }, Promise.resolve());
             });
