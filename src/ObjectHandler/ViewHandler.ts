@@ -51,13 +51,7 @@ export class ViewHandler implements ISPObjectHandler {
                                 processingPromise = this.deleteView(viewConfig, view);
                                 break;
                             default:
-                                this.addViewFields(viewConfig, view)
-                                    .then(() => {
-                                        Util.Resolve<View>(resolve, viewConfig.Title, `Added viewfields to view with the title '${viewConfig.Title}'.`, view);
-                                    })
-
-                                    .catch((error) => { Util.Reject<void>(reject, viewConfig.Title,
-                                         `Error while adding viewfields in the view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
+                                processingPromise = this.addViewFields(viewConfig, view);
                                 rejectOrResolved = true;
                                 break;
                         }
@@ -93,11 +87,11 @@ export class ViewHandler implements ISPObjectHandler {
             list.views.add(viewConfig.Title, viewConfig.PersonalView, properties)
                 .then((viewAddResult) => {
                     this.addViewFields(viewConfig, viewAddResult.view)
-                        .then(() => {
-                            Util.Resolve<View>(resolve, viewConfig.Title, `Added view: '${viewConfig.Title}' and added all Viewfields.`, viewAddResult.view);
-                        })
-                        .catch((error) => { Util.Reject<void>(reject, viewConfig.Title,
-                            `Error while adding Viewfields in the view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
+                        .then(() => { Util.Resolve<View>(resolve, viewConfig.Title, `Added view: '${viewConfig.Title}' and added all Viewfields.`, viewAddResult.view); })
+                        .catch((error) => {
+                            Util.Reject<void>(reject, viewConfig.Title,
+                                `Error while adding Viewfields in the view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error));
+                        });
                 })
                 .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while adding view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
         });
@@ -108,12 +102,15 @@ export class ViewHandler implements ISPObjectHandler {
             let properties = this.createProperties(viewConfig);
             view.update(properties)
                 .then((viewUpdateResult) => {
+                    let viewTitle = this.getTitleFromConfig(viewConfig);
                     this.addViewFields(viewConfig, viewUpdateResult.view)
                         .then(() => {
-                            Util.Resolve<View>(resolve, viewConfig.Title, `Updated view: '${viewConfig.Title}' and added all Viewfields.`, viewUpdateResult.view);
+                            Util.Resolve<View>(resolve, viewTitle, `Updated view: '${viewTitle}' and added all Viewfields.`, viewUpdateResult.view);
                         })
-                        .catch((error) => { Util.Reject<void>(reject, viewConfig.Title,
-                            `Error while adding Viewfields in the view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
+                        .catch((error) => {
+                            Util.Reject<void>(reject, viewTitle,
+                                `Error while adding Viewfields in the view with the title '${viewTitle}': ` + Util.getErrorMessage(error));
+                        });
                 })
                 .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while updating view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
         });
@@ -132,12 +129,13 @@ export class ViewHandler implements ISPObjectHandler {
             let spView = undefined;
             let viewUrl = view.toUrl();
             let listUrlParts = viewUrl.split("'");
+            let viewTitle = this.getTitleFromConfig(viewConfig);
             Logger.write(`Updating all viewfields from view with the title '${viewConfig.Title}' on the list '${listUrlParts[1]}'. `, Logger.LogLevel.Verbose);
             let context = SP.ClientContext.get_current();
             if (listUrlParts[1].match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
-                spView = context.get_web().get_lists().getById(listUrlParts[1]).get_views().getByTitle(viewConfig.Title);
+                spView = context.get_web().get_lists().getById(listUrlParts[1]).get_views().getByTitle(viewTitle);
             } else {
-                spView = context.get_web().get_lists().getByTitle(listUrlParts[1]).get_views().getByTitle(viewConfig.Title);
+                spView = context.get_web().get_lists().getByTitle(listUrlParts[1]).get_views().getByTitle(viewTitle);
             }
 
             let viewFieldCollection = spView.get_viewFields();
@@ -153,14 +151,22 @@ export class ViewHandler implements ISPObjectHandler {
             spView.update();
             context.executeQueryAsync(
                 (sender, args) => {
-                    resolve();
+                    Util.Resolve<void>(resolve, viewConfig.Title, `Added viewfields to view with the title '${viewConfig.Title}'.`);
                 },
                 (sender, args) => {
-                    reject(args.get_message());
+                    Util.Reject<void>(reject, viewConfig.Title,
+                        `Error while adding viewfields in the view with the title '${viewConfig.Title}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
                 });
         });
     }
 
+    private getTitleFromConfig(viewConfig: IView): string {
+        let viewTitle = viewConfig.Title;
+        if (viewConfig.NewTitle && viewConfig.NewTitle !== viewConfig.Title && viewConfig.NewTitle.length > 0) {
+            viewTitle = viewConfig.NewTitle;
+        }
+        return viewTitle;
+    }
 
     private createProperties(viewConfig: IView) {
         let stringifiedObject: string;
@@ -171,10 +177,13 @@ export class ViewHandler implements ISPObjectHandler {
                 delete parsedObject.ControlOption;
                 delete parsedObject.PersonalView;
                 delete parsedObject.ViewFields;
+                delete parsedObject.NewTitle;
+                parsedObject.Title = this.getTitleFromConfig(viewConfig);
                 break;
             default:
                 delete parsedObject.ControlOption;
                 delete parsedObject.Title;
+                delete parsedObject.NewTitle;
                 delete parsedObject.PersonalView;
                 delete parsedObject.ViewFields;
                 break;
