@@ -599,7 +599,7 @@
                             "Title": "All Items",
                             "NewTitle": "Alle Insider",
                             "PersonalView": false,
-                            "ControlOption": "",
+                            "ControlOption": "Update",
                             "ViewFields": [
                                 {
                                     "InternalName": "Edit"
@@ -870,7 +870,7 @@
                             "Title": "All Items",
                             "NewTitle": "Alle Projekte",
                             "PersonalView": false,
-                            "ControlOption": "",
+                            "ControlOption": "Update",
                             "ViewFields": [
                                 {
                                     "InternalName": "Edit"
@@ -1133,7 +1133,7 @@
                             "Title": "All Items",
                             "NewTitle": "Alle Zuordungen",
                             "PersonalView": false,
-                            "ControlOption": "",
+                            "ControlOption": "Update",
                             "ViewFields": [
                                 {
                                     "InternalName": "Edit"
