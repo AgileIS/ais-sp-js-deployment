@@ -101,22 +101,45 @@ export class DeploymentManager {
 
                         return fieldsProcessingPromise;
                     }).then(() => {
+                        let listPromise = listPromiseDictionary[listConfig.InternalName];
                         let viewProcessingPromise: Promise<any>[] = new Array();
+
                         if (listConfig.Views && listConfig.Views instanceof Array && listConfig.Views.length > 0) {
                             let viewObjectHandlerKey = "Views";
                             let viewObjectHandler = this._objectHandlers[viewObjectHandlerKey];
-                            let listPromise = listPromiseDictionary[listConfig.InternalName];
 
-                            viewProcessingPromise.push(listConfig.Views.reduce((previousPromise, viewConfig, viewIndex, viewsArray) => {
-                                return previousPromise.then(() => {
-                                    return viewObjectHandler.execute(viewConfig, listPromise);
-                                });
-                            }, Promise.resolve()));
+                            listConfig.Views.forEach((viewConfig, viewIndex, viewsArray) => {
+                                return viewProcessingPromise.push(viewObjectHandler.execute(viewConfig, listPromise));
+                            });
                         } else {
                             viewProcessingPromise.push(Promise.resolve());
                         }
 
-                        return Promise.all(viewProcessingPromise);
+                        let itemsProcessingPromise: Promise<any>[] = new Array();
+                        if (listConfig.Items && listConfig.Items instanceof Array && listConfig.Items.length > 0) {
+                            let itemsObjectHandlerKey = "Items";
+                            let itemsObjectHandler = this._objectHandlers[itemsObjectHandlerKey];
+
+                            listConfig.Items.forEach((itemConfig, itemIndex, itemsArray) => {
+                                itemsProcessingPromise.push(itemsObjectHandler.execute(itemConfig, listPromise));
+                            });
+                        } else {
+                            itemsProcessingPromise.push(Promise.resolve());
+                        }
+
+                        let filesProcessingPromise: Promise<any>[] = new Array();
+                        if (listConfig.Files && listConfig.Files instanceof Array && listConfig.Files.length > 0) {
+                            let filesObjectHandlerKey = "Files";
+                            let filesObjectHandler = this._objectHandlers[filesObjectHandlerKey];
+
+                            listConfig.Files.forEach((filesConfig, filesIndex, filesArray) => {
+                                filesProcessingPromise.push(filesObjectHandler.execute(filesConfig, listPromise));
+                            });
+                        } else {
+                            filesProcessingPromise.push(Promise.resolve());
+                        }
+
+                        return Promise.all(new Array().concat(viewProcessingPromise, itemsProcessingPromise, filesProcessingPromise));
                     });
                 }, Promise.resolve());
             });
