@@ -268,6 +268,13 @@
                     "ControlOption": ""
                 },
                 {
+                    "Title": "dienstlische Mobilfunknummer",
+                    "InternalName": "re_mobileBusiness",
+                    "FieldType": "Text",
+                    "Group": "HannRe Insiderverzeichnis Columns",
+                    "ControlOption": ""
+                },
+                {
                     "Title": "Fax",
                     "InternalName": "re_ivz_fax",
                     "FieldType": "Text",
@@ -320,11 +327,10 @@
                     "ControlOption": ""
                 },
                 {
-                    "Title": "Datum (der Erlangung des Zugangs zur Insiderinformation)",
+                    "Title": "Datum",
                     "InternalName": "re_ivz_accessDate",
-                    "Description": "Alternativ: (Datum der Erlangung des Zugangs zur Insiderinformation)",
+                    "Description": "Datum der Erlangung des Zugangs zur Insiderinformation",
                     "FieldType": "DateTime",
-                    "DisplayFormat": "DateOnly",
                     "Group": "HannRe Insiderverzeichnis Columns",
                     "Required": true,
                     "ControlOption": ""
@@ -379,9 +385,6 @@
                             "InternalName": "Title"
                         },
                         {
-                            "InternalName": "re_ivz_creationDate"
-                        },
-                        {
                             "InternalName": "re_ivz_toInsiderDate"
                         },
                         {
@@ -424,6 +427,12 @@
                             "InternalName": "re_ivz_birthname"
                         },
                         {
+                            "InternalName": "re_ivz_phoneBusiness"
+                        },
+                        {
+                            "InternalName": "re_mobileBusiness"
+                        },
+                        {
                             "InternalName": "re_ivz_company",
                             "Required": true
                         },
@@ -463,9 +472,6 @@
                         },
                         {
                             "InternalName": "re_ivz_staffNumber"
-                        },
-                        {
-                            "InternalName": "re_ivz_phoneBusiness"
                         },
                         {
                             "InternalName": "re_ivz_fax"
@@ -588,6 +594,7 @@
                     "Views": [
                         {
                             "Title": "All Items",
+                            "NewTitle": "Alle Insider",
                             "PersonalView": false,
                             "ControlOption": "",
                             "ViewFields": [
@@ -858,6 +865,7 @@
                     "Views": [
                         {
                             "Title": "All Items",
+                            "NewTitle": "Alle Projekte",
                             "PersonalView": false,
                             "ControlOption": "",
                             "ViewFields": [
@@ -952,6 +960,10 @@
                             "JSLink": "~sitecollection/_catalogs/masterpage/HannRe.Insiderverzeichnis/Scripts/reInsiderverzeichnisLookupSelect2Bundle.js",
                             "ControlOption": "",
                             "DependendFields": [
+                                {
+                                    "Title": "ID",
+                                    "InternalName": "ID"
+                                },
                                 {
                                     "Title": "Name",
                                     "InternalName": "re_ivz_name"
@@ -1091,6 +1103,10 @@
                             "ControlOption": "",
                             "DependendFields": [
                                 {
+                                    "Title": "ID",
+                                    "InternalName": "ID"
+                                },
+                                {
                                     "Title": "Entstehungsdatum",
                                     "InternalName": "re_ivz_creationDate"
                                 },
@@ -1107,16 +1123,12 @@
                                     "InternalName": "Modified"
                                 }
                             ]
-                        },
-                        {
-                            "InternalName": "Modified",
-                            "Title": "Letzte Änderung am",
-                            "ControlOption": ""
                         }
                     ],
                     "Views": [
                         {
                             "Title": "All Items",
+                            "NewTitle":"Alle Zuordungen",
                             "PersonalView": false,
                             "ControlOption": "",
                             "ViewFields": [
