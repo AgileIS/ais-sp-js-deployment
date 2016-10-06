@@ -385,6 +385,9 @@
                             "InternalName": "Title"
                         },
                         {
+                            "InternalName": "re_ivz_creationDate"
+                        },
+                        {
                             "InternalName": "re_ivz_toInsiderDate"
                         },
                         {
@@ -587,7 +590,7 @@
                             "Title": "Vollständiger Name",
                             "FieldType": "Calculated",
                             "Formula": "=CONCATENATE([Vorname], \" \",[Name]",
-                            "OutputType": "Type",
+                            "OutputType": "Text",
                             "ControlOption": ""
                         }
                     ],
@@ -642,7 +645,7 @@
                         {
                             "Title": "Aktive Insider",
                             "PersonalView": false,
-                            "ViewQuery": "\"<Where><Eq><FieldRef Name='re_ivz_archived'<Value Type='Boolean'>0</Value></Eq></Where>\"",
+                            "ViewQuery": "<Where><Eq><FieldRef Name='re_ivz_archived' /><Value Type='Boolean'>0</Value></Eq></Where>",
                             "ControlOption": "",
                             "ViewFields": [
                                 {
@@ -1128,7 +1131,7 @@
                     "Views": [
                         {
                             "Title": "All Items",
-                            "NewTitle":"Alle Zuordungen",
+                            "NewTitle": "Alle Zuordungen",
                             "PersonalView": false,
                             "ControlOption": "",
                             "ViewFields": [
