@@ -7,6 +7,7 @@ let siteDeploymentConfig = forkConfig.siteDeploymentConfig;
 let logLevel = forkConfig.logLevel;
 
 Logger.subscribe(new MyConsoleLogger());
+//string to int
 Logger.activeLogLevel = Logger.LogLevel.Verbose;
 
 let deploymentManager = new DeploymentManager(siteDeploymentConfig);
