@@ -176,7 +176,7 @@ export class DeploymentManager {
                 return dependentPromise
                     .then(() => {
                         let processingConfig = (<any>this._deploymentConfig.Sites[0])[processingKey];
-                        let processingHandler = this._objectHandlers[processingKey]
+                        let processingHandler = this._objectHandlers[processingKey];
                         let prossingPromise: Promise<any> = undefined;
 
                         if ((existingSiteNodes.indexOf(processingKey) === -1)
