@@ -8,26 +8,38 @@ import * as path from "path";
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { MyConsoleLogger } from "./Logger/MyConsoleLogger";
 import { GlobalDeploymentConfig } from "./Interfaces/Config/GlobalDeploymentConfig";
-import { SiteDeploymentConfig } from "./Interfaces/Config/SiteDeploymentConfig";
+import { ForkProcessArguments } from "./Interfaces/Config/ForkProcessArguments";
+
+let processCount = 0;
+function onChildProcessExit(code: number, signal: string): void {
+    Logger.write("child ends " + this.pid, Logger.LogLevel.Info);
+    processCount--;
+    if (processCount === 0) {
+        this.kill();
+    }
+}
+
+function onChildProcessDisconnect(): void {
+    Logger.write("child disconnect " + this.pid + " killing...", Logger.LogLevel.Info);
+}
 
 function processGlobalDeploymentConfig(globalDeploymentConfig: GlobalDeploymentConfig, loglevel: Logger.LogLevel) {
     if (globalDeploymentConfig.Sites && globalDeploymentConfig.Sites instanceof Array && globalDeploymentConfig.Sites.length > 0) {
         globalDeploymentConfig.Sites.forEach((siteCollection, index, array) => {
-            let forkOptions: childProcess.ForkOptions = { silent: false, execArgv: ["--debug-brk=5858"] };
-            //todo: define interface and use it in child process file
-            let forkArgs = {
+            //let forkOptions: childProcess.ForkOptions = { silent: false, execArgv: ["--debug-brk=58589"] }; //for debugging
+            let forkOptions: childProcess.ForkOptions = { silent: false };
+            let forkArgs: ForkProcessArguments = {
                 siteDeploymentConfig: {
                     User: globalDeploymentConfig.User,
                     Site: siteCollection,
                 },
-                loglevel: loglevel,
+                logLevel: loglevel,
             };
+            // todo: kill child process on end and kill all child process on parent child process kill
             let child = childProcess.fork(__dirname + path.sep + "DeploySiteConfigProcessModule.js", [JSON.stringify(forkArgs)], forkOptions);
-            child.on('disconnect', function (e) {
-                //todo: kill child process on end and kill all child process on parent child process kill
-                Logger.write('child disconnect ' + this.pid + ' killing...', Logger.LogLevel.Info);
-                this.kill();
-            });
+            child.on("disconnect", onChildProcessDisconnect);
+            child.on("exit", onChildProcessExit);
+            processCount++;
         });
     } else {
         Logger.write("None sites defined in deployment config.", Logger.LogLevel.Info);
