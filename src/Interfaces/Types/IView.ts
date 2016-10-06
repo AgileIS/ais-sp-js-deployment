@@ -3,6 +3,7 @@ import { IViewField } from "../Types/IViewField";
 export interface IView {
     Title: string;
     NewTitle: string;
+    InternalName: string;
     Paged: boolean;
     PersonalView: boolean;
     ViewQuery: string;

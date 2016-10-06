@@ -596,8 +596,8 @@
                     ],
                     "Views": [
                         {
-                            "Title": "All Items",
-                            "NewTitle": "Alle Insider",
+                            "Title": "Alle Insider",
+                            "InternalName": "AllItems.aspx",
                             "PersonalView": false,
                             "ControlOption": "Update",
                             "ViewFields": [
@@ -644,6 +644,7 @@
                         },
                         {
                             "Title": "Aktive Insider",
+                            "InternalName": "Aktive%20Insider.aspx",
                             "PersonalView": false,
                             "ViewQuery": "<Where><Eq><FieldRef Name='re_ivz_archived' /><Value Type='Boolean'>0</Value></Eq></Where>",
                             "ControlOption": "",
@@ -724,6 +725,7 @@
                         },
                         {
                             "Title": "InsiderToExcel",
+                            "InternalName": "InsiderToExcel.aspx",
                             "PersonalView": false,
                             "Hidden": true,
                             "ControlOption": "",
@@ -867,8 +869,8 @@
                     ],
                     "Views": [
                         {
-                            "Title": "All Items",
-                            "NewTitle": "Alle Projekte",
+                            "Title": "Alle Projekte",
+                            "InternalName": "AllItems.aspx",
                             "PersonalView": false,
                             "ControlOption": "Update",
                             "ViewFields": [
@@ -903,6 +905,7 @@
                         },
                         {
                             "Title": "ProjekteToExcel",
+                            "InternalName": "ProjekteToExcel.aspx",
                             "PersonalView": false,
                             "ViewQuery": "<Where><Neq><FieldRef Name='re_ivz_archived' /><Value Type='Boolean'>1</Value></Neq></Where>",
                             "Hidden": true,
@@ -1130,8 +1133,8 @@
                     ],
                     "Views": [
                         {
-                            "Title": "All Items",
-                            "NewTitle": "Alle Zuordungen",
+                            "Title": "Alle Zuordungen",
+                            "InternalName": "AllItems.aspx",
                             "PersonalView": false,
                             "ControlOption": "Update",
                             "ViewFields": [
@@ -1316,6 +1319,7 @@
                         },
                         {
                             "Title": "ZuordnungToExcel",
+                            "InternalName": "ZuordnungToExcel.aspx",
                             "PersonalView": false,
                             "Hidden": true,
                             "ControlOption": "",

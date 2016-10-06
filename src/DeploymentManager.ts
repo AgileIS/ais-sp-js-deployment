@@ -164,7 +164,6 @@ export class DeploymentManager {
 
     private processDeploymentConfigNodesSequential(processingHandler: ISPObjectHandler, deploymentConfigNodes: Array<any>, dependentPromise: Promise<any>): Promise<any> {
         let processingPromise: Promise<any> = Promise.resolve();
-
         if (processingHandler && deploymentConfigNodes && deploymentConfigNodes instanceof Array && deploymentConfigNodes.length > 0) {
             processingPromise = deploymentConfigNodes.reduce((previousPromise, processingConfig, proecssingIndex, array) => {
                 return previousPromise.then(() => {
