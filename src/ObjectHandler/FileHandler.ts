@@ -48,7 +48,8 @@ export class FileHandler implements ISPObjectHandler {
 
                     })
                     .catch(error => {
-                        Util.Reject<void>(reject, fileFolderConfig.Name, `Error while requesting parent ('${parentResult.value.toUrl()}') for element: '${fileFolderConfig.Name}': ` + error);
+                        Util.Reject<void>(reject, fileFolderConfig.Name, 
+                            `Error while requesting parent ('${parentResult.value.toUrl()}') for element: '${fileFolderConfig.Name}': ` + Util.getErrorMessage(error));
                     });
             });
         });
@@ -89,7 +90,8 @@ export class FileHandler implements ISPObjectHandler {
                                 break;
                         }
                     } else {
-                        Util.Reject<void>(reject, folderConfig.Name, `Error while requesting folder with the title '${folderConfig.Name}' from parent '${folder.parentFolder}': ` + error);
+                        Util.Reject<void>(reject, folderConfig.Name, 
+                            `Error while requesting folder with the title '${folderConfig.Name}' from parent '${folder.parentFolder}': ` + Util.getErrorMessage(error));
                     }
                 });
         });
@@ -141,7 +143,8 @@ export class FileHandler implements ISPObjectHandler {
                                 break;
                         }
                     } else {
-                        Util.Reject<void>(reject, fileConfig.Name, `Error while requesting file with the title '${fileConfig.Name}' from parent '${parentFolder.toUrl()}': ` + error);
+                        Util.Reject<void>(reject, fileConfig.Name, 
+                            `Error while requesting file with the title '${fileConfig.Name}' from parent '${parentFolder.toUrl()}': ` + Util.getErrorMessage(error));
                     }
                 });
         });
@@ -151,7 +154,7 @@ export class FileHandler implements ISPObjectHandler {
         return new Promise<IPromiseResult<Folder>>((resolve, reject) => {
             parentFolder.add(folderConfig.Name)
                 .then((folderAddResult) => { Util.Resolve<Folder>(resolve, folderConfig.Name, `Added item: '${folderConfig.Name}'`, folderAddResult.folder); })
-                .catch((error) => { Util.Reject<void>(reject, folderConfig.Name, `Error while adding folder with name '${folderConfig.Name}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, folderConfig.Name, `Error while adding folder with name '${folderConfig.Name}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -159,7 +162,7 @@ export class FileHandler implements ISPObjectHandler {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             folder.delete()
                 .then(() => { Util.Resolve<void>(resolve, folderConfig.Name, `Deleted folder: '${folderConfig.Name}'`); })
-                .catch((error) => { Util.Reject<void>(reject, `Error while deleting folder with name '${folderConfig.Name}': ` + error, folderConfig.Name); });
+                .catch((error) => { Util.Reject<void>(reject, `Error while deleting folder with name '${folderConfig.Name}': ` + Util.getErrorMessage(error), folderConfig.Name); });
         });
     }
 
@@ -179,16 +182,16 @@ export class FileHandler implements ISPObjectHandler {
                                         Util.Resolve<File>(resolve, fileConfig.Name, `Added file: '${fileConfig.Name}'`, fileAddResult.file);
                                     })
                                     .catch((error) => {
-                                        Util.Reject<void>(reject, fileConfig.Name, `Error while updating file item fields with name '${fileConfig.Name}': ` + error);
+                                        Util.Reject<void>(reject, fileConfig.Name, `Error while updating file item fields with name '${fileConfig.Name}': ` + Util.getErrorMessage(error));
                                     });
                             } else {
                                 Util.Resolve<File>(resolve, fileConfig.Name, `Added file: '${fileConfig.Name}'`, fileAddResult.file);
                             }
 
                         })
-                        .catch((error) => { Util.Reject<void>(reject, fileConfig.Name, `Error while adding file with name '${fileConfig.Name}': ` + error); });
+                        .catch((error) => { Util.Reject<void>(reject, fileConfig.Name, `Error while adding file with name '${fileConfig.Name}': ` + Util.getErrorMessage(error)); });
                 })
-                .catch((error) => { Util.Reject<void>(reject, fileConfig.Name, `Error while proccesing preTask for file with name '${fileConfig.Name}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, fileConfig.Name, `Error while proccesing preTask for file with name '${fileConfig.Name}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -196,7 +199,7 @@ export class FileHandler implements ISPObjectHandler {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             file.delete()
                 .then(() => { Util.Resolve<void>(resolve, fileConfig.Name, `Deleted file: '${fileConfig.Name}'`); })
-                .catch((error) => { Util.Reject(reject, fileConfig.Name, `Error while deleting file with name '${fileConfig.Name}': ` + error); });
+                .catch((error) => { Util.Reject(reject, fileConfig.Name, `Error while deleting file with name '${fileConfig.Name}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -209,7 +212,7 @@ export class FileHandler implements ISPObjectHandler {
                     Util.Resolve<Item>(resolve, fileConfig.Name, `Updated item: '${fileConfig.Name}'`, itemUpdateResult.item);
                 })
                 .catch((error) => {
-                    Util.Reject<void>(reject, fileConfig.Name, `Error while updating item with title '${fileConfig.Name}': ` + error);
+                    Util.Reject<void>(reject, fileConfig.Name, `Error while updating item with title '${fileConfig.Name}': ` + Util.getErrorMessage(error));
                 });
         });
     }

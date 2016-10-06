@@ -13,7 +13,7 @@ export class SiteHandler implements ISPObjectHandler {
                     .then((result) => {
                         Util.Resolve<Web>(resolve, siteConfig.Url, `Web '${siteConfig.Url}' already exists.`, PnP.sp.web);
                     })
-                    .catch((error) => { Util.Reject<void>(reject, siteConfig.Url, `Error while requesting web with the url '${siteConfig.Url}': ` + error); });
+                    .catch((error) => { Util.Reject<void>(reject, siteConfig.Url, `Error while requesting web with the url '${siteConfig.Url}': ` + Util.getErrorMessage(error)); });
             } else {
                 Util.Reject<void>(reject, "Unknown site", `Error while processing site: site url is undefined.`);
             }

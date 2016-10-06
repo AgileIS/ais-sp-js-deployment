@@ -55,7 +55,9 @@ export class ViewHandler implements ISPObjectHandler {
                                     .then(() => {
                                         Util.Resolve<View>(resolve, viewConfig.Title, `Added viewfields to view with the title '${viewConfig.Title}'.`, view);
                                     })
-                                    .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while adding viewfields in the view with the title '${viewConfig.Title}': ` + error); });
+
+                                    .catch((error) => { Util.Reject<void>(reject, viewConfig.Title,
+                                         `Error while adding viewfields in the view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
                                 rejectOrResolved = true;
                                 break;
                         }
@@ -81,7 +83,7 @@ export class ViewHandler implements ISPObjectHandler {
                         Logger.write("View handler processing promise is undefined!", Logger.LogLevel.Error);
                     }
                 })
-                .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while requesting view with the title '${viewConfig.Title}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while requesting view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -94,9 +96,10 @@ export class ViewHandler implements ISPObjectHandler {
                         .then(() => {
                             Util.Resolve<View>(resolve, viewConfig.Title, `Added view: '${viewConfig.Title}' and added all Viewfields.`, viewAddResult.view);
                         })
-                        .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while adding Viewfields in the view with the title '${viewConfig.Title}': ` + error); });
+                        .catch((error) => { Util.Reject<void>(reject, viewConfig.Title,
+                            `Error while adding Viewfields in the view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
                 })
-                .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while adding view with the title '${viewConfig.Title}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while adding view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -109,9 +112,10 @@ export class ViewHandler implements ISPObjectHandler {
                         .then(() => {
                             Util.Resolve<View>(resolve, viewConfig.Title, `Updated view: '${viewConfig.Title}' and added all Viewfields.`, viewUpdateResult.view);
                         })
-                        .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while adding Viewfields in the view with the title '${viewConfig.Title}': ` + error); });
+                        .catch((error) => { Util.Reject<void>(reject, viewConfig.Title,
+                            `Error while adding Viewfields in the view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
                 })
-                .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while updating view with the title '${viewConfig.Title}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while updating view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -119,7 +123,7 @@ export class ViewHandler implements ISPObjectHandler {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             view.delete()
                 .then(() => { Util.Resolve<void>(resolve, viewConfig.Title, `Deleted view: '${viewConfig.Title}'.`); })
-                .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while deleting view with the title '${viewConfig.Title}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while deleting view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
         });
     }
 

@@ -58,7 +58,7 @@ export class DeploymentManager {
                             resolve();
                         })
                         .catch((error) => {
-                            Logger.write("Error occured while processing site collections - " + error, Logger.LogLevel.Info);
+                            Logger.write("Error occured while processing site collections - " + Util.getErrorMessage(error), Logger.LogLevel.Info);
                             reject(error);
                         });
                 })

@@ -77,7 +77,7 @@ export class ItemHandler implements ISPObjectHandler {
                         Logger.write("List handler processing promise is undefined!", Logger.LogLevel.Error);
                     }
                 })
-                .catch((error) => { Util.Reject<void>(reject, itemConfig.Title, `Error while requesting item with the title '${itemConfig.Title}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, itemConfig.Title, `Error while requesting item with the title '${itemConfig.Title}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -86,7 +86,7 @@ export class ItemHandler implements ISPObjectHandler {
             let properties = this.createProperties(itemConfig);
             parentList.items.add(properties)
                 .then((itemAddResult) => { Util.Resolve<Item>(resolve, itemConfig.Title, `Added item: '${itemConfig.Title}'.`, itemAddResult.item); })
-                .catch((error) => { Util.Reject<void>(reject, itemConfig.Title, `Error while adding item with title '${itemConfig.Title}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, itemConfig.Title, `Error while adding item with title '${itemConfig.Title}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -95,7 +95,7 @@ export class ItemHandler implements ISPObjectHandler {
             let properties = this.createProperties(itemConfig);
             item.update(properties)
                 .then((itemUpdateResult) => { Util.Resolve<Item>(resolve, itemConfig.Title, `Updated item: '${itemConfig.Title}'.`, itemUpdateResult.item); })
-                .catch((error) => { Util.Reject<void>(reject, itemConfig.Title, `Error while updating item with title '${itemConfig.Title}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, itemConfig.Title, `Error while updating item with title '${itemConfig.Title}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -103,7 +103,7 @@ export class ItemHandler implements ISPObjectHandler {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             item.delete()
                 .then(() => { Util.Resolve<void>(resolve, itemConfig.Title, `Deleted item: '${itemConfig.Title}'.`); })
-                .catch((error) => { Util.Reject<void>(reject, itemConfig.Title, `Error while deleting item with title '${itemConfig.Title}': ` + error); });
+                .catch((error) => { Util.Reject<void>(reject, itemConfig.Title, `Error while deleting item with title '${itemConfig.Title}': ` + Util.getErrorMessage(error)); });
         });
     }
 
