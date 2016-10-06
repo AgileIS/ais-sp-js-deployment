@@ -35,12 +35,14 @@ export class ViewHandler implements ISPObjectHandler {
                 ? "Add" : viewConfig.ControlOption;
             Logger.write(`Processing '${processingText}' view: '${viewConfig.Title}.`, Logger.LogLevel.Info);
 
-            list.views.filter(`Title eq '${viewConfig.Title}'`).select("Id").get()
+            list.views.filter(`substringof('${viewConfig.InternalName}',ServerRelativeUrl) eq true`).select("Id", "Title").get()
                 .then((viewRequestResults) => {
                     let rejectOrResolved = false;
                     let processingPromise: Promise<IPromiseResult<void | View>> = undefined;
 
                     if (viewRequestResults && viewRequestResults.length === 1) {
+                        viewConfig.NewTitle = viewConfig.Title;
+                        viewConfig.Title = viewRequestResults[0].Title;
                         Logger.write(`Found view with title: '${viewConfig.Title}'`);
                         let view = list.views.getByTitle(viewConfig.Title);
                         switch (viewConfig.ControlOption) {
@@ -177,6 +179,7 @@ export class ViewHandler implements ISPObjectHandler {
                 delete parsedObject.ControlOption;
                 delete parsedObject.PersonalView;
                 delete parsedObject.ViewFields;
+                delete parsedObject.InternalName;
                 delete parsedObject.NewTitle;
                 parsedObject.Title = this.getTitleFromConfig(viewConfig);
                 break;
@@ -184,6 +187,7 @@ export class ViewHandler implements ISPObjectHandler {
                 delete parsedObject.ControlOption;
                 delete parsedObject.Title;
                 delete parsedObject.NewTitle;
+                delete parsedObject.InternalName;
                 delete parsedObject.PersonalView;
                 delete parsedObject.ViewFields;
                 break;
