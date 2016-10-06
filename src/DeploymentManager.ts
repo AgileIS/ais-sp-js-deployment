@@ -132,9 +132,10 @@ export class DeploymentManager {
             filesDeploymentConfig.forEach((fileConfig, fileIndex, array) => {
                 let fileProcessingPromise = filesHandler.execute(fileConfig, dependentPromise);
                 if (Object.keys(fileConfig).indexOf("Files") > -1) {
-                    fileProcessingPromise.then(() => {
+                    let subFileProcessingPromise = fileProcessingPromise.then(() => {
                         return this.processFilesDeploymentConfig(filesHandler, (<IFolder>fileConfig).Files, fileProcessingPromise);
                     });
+                    processingPromisses.push(subFileProcessingPromise);
                 }
                 processingPromisses.push(fileProcessingPromise);
             });
