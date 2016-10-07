@@ -16,7 +16,7 @@ export class FeatureHandler implements ISPObjectHandler {
                     if (featureConfig.Id) {
                         let context = SP.ClientContext.get_current();
                         this.processingFeatureConfig(featureConfig, context)
-                            .then((featureProsssingResult) => { resolve(featureProsssingResult); })
+                            .then((featureProcessingResult) => { resolve(featureProcessingResult); })
                             .catch((error) => {
                                 Util.Retry(error, featureConfig.Id,
                                     () => {
