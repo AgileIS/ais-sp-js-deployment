@@ -14,16 +14,19 @@ let processCount = 0;
 function onChildProcessExit(code: number, signal: string): void {
     Logger.write("child ends " + this.pid, Logger.LogLevel.Info);
     processCount--;
+    if (processCount === 0) {
+        Logger.write("all site collections processed", Logger.LogLevel.Info);
+    }
 }
 
 function onChildProcessDisconnect(): void {
-    Logger.write("child disconnect " + this.pid + " killing...", Logger.LogLevel.Info);
+    Logger.write("child disconnect " + this.pid, Logger.LogLevel.Info);
 }
 
 function processGlobalDeploymentConfig(globalDeploymentConfig: GlobalDeploymentConfig, loglevel: Logger.LogLevel) {
     if (globalDeploymentConfig.Sites && globalDeploymentConfig.Sites instanceof Array && globalDeploymentConfig.Sites.length > 0) {
         globalDeploymentConfig.Sites.forEach((siteCollection, index, array) => {
-            // let forkOptions: childProcess.ForkOptions = { silent: false, execArgv: ["--debug-brk=58589"] }; //for debugging
+            // let forkOptions: childProcess.ForkOptions = { silent: false, execArgv: [`--debug-brk=5858${index}`] }; //for debugging
             let forkOptions: childProcess.ForkOptions = { silent: false };
             let forkArgs: ForkProcessArguments = {
                 siteDeploymentConfig: {
@@ -32,7 +35,6 @@ function processGlobalDeploymentConfig(globalDeploymentConfig: GlobalDeploymentC
                 },
                 logLevel: loglevel,
             };
-            // todo: kill child process on end and kill all child process on parent child process kill
             let child = childProcess.fork(__dirname + path.sep + "DeploySiteConfigProcessModule.js", [JSON.stringify(forkArgs)], forkOptions);
             child.on("disconnect", onChildProcessDisconnect);
             child.on("exit", onChildProcessExit);
