@@ -26,7 +26,7 @@ function onChildProcessDisconnect(): void {
 function processGlobalDeploymentConfig(globalDeploymentConfig: GlobalDeploymentConfig, loglevel: Logger.LogLevel) {
     if (globalDeploymentConfig.Sites && globalDeploymentConfig.Sites instanceof Array && globalDeploymentConfig.Sites.length > 0) {
         globalDeploymentConfig.Sites.forEach((siteCollection, index, array) => {
-            // let forkOptions: childProcess.ForkOptions = { silent: false, execArgv: [`--debug-brk=5858${index}`] }; //for debugging
+            // let forkOptions: childProcess.ForkOptions = { silent: false, execArgv: [`--debug-brk=5858${index}`] }; // for debugging
             let forkOptions: childProcess.ForkOptions = { silent: false };
             let forkArgs: ForkProcessArguments = {
                 siteDeploymentConfig: {

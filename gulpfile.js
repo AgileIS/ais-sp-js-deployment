@@ -16,7 +16,7 @@ const configPrefix = 'config_';
 /*
  * value: string => merge by field
  * value: string Array => merge by each field, op: operator ["&&", "||"
- * value: tuple Array => cross merge (item[tuple[0]] === searchItem[tuple[1]]), op: operator ["&&", "||"]
+ * value: tuple Array => cross merge (item[tuple[0]] === searchItem[tuple[1]] + vise versa), op: operator ["&&", "||"]
  */
 let _parent = "";
 const assignments = {
