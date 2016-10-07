@@ -206,6 +206,7 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
             "_layouts/15/sp.core.debug.js",
             "_layouts/15/sp.runtime.debug.js",
             "_layouts/15/sp.debug.js",
+            "_layouts/15/sp.publishing.debug.js",
         ];
 
         return new Promise<void>((resolve, reject) => {

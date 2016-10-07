@@ -10,4 +10,5 @@ export interface ISPObjectHandlerCollection {
         Items: ISPObjectHandler;
         Navigation: ISPObjectHandler;
         Files: ISPObjectHandler;
+        Solutions: ISPObjectHandler;
 }

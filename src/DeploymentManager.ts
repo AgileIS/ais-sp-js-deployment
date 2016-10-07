@@ -13,6 +13,7 @@ import { ItemHandler } from "./ObjectHandler/ItemHandler";
 import { FileHandler } from "./ObjectHandler/FileHandler";
 import { FieldHandler } from "./ObjectHandler/FieldHandler";
 import { ViewHandler } from "./ObjectHandler/ViewHandler";
+import { SolutionHandler } from "./ObjectHandler/SolutionHandler";
 import { FeatureHandler } from "./ObjectHandler/FeatureHandler";
 import { ContentTypeHandler } from "./ObjectHandler/ContentTypeHandler";
 import { NavigationHandler } from "./ObjectHandler/NavigationHandler";
@@ -35,6 +36,7 @@ export class DeploymentManager {
         Items: new ItemHandler(),
         Navigation: new NavigationHandler(),
         Files: new FileHandler(),
+        Solutions: new SolutionHandler(),
     };
 
     constructor(deploymentConfig: DeploymentConfig) {
@@ -64,7 +66,7 @@ export class DeploymentManager {
     private processDeploymentConfig(): Promise<any> {
         let siteProcessingPromise = this._objectHandlers.Sites.execute(this._deploymentConfig.Sites[0], Promise.resolve());
 
-        let nodeProcessingOrder: string[] = ["Features", "Fields", "ContentTypes", "Lists", "Navigation", "Files"];
+        let nodeProcessingOrder: string[] = ["Features", "Fields", "ContentTypes", "Lists", "Navigation", "Files", "Solutions"];
         let existingSiteNodes = Object.keys(this._deploymentConfig.Sites[0]);
 
         return nodeProcessingOrder.reduce((dependentPromise, processingKey, proecssingIndex, array): Promise<any> => {
@@ -77,7 +79,7 @@ export class DeploymentManager {
                     if (existingSiteNodes.indexOf(processingKey) > -1 && processingHandler) {
                         if (processingKey === "Fields" || processingKey === "Files") {
                             prossingPromise = this.processDeploymentConfigNodesParallel(processingHandler, processingConfig, siteProcessingPromise);
-                        } else if (processingKey === "Features" || processingKey === "ContentTypes") {
+                        } else if (processingKey === "Features" || processingKey === "ContentTypes" || processingKey === "Solutions") {
                             prossingPromise = this.processDeploymentConfigNodesSequential(processingHandler, processingConfig, siteProcessingPromise);
                         } else if (processingKey === "Lists") {
                             prossingPromise = this.processListsDeploymentConfig(processingHandler, this._deploymentConfig.Sites[0].Lists, siteProcessingPromise);
@@ -85,7 +87,6 @@ export class DeploymentManager {
                             prossingPromise = processingHandler.execute(processingConfig, siteProcessingPromise);
                         }
                     }
-
                     return prossingPromise;
                 });
         }, siteProcessingPromise);

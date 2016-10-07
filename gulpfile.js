@@ -21,7 +21,8 @@ const assignments = {
   Features: 'Id',
   ContentTypes: 'Id',
   QuickLaunch: 'Title',
-  Files: 'Name'
+  Files: 'Name',
+  Solutions: 'Title',
 };
 
 function merge(target, source) {
