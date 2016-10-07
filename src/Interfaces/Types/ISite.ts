@@ -7,6 +7,7 @@ import { INavigation } from "./INavigation";
 import { IComposedLook } from "./IComposedlook";
 import { IWebSettings } from "./IWebsettings";
 import { IContentType } from "./IContentType";
+import { IPropertyBagEntry } from "./IPropertyBagEntry";
 
 export interface ISite {
     Url: string;
@@ -17,8 +18,21 @@ export interface ISite {
     Navigation: INavigation;
     CustomActions: Array<ICustomAction>;
     ComposedLook: IComposedLook;
-    PropertyBagEntries: Object;
+    PropertyBagEntries: Array<IPropertyBagEntry>;
     Parameters: Object;
     WebSettings: IWebSettings;
     Features: Array<IFeature>;
+    ControlOption: string;
+    Title: string;
+    Description: string;
+    EnableMinimalDownload: boolean;
+    QuickLaunchEnabled: boolean;
+    ServerRelativeUrl: string;
+    TreeViewEnabled: boolean;
+    RecycleBinEnabled: boolean;
+    LayoutsHive: string;
+    Template: string;
+    Language: number;
+    InheritPermissions: boolean;
+    Identifier: string;
 }

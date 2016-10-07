@@ -8,12 +8,7 @@
     "Sites": [
         {
             "Identifier": "insidervz",
-            "Url": "http://dev2013vm5/sites/insidervz",
-            "Title": "Insiderliste",
-            "Version": "1",
-            "Template": "STS#0",
-            "OwnerAlias": "ytasyol",
-            "LayoutsHive": "15"
+            "Url": "http://dev2013vm5/sites/insidervz"
         }
     ]
 }
