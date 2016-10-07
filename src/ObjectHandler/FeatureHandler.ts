@@ -6,6 +6,8 @@ import { IPromiseResult } from "../Interfaces/IPromiseResult";
 import { Util } from "../Util/Util";
 
 export class FeatureHandler implements ISPObjectHandler {
+    private _noRetry: boolean = false;
+
     public execute(featureConfig: IFeature, parentPromise: Promise<IPromiseResult<Web>>): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             parentPromise.then((promiseResult) => {
@@ -18,10 +20,15 @@ export class FeatureHandler implements ISPObjectHandler {
                         this.processingFeatureConfig(featureConfig, context)
                             .then((featureProsssingResult) => { resolve(featureProsssingResult); })
                             .catch((error) => {
-                                Util.Retry(error, featureConfig.Id,
-                                    () => {
-                                        return this.processingFeatureConfig(featureConfig, context);
-                                    });
+                                if (this._noRetry) {
+                                    Util.Reject<void>(reject, featureConfig.Id, error);
+                                } else {
+                                    Util.Retry(error, featureConfig.Id,
+                                        () => {
+                                            return this.processingFeatureConfig(featureConfig, context);
+                                        });
+                                }
+
                             });
                     } else {
                         Util.Reject<void>(reject, "Unknow feature", `Error while processing feature: Feature id is undefined.`);
@@ -96,6 +103,7 @@ export class FeatureHandler implements ISPObjectHandler {
                         Util.Reject<void>(reject, featureConfig.Id, `Error while activating feature with the id '${featureConfig.Id}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
                     });
             } else {
+                this._noRetry = true;
                 Util.Reject<void>(reject, featureConfig.Id,
                     `Error while activating feature with the id '${featureConfig.Id}' and feature scope '${featureConfig.Scope}': User '${currentUser.get_loginName()}' is no site administrator`);
             }
@@ -116,6 +124,7 @@ export class FeatureHandler implements ISPObjectHandler {
                     }
                 );
             } else {
+                this._noRetry = true;
                 Util.Reject<void>(reject, featureConfig.Id,
                     `Error while deactivating feature with the id '${featureConfig.Id}' and feature scope '${featureConfig.Scope}': User '${currentUser.get_loginName()}' is no site administrator`);
             }
