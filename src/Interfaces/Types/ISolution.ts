@@ -1,6 +1,6 @@
 export interface ISolution {
     Title: string;
-    Deactivate: boolean;
+    ControlOption: string;
     Library: string;
     MinorVersion: number;
     MajorVersion: number;

@@ -3,6 +3,7 @@ import { ISPObjectHandler } from "../Interfaces/ObjectHandler/ISPObjectHandler";
 import { ISolution } from "../Interfaces/Types/ISolution";
 import { File } from "@agileis/sp-pnp-js/lib/sharepoint/rest/files";
 import { IPromiseResult } from "../Interfaces/IPromiseResult";
+import { ControlOption } from "../Constants/ControlOption";
 import { Util } from "../Util/Util";
 
 export class SolutionHandler implements ISPObjectHandler {
@@ -51,12 +52,18 @@ export class SolutionHandler implements ISPObjectHandler {
                         packageInfo.set_minorVersion(solutionConfig.MinorVersion);
                         packageInfo.set_packageName(solutionConfig.Title);
                         let fileRelativeUrl = solutionGalRootFolder.get_serverRelativeUrl() + `/${solutionConfig.Title}`;
-                        switch (solutionConfig.Deactivate) {
-                            case false:
-                                processingPromise = this.installSolution(solutionConfig, clientContext, packageInfo, fileRelativeUrl);
-                                break;
-                            default:
+                        switch (solutionConfig.ControlOption) {
+                            case ControlOption.Delete:
                                 processingPromise = this.uninstallSolution(solutionConfig, clientContext, packageInfo);
+                                break;
+                            case ControlOption.Update:
+                                this.uninstallSolution(solutionConfig, clientContext, packageInfo)
+                                    .then(() => { processingPromise = this.installSolution(solutionConfig, clientContext, packageInfo, fileRelativeUrl); })
+                                    .catch((error) => {
+                                        reject(error);
+                                    });
+                            default:
+                                processingPromise = this.installSolution(solutionConfig, clientContext, packageInfo, fileRelativeUrl);
                                 break;
                         }
                         processingPromise
