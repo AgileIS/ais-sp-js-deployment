@@ -14,9 +14,6 @@ let processCount = 0;
 function onChildProcessExit(code: number, signal: string): void {
     Logger.write("child ends " + this.pid, Logger.LogLevel.Info);
     processCount--;
-    if (processCount === 0) {
-        this.kill();
-    }
 }
 
 function onChildProcessDisconnect(): void {
@@ -26,7 +23,7 @@ function onChildProcessDisconnect(): void {
 function processGlobalDeploymentConfig(globalDeploymentConfig: GlobalDeploymentConfig, loglevel: Logger.LogLevel) {
     if (globalDeploymentConfig.Sites && globalDeploymentConfig.Sites instanceof Array && globalDeploymentConfig.Sites.length > 0) {
         globalDeploymentConfig.Sites.forEach((siteCollection, index, array) => {
-            //let forkOptions: childProcess.ForkOptions = { silent: false, execArgv: ["--debug-brk=58589"] }; //for debugging
+            // let forkOptions: childProcess.ForkOptions = { silent: false, execArgv: ["--debug-brk=58589"] }; //for debugging
             let forkOptions: childProcess.ForkOptions = { silent: false };
             let forkArgs: ForkProcessArguments = {
                 siteDeploymentConfig: {
@@ -73,7 +70,7 @@ if (clArgs.deploymentConfigPath) {
     let globalDeploymentConfig: GlobalDeploymentConfig = JSON.parse(FileSystem.readFileSync(clArgs.deploymentConfigPath, "utf8"));
     if (globalDeploymentConfig) {
         Logger.write(`Loaded deployment config: ${clArgs.deploymentConfigPath} `);
-        Logger.write(JSON.stringify(globalDeploymentConfig), 0);
+        // Logger.write(JSON.stringify(globalDeploymentConfig), 0);
 
         Logger.write(`Authentication details:`);
         Logger.write(`Authtype: ${globalDeploymentConfig.User.authtype}.`);

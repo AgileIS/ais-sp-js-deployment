@@ -57,10 +57,10 @@ export class DeploymentManager {
         return Promise.all(this._deployDependencies).then(() => {
             return this.processDeploymentConfig()
                 .then(() => {
-                    Logger.write("All site collection processed", Logger.LogLevel.Info);
+                    Logger.write(`site collection '${this._siteDeploymentConfig.Site.Url}' processed`, Logger.LogLevel.Info);
                 })
                 .catch((error) => {
-                    Logger.write("Error occured while processing site collections - " + Util.getErrorMessage(error), Logger.LogLevel.Info);
+                    Logger.write(`Error occured while processing site collection '${this._siteDeploymentConfig.Site.Url}' - ` + Util.getErrorMessage(error), Logger.LogLevel.Info);
                 });
         });
     }
