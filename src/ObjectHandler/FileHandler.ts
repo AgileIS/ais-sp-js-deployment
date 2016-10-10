@@ -270,7 +270,7 @@ export class FileHandler implements ISPObjectHandler {
                     fs.writeFileSync(`${fileConfig.Src}.json`, JSON.stringify(connections));
                     let ps = spawn("powershell.exe",
                         [
-                            ".\\config\\files\\LibraryFiles\\UpdateDataConnection.ps1",
+                            ".\\UpdateDataConnection.ps1",
                             "-File",
                             fileConfig.Src,
                             "-ConnectionTemplate",
