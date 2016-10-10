@@ -4,7 +4,8 @@ var gulp = require('gulp'),
     sourcemaps = require('gulp-sourcemaps'),
     del = require('del'),
     path = require('path'),
-    merge = require('merge2');
+    merge = require('merge2'),
+    chug = require('gulp-chug');
 
 var tsProject = tsc.createProject('tsconfig.json');
 
@@ -39,6 +40,11 @@ gulp.task('clean-ts', function (cb) {
 
     // delete the files
     return del(typeScriptGenFiles, cb);
+});
+
+gulp.task('merge', function (cb) {
+    return gulp.src('./gulpfile.template.js')
+        .pipe(chug())
 });
 
 gulp.task('default', ['clean-ts', 'ts-lint', 'compile-ts']);

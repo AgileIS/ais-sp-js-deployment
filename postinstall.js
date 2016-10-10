@@ -1,8 +1,8 @@
 var fs = require('fs');
 
 
-var gulpSrc = 'gulpfile.js.template';
-var gulpDest = '../../gulpfile.js';
+var gulpSrc = 'gulpfile.template.js';
+var gulpDest = '../../gulpfile.merge.js';
 var deploySrc = './dist/deploy.js';
 var deployDest = '../../deploy.js';
 

@@ -176,6 +176,7 @@ export class ContentTypeHandler implements ISPObjectHandler {
 
                 if (existingFieldLinks[fieldLink.InternalName]) {
                     spfieldLink = fieldLinks.getById(existingFieldLinks[fieldLink.InternalName]);
+                    delete existingFieldLinks[fieldLink.InternalName];
                 } else {
                     let fieldLinkCreationInfo = new SP.FieldLinkCreationInformation();
                     let field = web.get_availableFields().getByInternalNameOrTitle(fieldLink.InternalName);
@@ -193,6 +194,10 @@ export class ContentTypeHandler implements ISPObjectHandler {
 
                 currentFieldLinksInternalNames.push(fieldLink.InternalName);
             });
+
+            for (let bwFieldLink in existingFieldLinks) {
+                fieldLinks.getById(existingFieldLinks[bwFieldLink]).deleteObject();
+            }
 
             fieldLinks.reorder(currentFieldLinksInternalNames);
         }
