@@ -35,45 +35,35 @@ export class SolutionHandler implements ISPObjectHandler {
     private processingSolutionConfig(solutionConfig: ISolution, clientContext: SP.ClientContext): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             Logger.write(`Processing Solution: '${solutionConfig.Title}'.`, Logger.LogLevel.Info);
-            let solutionGallery = clientContext.get_web().get_lists().getByTitle(solutionConfig.Library);
-            let solutionGalRootFolder = solutionGallery.get_rootFolder();
-            let qry = new SP.CamlQuery();
-            qry.set_viewXml(`<View><Query><Where><Eq><FieldRef Name='FileLeafRef' /><Value Type='File'>${solutionConfig.Title}</Value></Eq></Where></Query></View>`);
-            let itemColl = solutionGallery.getItems(qry);
-            clientContext.load(itemColl);
-            clientContext.load(solutionGalRootFolder);
+            let list = clientContext.get_web().get_lists().getByTitle(solutionConfig.Library);
+            let listRootFolder = list.get_rootFolder();
+            clientContext.load(listRootFolder);
             clientContext.executeQueryAsync(
                 (sender, args) => {
-                    if (itemColl.get_count() === 1) {
-                        let processingPromise: Promise<IPromiseResult<void>> = undefined;
-                        let packageInfo = new SP.Publishing.DesignPackageInfo();
-                        packageInfo.set_packageGuid(SP.Guid.newGuid());
-                        packageInfo.set_majorVersion(solutionConfig.MajorVersion);
-                        packageInfo.set_minorVersion(solutionConfig.MinorVersion);
-                        packageInfo.set_packageName(solutionConfig.Title);
-                        let fileRelativeUrl = solutionGalRootFolder.get_serverRelativeUrl() + `/${solutionConfig.Title}`;
-                        switch (solutionConfig.ControlOption) {
-                            case ControlOption.Delete:
-                                processingPromise = this.uninstallSolution(solutionConfig, clientContext, packageInfo);
-                                break;
-                            case ControlOption.Update:
-                                this.uninstallSolution(solutionConfig, clientContext, packageInfo)
-                                    .then(() => { processingPromise = this.installSolution(solutionConfig, clientContext, packageInfo, fileRelativeUrl); })
-                                    .catch((error) => {
-                                        reject(error);
-                                    });
-                            default:
-                                processingPromise = this.installSolution(solutionConfig, clientContext, packageInfo, fileRelativeUrl);
-                                break;
-                        }
-                        processingPromise
-                            .then(() => { resolve(); })
-                            .catch((error) => { reject(error); });
-                    } else if (itemColl.get_count() === 0) {
-                        Util.Reject<void>(reject, solutionConfig.Title, `No Solution with the title '${solutionConfig.Title}' found`);
-                    } else if (itemColl.get_count() > 1) {
-                        Util.Reject<void>(reject, solutionConfig.Title, `More than one Solution with the title '${solutionConfig.Title}' found`);
+                    let processingPromise: Promise<IPromiseResult<void>> = undefined;
+                    let packageInfo = new SP.Publishing.DesignPackageInfo();
+                    packageInfo.set_packageGuid(SP.Guid.newGuid());
+                    packageInfo.set_majorVersion(solutionConfig.MajorVersion);
+                    packageInfo.set_minorVersion(solutionConfig.MinorVersion);
+                    packageInfo.set_packageName(solutionConfig.Title);
+                    let fileRelativeUrl = listRootFolder.get_serverRelativeUrl() + `/${solutionConfig.Src}${solutionConfig.FileName}`;
+                    switch (solutionConfig.ControlOption) {
+                        case ControlOption.Delete:
+                            processingPromise = this.uninstallSolution(solutionConfig, clientContext, packageInfo);
+                            break;
+                        case ControlOption.Update:
+                            this.uninstallSolution(solutionConfig, clientContext, packageInfo)
+                                .then(() => { processingPromise = this.installSolution(solutionConfig, clientContext, packageInfo, fileRelativeUrl); })
+                                .catch((error) => {
+                                    processingPromise = Promise.reject(error);
+                                });
+                        default:
+                            processingPromise = this.installSolution(solutionConfig, clientContext, packageInfo, fileRelativeUrl);
+                            break;
                     }
+                    processingPromise
+                        .then(() => { resolve(); })
+                        .catch((error) => { reject(error); });
                 },
                 (sender, args) => {
                     Util.Reject<void>(reject, solutionConfig.Title,
@@ -85,17 +75,26 @@ export class SolutionHandler implements ISPObjectHandler {
 
     private installSolution(solutionConfig: ISolution, clientContext: SP.ClientContext, packageInfo: SP.Publishing.DesignPackageInfo, filerelativeurl: string): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
-            this.checkSolutionGallery(solutionConfig, clientContext, packageInfo.get_packageName())
+            this.checkSolutionGallery(solutionConfig, clientContext)
                 .then((isExisting) => {
                     if (!isExisting) {
                         SP.Publishing.DesignPackage.install(clientContext, clientContext.get_site(), packageInfo, filerelativeurl);
                         clientContext.executeQueryAsync(
                             (sender, args) => {
-                                Util.Resolve<void>(resolve, solutionConfig.Title, `Activated Solution with title : '${solutionConfig.Title}'.`);
+                                SP.Publishing.DesignPackage.apply(clientContext, clientContext.get_site(), packageInfo);
+                                clientContext.executeQueryAsync(
+                                    (sender, args) => {
+                                        Util.Resolve<void>(resolve, solutionConfig.Title, `Activated Solution with title : '${solutionConfig.Title}'.`);
+                                    },
+                                    (sender, args) => {
+                                        Util.Reject<void>(reject, solutionConfig.Title,
+                                            `Error while activating Solution with the title '${solutionConfig.Title}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                                    }
+                                )
                             },
                             (sender, args) => {
                                 Util.Reject<void>(reject, solutionConfig.Title,
-                                    `Error while activating Solution with the title '${solutionConfig.Title}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                                    `Error while installing Solution with the title '${solutionConfig.Title}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
                             });
                     } else {
                         Util.Reject<void>(reject, solutionConfig.Title,
@@ -111,7 +110,7 @@ export class SolutionHandler implements ISPObjectHandler {
 
     private uninstallSolution(solutionConfig: ISolution, clientContext: SP.ClientContext, packageInfo: SP.Publishing.DesignPackageInfo): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
-            this.checkSolutionGallery(solutionConfig, clientContext, packageInfo.get_packageName())
+            this.checkSolutionGallery(solutionConfig, clientContext)
                 .then((isExisting) => {
                     if (isExisting) {
                         SP.Publishing.DesignPackage.unInstall(clientContext, clientContext.get_site(), packageInfo);
@@ -136,12 +135,30 @@ export class SolutionHandler implements ISPObjectHandler {
         });
     }
 
-    private checkSolutionGallery(solutionConfig: ISolution, clientContext: SP.ClientContext, solutionName: string) {
+    private removeSolutionFile(solutionConfig: ISolution, clientContext: SP.ClientContext, list: SP.List) {
+        return new Promise<boolean>((resolve, reject) => {
+            let qry = new SP.CamlQuery();
+            qry.set_viewXml(`<View><Query><Where><Eq><FieldRef Name='FileLeafRef' /><Value Type='File'>${solutionConfig.FileName}</Value></Eq></Where></Query></View>`);
+            let itemColl = list.getItems(qry);
+            clientContext.load(itemColl);
+            let item = itemColl.itemAt(0);
+            item.deleteObject();
+            clientContext.executeQueryAsync(
+                (sender, args) => {
+                    resolve();
+                },
+                (sender, args) => {
+                    reject();
+                })
+        })
+    }
+
+    private checkSolutionGallery(solutionConfig: ISolution, clientContext: SP.ClientContext) {
         return new Promise<boolean>((resolve, reject) => {
             let solutionGallery = clientContext.get_web().get_lists().getByTitle("Solution Gallery");
             let solutionGalRootFolder = solutionGallery.get_rootFolder();
             let qry = new SP.CamlQuery();
-            qry.set_viewXml(`<View><Query><Where><Contains><FieldRef Name='FileLeafRef' /><Value Type='File'>${solutionName}</Value></Contains></Where></Query></View>`);
+            qry.set_viewXml(`<View><Query><Where><Contains><FieldRef Name='FileLeafRef' /><Value Type='File'>${solutionConfig.Title}</Value></Contains></Where></Query></View>`);
             let itemColl = solutionGallery.getItems(qry);
             clientContext.load(itemColl);
             clientContext.load(solutionGalRootFolder);

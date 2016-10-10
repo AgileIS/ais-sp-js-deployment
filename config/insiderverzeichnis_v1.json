@@ -5,7 +5,7 @@
             "Title": "Insiderliste",
             "Template": "STS#0",
             "LayoutsHive": "15",
-            "ControlOption": "Update",
+            "ControlOption": "",
             "PropertyBagEntries": [
                 {
                     "Title": "hannre_insiderverzeichnis",
@@ -1450,10 +1450,31 @@
                                             "Overwrite": true
                                         }
                                     ]
+                                },
+                                {
+                                    "Name": "Solutions",
+                                    "Files": [
+                                        {
+                                            "Name": "SandboxWSPTest.wsp",
+                                            "Src": "./config/files/LibraryFiles/SandboxWSPTest.wsp",
+                                            "Overwrite": true
+                                        }
+                                    ]
                                 }
                             ]
                         }
                     ]
+                }
+            ],
+            "Solutions": [
+                {
+                    "Library": "Master Page Gallery",
+                    "Title": "SandboxWSPTest",
+                    "FileName": "SandboxWSPTest.wsp",
+                    "Src": "HannRe.Insiderverzeichnis/Solutions/",
+                    "ControlOption": "Delete",
+                    "MinorVersion": 0,
+                    "MajorVersion": 1
                 }
             ]
         }
