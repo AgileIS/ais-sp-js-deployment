@@ -79,7 +79,7 @@ export class SolutionHandler implements ISPObjectHandler {
                         SP.Publishing.DesignPackage.install(clientContext, clientContext.get_site(), packageInfo, filerelativeurl);
                         clientContext.executeQueryAsync(
                             (sender, args) => {
-                                //this.removeSolutionFile(clientContext,filerelativeurl);
+                                // this.removeSolutionFile(clientContext,filerelativeurl);
                                 Util.Resolve<void>(resolve, solutionConfig.Title, `Activated Solution with title : '${solutionConfig.Title}'.`);
                             },
                             (sender, args) => {
