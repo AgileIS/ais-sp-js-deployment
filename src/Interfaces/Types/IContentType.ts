@@ -1,4 +1,4 @@
-import { IFieldLink } from "./IFieldLink.ts";
+import { IFieldLink } from "./IFieldLink";
 
 export interface IContentType {
     Id: string;

@@ -172,7 +172,7 @@ export class SolutionHandler implements ISPObjectHandler {
                     reject();
                 }
             );
-        })
+        });
     }
 
 }

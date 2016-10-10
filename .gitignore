@@ -5,3 +5,4 @@ dist
 deleteElements.ps1
 config/config_*
 Lorem.*
+*.tgz

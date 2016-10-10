@@ -2,23 +2,11 @@
   "name": "ais-sp-js-deployment",
   "version": "0.0.1",
   "description": "Basic deployment package for sharepoint provisioning",
-  "main": "dist/deploy.js",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "runapp": "node run .\\dist\\deploy.js -f .\\config\\democonfig.json",
-    "contentTypeAddTest": "node .\\dist\\deploy.js -f .\\config\\contentTypesAddTestConfig.json -p Start@123",
-    "siteColumAddTest": "node .\\dist\\deploy.js -f .\\config\\siteColumnsAddTestConfig.json -p Start@123",
-    "siteColumUpdateTest": "node .\\dist\\deploy.js -f .\\config\\siteColumnsUpdateTestConfig.json -p Start@123",
-    "siteColumDeleteTest": "node .\\dist\\deploy.js -f .\\config\\siteColumnsDeleteTestConfig.json -p Start@123",
-    "listAddTest": "node .\\dist\\deploy.js -f .\\config\\listAddTestConfig.json -p Start@123",
-    "listDeleteTest": "node .\\dist\\deploy.js -f .\\config\\listDeleteTestConfig.json -p Start@123",
-    "listUpdateTest": "node .\\dist\\deploy.js -f .\\config\\listUpdateTestConfig.json -p Start@123",
-    "viewAddTest": "node .\\dist\\deploy.js -f .\\config\\viewAddTestConfig.json -p Start@123",
-    "viewDeleteTest": "node .\\dist\\deploy.js -f .\\config\\viewDeleteTestConfig.json -p Start@123",
-    "viewUpdateTest": "node .\\dist\\deploy.js -f .\\config\\viewUpdateTestConfig.json -p Start@123",
-    "viewFieldsAddTest": "node .\\dist\\deploy.js -f .\\config\\viewFieldsAddTestConfig.json -p Start@123",
-    "viewFieldsDeleteTest": "node .\\dist\\deploy.js -f .\\config\\viewFieldsDeleteTestConfig.json -p Start@123",
-    "viewFieldsUpdateTest": "node .\\dist\\deploy.js -f .\\config\\viewFieldsUpdateTestConfig.json -p Start@123"
+    "postinstall": "node postinstall.js",
+    "prepublish": "gulp"
   },
   "keywords": [
     "SharePoint",
@@ -31,15 +19,6 @@
   "license": "MIT",
   "dependencies": {
     "@agileis/sp-pnp-js": "^1.0.4",
-    "mime": "^1.3.4",
-    "minimist": "^1.2.0",
-    "node-fetch": "^1.6.0",
-    "promptly": "^2.1.0",
-    "proxying-agent": "^2.1.0",
-    "typings": "^1.3.2",
-    "url": "^0.11.0",
-    "vm": "^0.1.0",
-    "xmlhttprequest": "^1.8.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
     "gulp-foreach": "^0.1.0",
@@ -47,7 +26,25 @@
     "gulp-jsoncombine": "^1.0.3",
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.5.4",
-    "merge-stream": "^1.0.0"
+    "merge-stream": "^1.0.0",
+    "mime": "^1.3.4",
+    "minimist": "^1.2.0",
+    "node-fetch": "^1.6.0",
+    "promptly": "^2.1.0",
+    "proxying-agent": "^2.1.0",
+    "url": "^0.11.0",
+    "vm": "^0.1.0",
+    "xmlhttprequest": "^1.8.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "del": "^2.2.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-tslint": "^6.1.2",
+    "gulp-typescript": "^3.0.2",
+    "merge2": "^1.0.2",
+    "path": "^0.12.7",
+    "tslint": "^3.15.1",
+    "typescript": "^2.0.3",
+    "typings": "^1.3.2"
+  }
 }

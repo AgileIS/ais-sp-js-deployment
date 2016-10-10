@@ -1,0 +1,9 @@
+*.tgz
+src/
+config/
+.vscode/
+tsconfig.json
+tslint.json
+typings/
+typings.json
+gulpfile.js
