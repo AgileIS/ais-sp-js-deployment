@@ -7,3 +7,4 @@ tslint.json
 typings/
 typings.json
 gulpfile.js
+.npmignore
