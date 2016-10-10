@@ -1472,7 +1472,7 @@
                     "Title": "SandboxWSPTest",
                     "FileName": "SandboxWSPTest.wsp",
                     "Src": "HannRe.Insiderverzeichnis/Solutions/",
-                    "ControlOption": "Delete",
+                    "ControlOption": "",
                     "MinorVersion": 0,
                     "MajorVersion": 1
                 }
