@@ -35,18 +35,16 @@ export class SolutionHandler implements ISPObjectHandler {
     private processingSolutionConfig(solutionConfig: ISolution, clientContext: SP.ClientContext): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             Logger.write(`Processing Solution: '${solutionConfig.Title}'.`, Logger.LogLevel.Info);
-            let list = clientContext.get_web().get_lists().getByTitle(solutionConfig.Library);
-            let listRootFolder = list.get_rootFolder();
+            let listRootFolder = clientContext.get_web().get_lists().getByTitle(solutionConfig.Library).get_rootFolder();
             clientContext.load(listRootFolder);
             clientContext.executeQueryAsync(
                 (sender, args) => {
                     let processingPromise: Promise<IPromiseResult<void>> = undefined;
                     let packageInfo = new SP.Publishing.DesignPackageInfo();
-                    packageInfo.set_packageGuid(SP.Guid.newGuid());
                     packageInfo.set_majorVersion(solutionConfig.MajorVersion);
                     packageInfo.set_minorVersion(solutionConfig.MinorVersion);
                     packageInfo.set_packageName(solutionConfig.Title);
-                    let fileRelativeUrl = listRootFolder.get_serverRelativeUrl() + `/${solutionConfig.Src}${solutionConfig.FileName}`;
+                    let fileRelativeUrl = listRootFolder.get_serverRelativeUrl() + "/" + solutionConfig.Src + solutionConfig.FileName;
                     switch (solutionConfig.ControlOption) {
                         case ControlOption.Delete:
                             processingPromise = this.uninstallSolution(solutionConfig, clientContext, packageInfo);
@@ -62,7 +60,7 @@ export class SolutionHandler implements ISPObjectHandler {
                             break;
                     }
                     processingPromise
-                        .then(() => { resolve(); })
+                        .then((solutionProcessingResult) => { resolve(solutionProcessingResult); })
                         .catch((error) => { reject(error); });
                 },
                 (sender, args) => {
@@ -81,16 +79,8 @@ export class SolutionHandler implements ISPObjectHandler {
                         SP.Publishing.DesignPackage.install(clientContext, clientContext.get_site(), packageInfo, filerelativeurl);
                         clientContext.executeQueryAsync(
                             (sender, args) => {
-                                SP.Publishing.DesignPackage.apply(clientContext, clientContext.get_site(), packageInfo);
-                                clientContext.executeQueryAsync(
-                                    (sender, args) => {
-                                        Util.Resolve<void>(resolve, solutionConfig.Title, `Activated Solution with title : '${solutionConfig.Title}'.`);
-                                    },
-                                    (sender, args) => {
-                                        Util.Reject<void>(reject, solutionConfig.Title,
-                                            `Error while activating Solution with the title '${solutionConfig.Title}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
-                                    }
-                                )
+                                //this.removeSolutionFile(clientContext,filerelativeurl);
+                                Util.Resolve<void>(resolve, solutionConfig.Title, `Activated Solution with title : '${solutionConfig.Title}'.`);
                             },
                             (sender, args) => {
                                 Util.Reject<void>(reject, solutionConfig.Title,
@@ -135,13 +125,9 @@ export class SolutionHandler implements ISPObjectHandler {
         });
     }
 
-    private removeSolutionFile(solutionConfig: ISolution, clientContext: SP.ClientContext, list: SP.List) {
+    private removeSolutionFile(clientContext: SP.ClientContext, fileRelativeUrl: string) {
         return new Promise<boolean>((resolve, reject) => {
-            let qry = new SP.CamlQuery();
-            qry.set_viewXml(`<View><Query><Where><Eq><FieldRef Name='FileLeafRef' /><Value Type='File'>${solutionConfig.FileName}</Value></Eq></Where></Query></View>`);
-            let itemColl = list.getItems(qry);
-            clientContext.load(itemColl);
-            let item = itemColl.itemAt(0);
+            let item = clientContext.get_web().getFileByServerRelativeUrl(fileRelativeUrl);
             item.deleteObject();
             clientContext.executeQueryAsync(
                 (sender, args) => {
@@ -149,8 +135,8 @@ export class SolutionHandler implements ISPObjectHandler {
                 },
                 (sender, args) => {
                     reject();
-                })
-        })
+                });
+        });
     }
 
     private checkSolutionGallery(solutionConfig: ISolution, clientContext: SP.ClientContext) {
