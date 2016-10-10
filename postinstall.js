@@ -24,6 +24,7 @@ fs.rename(deploySrc, deployDest, (error) => {
             console.error(error);
         } else {
             var result = data.replace('./index', 'ais-sp-js-deployment');
+            var result = result.replace('//# sourceMappingURL=deploy.js.map', '');
             fs.writeFile(deployDest, result, 'utf8', (error) => {
                 if (error) {
                     return console.log(error);

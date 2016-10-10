@@ -5,7 +5,7 @@ npm install
 typings install
 
 ##build
-tsc || tsc -w (mit watch)
+gulp || tsc || tsc -w (mit watch)
 
 #parameters
 -f : <configfile>
@@ -13,4 +13,4 @@ tsc || tsc -w (mit watch)
 -x : flag -> proxy
 
 ##run
-node /dist/deploy -f /config/democonfig.json
+node dist/deploy -f config/democonfig.json
