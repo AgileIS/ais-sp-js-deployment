@@ -1,16 +1,21 @@
 # Deployment / Provisioning mit nodejs
 
-##install
-npm install
-typings install
-
-##build
-gulp || tsc || tsc -w (mit watch)
-
 #parameters
 -f : <configfile>
--p : <password>
--x : flag -> proxy
+
+##dev
+npm install
+typings install
+tsc || tsc -w (mit watch)
+
+##dev-run
+node dist/deploy -f config/<config>.json
+
+##build
+gulp && npm pack || npm publish
+
+##install
+npm install ais-sp-js-deployment [--save]
 
 ##run
-node dist/deploy -f config/democonfig.json
+node deploy -f config/<config>.json
