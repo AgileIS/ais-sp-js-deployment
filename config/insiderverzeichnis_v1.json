@@ -1470,26 +1470,6 @@
                         }
                     ]
                 }
-            ],
-            "Solutions": [
-                {
-                    "Library": "Master Page Gallery",
-                    "Title": "SandboxWSPTest",
-                    "FileName": "SandboxWSPTest.wsp",
-                    "Src": "HannRe.Insiderverzeichnis/Solutions/",
-                    "ControlOption": "",
-                    "MinorVersion": 0,
-                    "MajorVersion": 1
-                },
-                {
-                    "Library": "Master Page Gallery",
-                    "Title": "SandboxWSPTest2",
-                    "FileName": "SandboxWSPTest2.wsp",
-                    "Src": "HannRe.Insiderverzeichnis/Solutions/",
-                    "ControlOption": "",
-                    "MinorVersion": 0,
-                    "MajorVersion": 1
-                }
             ]
         }
     ]

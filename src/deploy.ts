@@ -25,5 +25,5 @@ let clArgs: ConsoleArguments = <any>minimist(global.process.argv.slice(2), {
 if (clArgs.deploymentConfigPath) {
     AisDeploy.deploy(clArgs.deploymentConfigPath, clArgs.logLevel, clArgs.runChildProcessInhDebugMode);
 } else {
-    console.error("ERROR: missing arguments (deploymentConfigPath)!");
+    console.error("\x1b[31m", "ERROR: missing arguments (deploymentConfigPath)!");
 }

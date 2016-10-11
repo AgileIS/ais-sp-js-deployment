@@ -62,7 +62,7 @@ export class DeploymentManager {
                     Logger.write(`site collection '${this._siteDeploymentConfig.Site.Url}' processed`, Logger.LogLevel.Info);
                 })
                 .catch((error) => {
-                    Logger.write(`Error occured while processing site collection '${this._siteDeploymentConfig.Site.Url}' - ` + Util.getErrorMessage(error), Logger.LogLevel.Info);
+                    Logger.write(`Error occured while processing site collection '${this._siteDeploymentConfig.Site.Url}' - ` + Util.getErrorMessage(error), Logger.LogLevel.Error);
                 });
         });
     }

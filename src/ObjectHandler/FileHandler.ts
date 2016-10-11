@@ -124,7 +124,7 @@ export class FileHandler implements ISPObjectHandler {
                             .then((fileProcessingResult) => { resolve(fileProcessingResult); })
                             .catch((error) => { reject(error); });
                     } else {
-                        Logger.write("File handler processing promise is undefined!");
+                        Logger.write("File handler processing promise is undefined!", Logger.LogLevel.Error);
                     }
                 })
                 .catch((error) => {

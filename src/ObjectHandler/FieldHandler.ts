@@ -55,7 +55,7 @@ export class FieldHandler implements ISPObjectHandler {
                     let processingPromise: Promise<IPromiseResult<void | Field>> = undefined;
 
                     if (fieldRequestResults && fieldRequestResults.length === 1) {
-                        Logger.write(`Found Field with the internal name: '${fieldConfig.InternalName}'`);
+                        Logger.write(`Found Field with the internal name: '${fieldConfig.InternalName}'`, Logger.LogLevel.Info);
                         let field = fieldCollection.getById(fieldRequestResults[0].Id);
                         switch (fieldConfig.ControlOption) {
                             case ControlOption.Update:

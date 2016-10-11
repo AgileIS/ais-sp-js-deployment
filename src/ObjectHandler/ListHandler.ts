@@ -42,7 +42,7 @@ export class ListHandler implements ISPObjectHandler {
                     let rejectOrResolved = false;
                     let processingPromise: Promise<IPromiseResult<void | List>> = undefined;
                     if (listRequestResults && listRequestResults.length === 1) {
-                        Logger.write(`Found List with title: '${listConfig.Title}'`);
+                        Logger.write(`Found List with title: '${listConfig.Title}'`, Logger.LogLevel.Info);
                         let list = web.lists.getById(listRequestResults[0].Id);
                         switch (listConfig.ControlOption) {
                             case ControlOption.Update:
