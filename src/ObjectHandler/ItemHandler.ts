@@ -41,7 +41,7 @@ export class ItemHandler implements ISPObjectHandler {
                     let processingPromise: Promise<IPromiseResult<void | Item>> = undefined;
 
                     if (itemRequestResults && itemRequestResults.length === 1) {
-                        Logger.write(`Found Item with the title: '${itemConfig.Title}'`);
+                        Logger.write(`Found Item with the title: '${itemConfig.Title}'`, Logger.LogLevel.Info);
                         let item = list.items.getById(itemRequestResults[0].Id);
                         switch (itemConfig.ControlOption) {
                             case ControlOption.Update:

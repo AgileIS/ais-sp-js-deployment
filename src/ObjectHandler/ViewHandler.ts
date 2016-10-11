@@ -43,7 +43,7 @@ export class ViewHandler implements ISPObjectHandler {
                     if (viewRequestResults && viewRequestResults.length === 1) {
                         viewConfig.NewTitle = viewConfig.Title;
                         viewConfig.Title = viewRequestResults[0].Title;
-                        Logger.write(`Found view with title: '${viewConfig.Title}'`);
+                        Logger.write(`Found view with title: '${viewConfig.Title}'`, Logger.LogLevel.Info);
                         let view = list.views.getByTitle(viewConfig.Title);
                         switch (viewConfig.ControlOption) {
                             case ControlOption.Update:
