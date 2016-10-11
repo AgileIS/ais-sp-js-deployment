@@ -105,13 +105,14 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
     }
 
     private setupSiteContext(siteUrl: string): Promise<void> {
-        const lib = siteUrl.indexOf("https") > -1 ? https : http;
+        const Agent = siteUrl.indexOf("https") > -1 ? https.Agent : http.Agent;
+        const get = siteUrl.indexOf("https") > -1 ? https.get : http.get;
         let reqUrl = Util.JoinAndNormalizeUrl([siteUrl, "_api/web/title"]);
         let parsedUrl = url.parse(reqUrl as string);
         let authValue = NodeJsomHandlerImpl._authOptions;
         if (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) {
             authValue = NTLM.createType1Message(NodeJsomHandlerImpl._authOptions);
-            NodeJsomHandlerImpl._agents[siteUrl] = new lib.Agent({ keepAlive: true, maxSockets: 1, keepAliveMsecs: 100 });
+            NodeJsomHandlerImpl._agents[siteUrl] = new Agent({ keepAlive: true, maxSockets: 1, keepAliveMsecs: 100 });
         }
         let options = {
             hostname: parsedUrl.hostname,
@@ -126,7 +127,7 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
         };
 
         return new Promise<void>((resolve, reject) => {
-            http.get(options, firstResponse => {
+            get(options, firstResponse => {
                 firstResponse.on("data", () => null);
                 firstResponse.on("end", () => {
                     if (firstResponse.statusCode === 401) {
@@ -135,7 +136,7 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                         });
                         let type3msg = NTLM.createType3Message(type2msg, NodeJsomHandlerImpl._authOptions);
                         options.headers.Authorization = type3msg;
-                        http.get(options, secondResponse => {
+                        get(options, secondResponse => {
                             secondResponse.on("data", () => null);
                             secondResponse.on("end", () => {
                                 if (secondResponse.statusCode !== 200) {
@@ -208,8 +209,9 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                     if (loadedScript) {
                         vm.runInThisContext(loadedScript);
                     }
-                    return new Promise((res, rej) => {
-                        const lib = siteUrl.indexOf("https") > -1 ? https : http;
+
+                    return new Promise((resolveRequest, rejectRequest) => {
+                        const get = siteUrl.indexOf("https") > -1 ? https.get : http.get;
 
                         let reqUrl = Util.JoinAndNormalizeUrl([siteUrl, currentValue]);
                         let parsedUrl = url.parse(reqUrl as string);
@@ -224,27 +226,28 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
                             agent: (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) ? NodeJsomHandlerImpl._agents[siteUrl] : false,
                         };
 
-                        const request = lib.get(options, response => {
+                        const request = get(options, response => {
                             const body = [];
                             response.on("data", (chunk) => body.push(chunk));
-                            response.on("end", () => res(body.join("")));
+                            response.on("end", () => resolveRequest(body.join("")));
                         });
                         request.on("error", (error) => { Util.Reject<void>(reject, "NodeJsom", "JSOM Ntlm initialize error: " + error); });
                     });
                 });
-            }, Promise.resolve()).then((loadedScript: string) => {
-                if (loadedScript) {
-                    vm.runInThisContext(loadedScript);
-                }
-                let context = new SP.ClientContext(siteUrl);
-                let web = context.get_web();
-                context.load(web);
-                context.executeQueryAsync((sender, args) => {
-                    resolve();
-                }, (sender, args) => {
-                    Util.Reject<void>(reject, "NodeJsom", `Error while initialize JSOM: ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+            }, Promise.resolve())
+                .then((loadedScript: string) => {
+                    if (loadedScript) {
+                        vm.runInThisContext(loadedScript);
+                    }
+                    let context = new SP.ClientContext(siteUrl);
+                    let web = context.get_web();
+                    context.load(web);
+                    context.executeQueryAsync((sender, args) => {
+                        resolve();
+                    }, (sender, args) => {
+                        Util.Reject<void>(reject, "NodeJsom", `Error while initialize JSOM: ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    });
                 });
-            });
         });
     }
 }

@@ -91,7 +91,6 @@ class NodeHttpProxyImpl implements NodeHttpProxy {
     }
 }
 
-
 export let NodeHttpProxy: NodeHttpProxy = new NodeHttpProxyImpl();
 
 
