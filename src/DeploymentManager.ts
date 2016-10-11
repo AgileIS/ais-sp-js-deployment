@@ -45,8 +45,9 @@ export class DeploymentManager {
 
     constructor(siteDeploymentConfig: SiteDeploymentConfig) {
         if (siteDeploymentConfig.Site && siteDeploymentConfig.Site.Url) {
+            let layoutsUrlPart = siteDeploymentConfig.Site.LayoutsHive ? `_layouts/${siteDeploymentConfig.Site.LayoutsHive}` : `_layouts/15`;
             this._siteDeploymentConfig = <SiteDeploymentConfig>JSON.parse(
-                Util.replaceUrlTokens(JSON.stringify(siteDeploymentConfig), Util.getRelativeUrl(siteDeploymentConfig.Site.Url), `_layouts/${siteDeploymentConfig.Site.LayoutsHive}`));
+                Util.replaceUrlTokens(JSON.stringify(siteDeploymentConfig), Util.getRelativeUrl(siteDeploymentConfig.Site.Url), layoutsUrlPart));
             this.setupProxy();
             this.setupPnPJs();
             this._deployDependencies.push(NodeJsomHandler.initialize(siteDeploymentConfig));
