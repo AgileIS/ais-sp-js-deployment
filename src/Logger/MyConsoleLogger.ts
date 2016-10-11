@@ -1,4 +1,4 @@
-import { LogListener, LogEntry } from "@agileis/sp-pnp-js/lib/utils/logging";
+import { LogListener, LogEntry, Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 
 export class MyConsoleLogger implements LogListener {
     private _logPrefix: string;
@@ -15,6 +15,12 @@ export class MyConsoleLogger implements LogListener {
             log += `- ${entry.data}`;
         }
 
-        console.log(log);
+        if (entry.level === Logger.LogLevel.Info || entry.level === Logger.LogLevel.Verbose) {
+            console.log("\x1b[0m", log);
+        } else if (entry.level === Logger.LogLevel.Warning) {
+            console.warn("\x1b[33m", log);
+        } else if (entry.level === Logger.LogLevel.Error) {
+            console.error("\x1b[31m", log);
+        }
     }
 }

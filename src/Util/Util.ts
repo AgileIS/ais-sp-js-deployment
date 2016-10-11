@@ -18,7 +18,7 @@ export namespace Util {
     export function Reject<T>(reject: (error?: any) => void, configNodeIdentifier: string, promiseResultMessage: string, promiseResultValue?: T) {
         if (configNodeIdentifier && promiseResultMessage) {
             let errorMsg = `'${configNodeIdentifier}' - ${promiseResultMessage}`;
-            Logger.write(errorMsg, Logger.LogLevel.Info);
+            Logger.write(errorMsg, Logger.LogLevel.Error);
         }
 
         reject(new PromiseResult<T>(promiseResultMessage, promiseResultValue));
@@ -46,18 +46,18 @@ export namespace Util {
     }
 
     export function Retry(error: any, configNodeIdentifier: string, retryFunction: () => Promise<IPromiseResult<any>>) {
-        Logger.write(`Retry process for '${configNodeIdentifier}' because Error: ${getErrorMessage(error)}`);
+        Logger.write(`Retry process for '${configNodeIdentifier}' because Error: ${getErrorMessage(error)}`, Logger.LogLevel.Warning);
         setTimeout(() => {
-            Logger.write(`Retry first time: '${configNodeIdentifier}'`);
+            Logger.write(`Retry first time: '${configNodeIdentifier}'`, Logger.LogLevel.Warning);
             retryFunction().then((result) => {
                 return Promise.resolve(result);
             }).catch((firstRetryError) => {
                 setTimeout(() => {
-                    Logger.write(`Retry failed first time for '${configNodeIdentifier}' - ${getErrorMessage(firstRetryError)}`);
+                    Logger.write(`Retry failed first time for '${configNodeIdentifier}' - ${getErrorMessage(firstRetryError)}`, Logger.LogLevel.Warning);
                     retryFunction().then((result) => {
                         return Promise.resolve(result);
                     }).catch((secondRetryError) => {
-                        Logger.write(`Retry failed second time: '${configNodeIdentifier}' - Reject`);
+                        Logger.write(`Retry failed second time: '${configNodeIdentifier}' - Reject`, Logger.LogLevel.Warning);
                         return Promise.reject(getErrorMessage(secondRetryError));
                     });
                 }, 5000);
