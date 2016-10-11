@@ -18,7 +18,7 @@
                     "Files": [
                         {
                             "Name": "SandboxWSPTest.wsp",
-                            "Src": "./config/files/LibraryFiles/SandboxWSPTest.wsp",
+                            "Src": "./SandboxWSPTest.wsp",
                             "Overwrite": true
                         }
                     ]
