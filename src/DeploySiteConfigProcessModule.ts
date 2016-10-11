@@ -11,5 +11,10 @@ let logLevel: number = forkConfig.logLevel;
 Logger.subscribe(new MyConsoleLogger(siteDeploymentConfig.Site.Url));
 Logger.activeLogLevel = logLevel ? logLevel : Logger.LogLevel.Verbose;
 
-let deploymentManager = new DeploymentManager(siteDeploymentConfig);
-deploymentManager.deploy();
+try {
+    let deploymentManager = new DeploymentManager(siteDeploymentConfig);
+    deploymentManager.deploy();
+} catch (error) {
+    console.error("\x1b[31m", error);
+}
+
