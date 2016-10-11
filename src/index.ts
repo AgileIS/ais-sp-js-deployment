@@ -25,11 +25,14 @@ export namespace AisDeploy {
         Logger.write("child disconnect " + this.pid, Logger.LogLevel.Info);
     }
 
-    function processGlobalDeploymentConfig(globalDeploymentConfig: GlobalDeploymentConfig, loglevel: Logger.LogLevel) {
+    function processGlobalDeploymentConfig(globalDeploymentConfig: GlobalDeploymentConfig, loglevel: Logger.LogLevel, runChildProcessInhDebugMode: boolean) {
         if (globalDeploymentConfig.Sites && globalDeploymentConfig.Sites instanceof Array && globalDeploymentConfig.Sites.length > 0) {
             globalDeploymentConfig.Sites.forEach((siteCollection, index, array) => {
-                // let forkOptions: childProcess.ForkOptions = { silent: false, execArgv: [`--debug-brk=5858${index}`] }; // for debugging
                 let forkOptions: childProcess.ForkOptions = { silent: false };
+                if (runChildProcessInhDebugMode) {
+                    forkOptions.execArgv = [`--debug-brk=5858${index}`];
+                }
+
                 let forkArgs: ForkProcessArguments = {
                     siteDeploymentConfig: {
                         User: globalDeploymentConfig.User,
@@ -47,7 +50,7 @@ export namespace AisDeploy {
         }
     }
 
-    export function deploy(deploymentConfigPath: string, logLevel?: string): void {
+    export function deploy(deploymentConfigPath: string, logLevel?: string, runChildProcessInhDebugMode?: boolean): void {
         Logger.subscribe(new MyConsoleLogger());
         Logger.activeLogLevel = Logger.LogLevel[logLevel ? logLevel : "Verbose"];
 
@@ -67,13 +70,13 @@ export namespace AisDeploy {
                     promptly.password("Password:", (error, password) => {
                         if (password) {
                             globalDeploymentConfig.User.password = password;
-                            processGlobalDeploymentConfig(globalDeploymentConfig, Logger.activeLogLevel);
+                            processGlobalDeploymentConfig(globalDeploymentConfig, Logger.activeLogLevel, runChildProcessInhDebugMode);
                         } else {
                             throw new Error(`Requesting user password failed. ${error}`);
                         }
                     });
                 } else {
-                    processGlobalDeploymentConfig(globalDeploymentConfig, Logger.activeLogLevel);
+                    processGlobalDeploymentConfig(globalDeploymentConfig, Logger.activeLogLevel, runChildProcessInhDebugMode);
                 }
             }
         } else {

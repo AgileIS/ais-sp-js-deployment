@@ -70,7 +70,6 @@ export class DeploymentManager {
     private processDeploymentConfig(): Promise<any> {
         let siteProcessingPromise = this._objectHandlers.Sites.execute(this._siteDeploymentConfig.Site, Promise.resolve());
 
-
         let nodeProcessingOrder: string[] = ["Features", "Fields", "ContentTypes", "Lists", "Navigation", "Files", "Solutions"];
         let existingSiteNodes = Object.keys(this._siteDeploymentConfig.Site);
 
