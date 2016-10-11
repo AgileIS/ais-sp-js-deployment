@@ -3,4 +3,5 @@ export interface IFeature {
     Deactivate: boolean;
     Description: string;
     Scope: string;
+    Force: boolean;
 }

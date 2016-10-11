@@ -45,7 +45,7 @@ export class FeatureHandler implements ISPObjectHandler {
 
             let featureCollection = clientContext.get_site().get_features();
             let currUser = clientContext.get_web().get_currentUser();
-            if (featureConfig.Scope === SP.FeatureDefinitionScope.web.toString()) {
+            if (SP.FeatureDefinitionScope[featureConfig.Scope.toLocaleLowerCase()] === SP.FeatureDefinitionScope.web) {
                 featureCollection = clientContext.get_web().get_features();
             }
 
@@ -90,11 +90,12 @@ export class FeatureHandler implements ISPObjectHandler {
 
     private activateFeature(featureConfig: IFeature, featureCollection: SP.FeatureCollection, currentUser: SP.User): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
+            let activateForce = featureConfig.Force === true;
             let scope = featureConfig.Scope ? SP.FeatureDefinitionScope[featureConfig.Scope.toLowerCase()] : SP.FeatureDefinitionScope.none;
             scope = scope === SP.FeatureDefinitionScope.web ? SP.FeatureDefinitionScope.none : scope;
             scope = scope === SP.FeatureDefinitionScope.site ? SP.FeatureDefinitionScope.farm : scope;
-            if ((scope === SP.FeatureDefinitionScope.site || scope === SP.FeatureDefinitionScope.farm) && currentUser.get_isSiteAdmin()) {
-                featureCollection.add(new SP.Guid(featureConfig.Id), false, scope as SP.FeatureDefinitionScope);
+            if (((scope === SP.FeatureDefinitionScope.site || scope === SP.FeatureDefinitionScope.farm) && currentUser.get_isSiteAdmin()) || scope === SP.FeatureDefinitionScope.none) {
+                featureCollection.add(new SP.Guid(featureConfig.Id), activateForce, scope as SP.FeatureDefinitionScope);
                 featureCollection.get_context().executeQueryAsync(
                     (sender, args) => {
                         Util.Resolve<void>(resolve, featureConfig.Id, `Activated feature: '${featureConfig.Id}'.`);
@@ -113,7 +114,7 @@ export class FeatureHandler implements ISPObjectHandler {
     private deactivateFeature(featureConfig: IFeature, featureCollection: SP.FeatureCollection, currentUser: SP.User): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             let scope = SP.FeatureDefinitionScope[featureConfig.Scope.toLowerCase()];
-            if ((scope === SP.FeatureDefinitionScope.site || scope === SP.FeatureDefinitionScope.farm) && currentUser.get_isSiteAdmin()) {
+            if (((scope === SP.FeatureDefinitionScope.site || scope === SP.FeatureDefinitionScope.farm) && currentUser.get_isSiteAdmin()) || scope === SP.FeatureDefinitionScope.none) {
                 featureCollection.remove(new SP.Guid(featureConfig.Id), true);
                 featureCollection.get_context().executeQueryAsync(
                     (sender, args) => {
