@@ -41,6 +41,7 @@ export class SolutionHandler implements ISPObjectHandler {
                 (sender, args) => {
                     let processingPromise: Promise<IPromiseResult<void>> = undefined;
                     let packageInfo = new SP.Publishing.DesignPackageInfo();
+                    packageInfo.set_packageGuid(SP.Guid.newGuid());
                     packageInfo.set_majorVersion(solutionConfig.MajorVersion);
                     packageInfo.set_minorVersion(solutionConfig.MinorVersion);
                     packageInfo.set_packageName(solutionConfig.Title);
@@ -73,55 +74,34 @@ export class SolutionHandler implements ISPObjectHandler {
 
     private installSolution(solutionConfig: ISolution, clientContext: SP.ClientContext, packageInfo: SP.Publishing.DesignPackageInfo, filerelativeurl: string): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
-            this.checkSolutionGallery(solutionConfig, clientContext)
-                .then((isExisting) => {
-                    if (!isExisting) {
-                        SP.Publishing.DesignPackage.install(clientContext, clientContext.get_site(), packageInfo, filerelativeurl);
-                        clientContext.executeQueryAsync(
-                            (sender, args) => {
-                                // this.removeSolutionFile(clientContext,filerelativeurl);
-                                Util.Resolve<void>(resolve, solutionConfig.Title, `Activated Solution with title : '${solutionConfig.Title}'.`);
-                            },
-                            (sender, args) => {
-                                Util.Reject<void>(reject, solutionConfig.Title,
-                                    `Error while installing Solution with the title '${solutionConfig.Title}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
-                            });
-                    } else {
-                        Util.Reject<void>(reject, solutionConfig.Title,
-                            `Error while deactivating Solution with the title '${solutionConfig.Title}'- Solution already exists in Solution Gallery`);
-                    }
-                })
-                .catch(() => {
+            SP.Publishing.DesignPackage.install(clientContext, clientContext.get_site(), packageInfo, filerelativeurl);
+            clientContext.executeQueryAsync(
+                (sender, args) => {
+                    this.removeSolutionFile(clientContext, filerelativeurl)
+                        .then(() => { Util.Resolve<void>(resolve, solutionConfig.Title, `Activated Solution with title : '${solutionConfig.Title}'.`); })
+                        .catch((error) => {
+                            Util.Reject<void>(reject, solutionConfig.Title,
+                                `Error while deleting Solution File with the title '${solutionConfig.Title}': ${Util.getErrorMessage(error)}`);
+                        });
+                },
+                (sender, args) => {
                     Util.Reject<void>(reject, solutionConfig.Title,
-                        `Error while deactivating Solution with the title '${solutionConfig.Title}'- Solution Gallery could not be checked`);
+                        `Error while installing Solution with the title '${solutionConfig.Title}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
                 });
         });
     }
 
     private uninstallSolution(solutionConfig: ISolution, clientContext: SP.ClientContext, packageInfo: SP.Publishing.DesignPackageInfo): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
-            this.checkSolutionGallery(solutionConfig, clientContext)
-                .then((isExisting) => {
-                    if (isExisting) {
-                        SP.Publishing.DesignPackage.unInstall(clientContext, clientContext.get_site(), packageInfo);
-                        clientContext.executeQueryAsync(
-                            (sender, args) => {
-                                Util.Resolve<void>(resolve, solutionConfig.Title, `Deactivated Solution with title : '${solutionConfig.Title}'.`);
-                            },
-                            (sender, args) => {
-                                Util.Reject<void>(reject, solutionConfig.Title,
-                                    `Error while deactivating Solution with the title '${solutionConfig.Title}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
-                            });
-                    } else {
-                        Util.Reject<void>(reject, solutionConfig.Title,
-                            `Error while deactivating Solution with the title '${solutionConfig.Title}'- Solution not found in Solution Gallery`);
-                    }
-                })
-                .catch(() => {
+            SP.Publishing.DesignPackage.unInstall(clientContext, clientContext.get_site(), packageInfo);
+            clientContext.executeQueryAsync(
+                (sender, args) => {
+                    Util.Resolve<void>(resolve, solutionConfig.Title, `Deactivated Solution with title : '${solutionConfig.Title}'.`);
+                },
+                (sender, args) => {
                     Util.Reject<void>(reject, solutionConfig.Title,
-                        `Error while deactivating Solution with the title '${solutionConfig.Title}'- Solution Gallery could not be checked`);
+                        `Error while deactivating Solution with the title '${solutionConfig.Title}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
                 });
-
         });
     }
 
@@ -138,27 +118,4 @@ export class SolutionHandler implements ISPObjectHandler {
                 });
         });
     }
-
-    private checkSolutionGallery(solutionConfig: ISolution, clientContext: SP.ClientContext) {
-        return new Promise<boolean>((resolve, reject) => {
-            let solutionGallery = clientContext.get_web().get_lists().getByTitle("Solution Gallery");
-            let solutionGalRootFolder = solutionGallery.get_rootFolder();
-            let qry = new SP.CamlQuery();
-            qry.set_viewXml(`<View><Query><Where><Contains><FieldRef Name='FileLeafRef' /><Value Type='File'>${solutionConfig.Title}</Value></Contains></Where></Query></View>`);
-            let itemColl = solutionGallery.getItems(qry);
-            clientContext.load(itemColl);
-            clientContext.load(solutionGalRootFolder);
-            clientContext.executeQueryAsync(
-                (sender, args) => {
-                    let count = itemColl.get_count();
-                    let isExisting = count === 1 ? true : false;
-                    resolve(isExisting);
-                },
-                (sender, args) => {
-                    reject();
-                }
-            );
-        });
-    }
-
 }

@@ -1450,21 +1450,6 @@
                                             "Overwrite": true
                                         }
                                     ]
-                                },
-                                {
-                                    "Name": "Solutions",
-                                    "Files": [
-                                        {
-                                            "Name": "SandboxWSPTest.wsp",
-                                            "Src": "./config/files/LibraryFiles/SandboxWSPTest.wsp",
-                                            "Overwrite": true
-                                        },
-                                        {
-                                            "Name": "SandboxWSPTest2.wsp",
-                                            "Src": "./config/files/LibraryFiles/SandboxWSPTest2.wsp",
-                                            "Overwrite": true
-                                        }
-                                    ]
                                 }
                             ]
                         }
