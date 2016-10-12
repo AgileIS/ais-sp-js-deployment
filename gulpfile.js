@@ -43,7 +43,7 @@ gulp.task('clean-ts', function (cb) {
 });
 
 gulp.task('merge', function (cb) {
-    return gulp.src('./gulpfile.template.js')
+    return gulp.src('./gulpfile.merge.js')
         .pipe(chug())
 });
 

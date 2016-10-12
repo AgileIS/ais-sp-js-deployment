@@ -1,7 +1,7 @@
 {
     "Sites": [
         {
-            "RelativeUrl": "demo",
+            "Identifier": "sitex",
             "Fields": [
                 {
                     "Title": "TestField2",

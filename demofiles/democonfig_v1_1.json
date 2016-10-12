@@ -1,7 +1,7 @@
 {
     "Sites": [
         {
-            "RelativeUrl": "demo",
+            "Identifier": "sitex",
             "Lists": [
                 {
                     "Title": "TestListe2 1.1",
