@@ -15,7 +15,7 @@ export class SiteHandler implements ISPObjectHandler {
                         switch (siteConfig.ControlOption) {
                             case ControlOption.Update:
                                 this.updateSiteProperties(siteConfig, PnP.sp.web)
-                                    .then((siteProsssingResult) => { resolve(siteProsssingResult); })
+                                    .then((siteProcessingResult) => { resolve(siteProcessingResult); })
                                     .catch((error) => { reject(error); });
                                 break;
                             case ControlOption.Delete:

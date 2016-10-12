@@ -16,14 +16,9 @@ export class SolutionHandler implements ISPObjectHandler {
                 } else {
                     if (solutionConfig.Title) {
                         let context = SP.ClientContext.get_current();
-                        this.processingSolutionConfig(solutionConfig, context)
-                            .then(() => { resolve(); })
-                            .catch((error) => {
-                                Util.Retry(error, solutionConfig.Title,
-                                    () => {
-                                        return this.processingSolutionConfig(solutionConfig, context);
-                                    });
-                            });
+                        Util.tryToProcess(solutionConfig.Title, () => { return this.processingSolutionConfig(solutionConfig, context); })
+                            .then(solutionProcessingResult => { resolve(solutionProcessingResult); })
+                            .catch(error => { reject(error); });
                     } else {
                         Util.Reject<void>(reject, "Unknow Solution", `Error while processing Solution: Solution Title is undefined.`);
                     }

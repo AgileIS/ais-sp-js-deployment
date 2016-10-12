@@ -1,6 +1,5 @@
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import * as url from "url";
-import { IPromiseResult } from "../Interfaces/IPromiseResult";
 import { PromiseResult } from "../PromiseResult";
 
 export namespace Util {
@@ -45,25 +44,44 @@ export namespace Util {
         return errorMessage;
     }
 
-    export function Retry(error: any, configNodeIdentifier: string, retryFunction: () => Promise<IPromiseResult<any>>) {
-        Logger.write(`Retry process for '${configNodeIdentifier}' because Error: ${getErrorMessage(error)}`, Logger.LogLevel.Warning);
-        setTimeout(() => {
-            Logger.write(`Retry first time: '${configNodeIdentifier}'`, Logger.LogLevel.Warning);
-            retryFunction().then((result) => {
-                return Promise.resolve(result);
-            }).catch((firstRetryError) => {
+    export function tryToProcess<T>(configNodeIdentifier: string, executionFunction: () => Promise<T>, executionCount = 3, executionTimeOut = 0): Promise<T> {
+        return new Promise<T>((resolve, reject) => {
+            if (executionCount < 1) {
+                reject(`Error in 'Retry<T>' function: Parameter 'executionCount' is lower than 1 for node '${configNodeIdentifier}'`);
+            } else {
                 setTimeout(() => {
-                    Logger.write(`Retry failed first time for '${configNodeIdentifier}' - ${getErrorMessage(firstRetryError)}`, Logger.LogLevel.Warning);
-                    retryFunction().then((result) => {
-                        return Promise.resolve(result);
-                    }).catch((secondRetryError) => {
-                        Logger.write(`Retry failed second time: '${configNodeIdentifier}' - Reject`, Logger.LogLevel.Warning);
-                        return Promise.reject(getErrorMessage(secondRetryError));
-                    });
-                }, 5000);
-            });
-        }, 2500);
+                    if (executionTimeOut !== 0) {
+                        Logger.write(`Retry node processing for '${configNodeIdentifier}'`, Logger.LogLevel.Warning);
+                    }
+                    executionFunction()
+                        .then((executionResult) => {
+                            resolve(executionResult);
+                        })
+                        .catch((error) => {
+                            if ((executionCount - 1) >= 1) {
+                                if (executionTimeOut === 0) {
+                                    Logger.write(`Node processing failed for '${configNodeIdentifier}'.
+                                    ${Util.getErrorMessage(error)}
+                                    Start retry for maximum ${executionCount} times`, Logger.LogLevel.Warning);
+                                }
+                                let newExecutionTimeout = executionTimeOut + 2500;
+                                tryToProcess(configNodeIdentifier, executionFunction, executionCount - 1, newExecutionTimeout)
+                                    .then((retryResult) => {
+                                        resolve(retryResult);
+                                    })
+                                    .catch((retryError) => {
+                                        reject(retryError);
+                                    });
+                            } else {
+                                reject(error);
+                            }
+                        });
+                }, executionTimeOut);
+            }
+        });
     }
+
+
 
     export function getRelativeUrl(absoluteUrl: string): string {
         let urlObject = url.parse(absoluteUrl, true, true);

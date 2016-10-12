@@ -16,14 +16,9 @@ export class ViewHandler implements ISPObjectHandler {
                         `View handler parent promise value result is null or undefined for the view with the title '${viewConfig.Title}'!`);
                 } else {
                     let list = promiseResult.value;
-                    this.processingViewConfig(viewConfig, list)
-                        .then((viewProsssingResult) => { resolve(viewProsssingResult); })
-                        .catch((error) => {
-                            Util.Retry(error, viewConfig.Title,
-                                () => {
-                                    return this.processingViewConfig(viewConfig, list);
-                                });
-                        });
+                    Util.tryToProcess(viewConfig.InternalName, () => { return this.processingViewConfig(viewConfig, list); })
+                        .then(viewProcessingResult => { resolve(viewProcessingResult); })
+                        .catch(error => { reject(error); });
                 }
             });
         });

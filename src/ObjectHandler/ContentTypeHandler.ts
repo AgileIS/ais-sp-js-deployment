@@ -19,23 +19,20 @@ export class ContentTypeHandler implements ISPObjectHandler {
                     if (contentTypeConfig && contentTypeConfig.Id && contentTypeConfig.Name) {
                         let web = promiseResult.value;
                         let context = SP.ClientContext.get_current();
-                        this.processingContentTypeConfig(contentTypeConfig, context)
-                            .then((contentTypeProsssingResult) => {
+                        Util.tryToProcess(contentTypeConfig.Id, () => { return this.processingContentTypeConfig(contentTypeConfig, context); })
+                            .then((contentTypeProcessingResult) => {
                                 let resolveValue = undefined;
-                                if (contentTypeProsssingResult.value) {
-                                    let contentType = (<SP.ContentType>contentTypeProsssingResult.value);
+                                if (contentTypeProcessingResult.value) {
+                                    let contentType = (<SP.ContentType>contentTypeProcessingResult.value);
                                     resolveValue = web.contentTypes.getById(contentType.get_id().get_stringValue());
                                 }
-                                resolve(new PromiseResult(contentTypeProsssingResult.message, resolveValue));
+                                resolve(new PromiseResult(contentTypeProcessingResult.message, resolveValue));
                             })
                             .catch((error) => {
-                                Util.Retry(error, contentTypeConfig.Id,
-                                    () => {
-                                        return this.processingContentTypeConfig(contentTypeConfig, context);
-                                    });
+                                reject(error);
                             });
                     } else {
-                        Util.Reject<void>(reject, "Unknow content type", `Error while processing content type: Content type id or/and name are undefined.`);
+                        Util.Reject<void>(reject, "Unknown content type", `Error while processing content type: Content type id or/and name are undefined.`);
                     }
                 }
             });

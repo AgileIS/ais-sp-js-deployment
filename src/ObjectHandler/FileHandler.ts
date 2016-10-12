@@ -42,7 +42,7 @@ export class FileHandler implements ISPObjectHandler {
                                 processing = this.processingFolderConfig(fileFolderConfig as IFolder, (parent as Folder).folders);
                             }
                             processing
-                                .then((fileFolderProsssingResult) => { resolve(fileFolderProsssingResult); })
+                                .then((fileFolderProcessingResult) => { resolve(fileFolderProcessingResult); })
                                 .catch((error) => { reject(error); });
                         }
 
