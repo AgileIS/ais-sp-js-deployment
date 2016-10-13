@@ -1,6 +1,6 @@
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import * as url from "url";
-import { PromiseResult } from "../PromiseResult";
+import { PromiseResult } from "../promiseResult";
 
 export namespace Util {
     /** Resolve with a IPromiseResult */

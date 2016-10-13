@@ -1,4 +1,4 @@
-import { IContents } from "./IContent";
+import { IContents } from "./iContent";
 
 export interface IWebPart {
     Title: string;

@@ -1,4 +1,4 @@
-import { IRoleAssignment } from "./IRoleAssignment";
+import { IRoleAssignment } from "./iRoleAssignment";
 
 export interface ISecurity {
     BreakRoleInheritance: boolean;

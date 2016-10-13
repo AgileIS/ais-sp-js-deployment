@@ -1,4 +1,4 @@
-import { IViewField } from "../Types/IViewField";
+import { IViewField } from "../types/iViewField";
 
 export interface IView {
     Title: string;

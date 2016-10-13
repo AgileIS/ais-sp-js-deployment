@@ -1,13 +1,13 @@
-import { IList } from "./IList";
-import { ICustomAction } from "./ICustomaction";
-import { IFeature } from "./IFeature";
-import { IFile } from "./IFile";
-import { IField } from "./IField";
-import { INavigation } from "./INavigation";
-import { IComposedLook } from "./IComposedlook";
-import { IWebSettings } from "./IWebsettings";
-import { IContentType } from "./IContentType";
-import { IPropertyBagEntry } from "./IPropertyBagEntry";
+import { IList } from "./iList";
+import { ICustomAction } from "./iCustomaction";
+import { IFeature } from "./iFeature";
+import { IFile } from "./iFile";
+import { IField } from "./iField";
+import { INavigation } from "./iNavigation";
+import { IComposedLook } from "./iComposedlook";
+import { IWebSettings } from "./iWebsettings";
+import { IContentType } from "./iContentType";
+import { IPropertyBagEntry } from "./iPropertyBagEntry";
 
 export interface ISite {
     Url: string;

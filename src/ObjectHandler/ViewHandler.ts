@@ -1,11 +1,11 @@
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { List } from "@agileis/sp-pnp-js/lib/sharepoint/rest/lists";
 import { View } from "@agileis/sp-pnp-js/lib/sharepoint/rest/views";
-import { ISPObjectHandler } from "../Interfaces/ObjectHandler/ISPObjectHandler";
-import { IView } from "../Interfaces/Types/IView";
-import { IPromiseResult } from "../Interfaces/IPromiseResult";
-import { ControlOption } from "../Constants/ControlOption";
-import { Util } from "../Util/Util";
+import { ISPObjectHandler } from "../interfaces/objectHandler/iSpObjectHandler";
+import { IView } from "../interfaces/types/iView";
+import { IPromiseResult } from "../interfaces/iPromiseResult";
+import { ControlOption } from "../constants/controlOption";
+import { Util } from "../util/util";
 
 export class ViewHandler implements ISPObjectHandler {
     public execute(viewConfig: IView, parentPromise: Promise<IPromiseResult<List>>): Promise<IPromiseResult<void | View>> {

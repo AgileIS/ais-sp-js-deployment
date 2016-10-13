@@ -1,13 +1,13 @@
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
 import { List } from "@agileis/sp-pnp-js/lib/sharepoint/rest/lists";
-import { ISPObjectHandler } from "../interfaces/ObjectHandler/ispobjecthandler";
-import { IList } from "../interfaces/Types/IList";
-import { IContentTypeBinding } from "../interfaces/Types/IContentTypeBinding";
-import { ListTemplates } from "../Constants/ListTemplates";
-import { IPromiseResult } from "../Interfaces/IPromiseResult";
-import { ControlOption } from "../Constants/ControlOption";
-import { Util } from "../Util/Util";
+import { ISPObjectHandler } from "../interfaces/objectHandler/iSpObjectHandler";
+import { IList } from "../interfaces/types/iList";
+import { IContentTypeBinding } from "../interfaces/types/iContentTypeBinding";
+import { ListTemplates } from "../constants/listTemplates";
+import { IPromiseResult } from "../interfaces/iPromiseResult";
+import { ControlOption } from "../constants/controlOption";
+import { Util } from "../util/util";
 
 export class ListHandler implements ISPObjectHandler {
     public execute(listConfig: IList, parentPromise: Promise<IPromiseResult<Web>>): Promise<IPromiseResult<void | List>> {

@@ -1,4 +1,4 @@
-import { INavigationNode } from "./inavigationnode";
+import { INavigationNode } from "./iNavigationNode";
 
 export interface INavigation {
     UseShared: boolean;

@@ -1,10 +1,10 @@
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
-import { ISPObjectHandler } from "../Interfaces/ObjectHandler/ISPObjectHandler";
-import { ISolution } from "../Interfaces/Types/ISolution";
+import { ISPObjectHandler } from "../interfaces/objectHandler/iSpObjectHandler";
+import { ISolution } from "../interfaces/types/iSolution";
 import { File } from "@agileis/sp-pnp-js/lib/sharepoint/rest/files";
-import { IPromiseResult } from "../Interfaces/IPromiseResult";
-import { ControlOption } from "../Constants/ControlOption";
-import { Util } from "../Util/Util";
+import { IPromiseResult } from "../interfaces/iPromiseResult";
+import { ControlOption } from "../constants/controlOption";
+import { Util } from "../util/util";
 
 export class SolutionHandler implements ISPObjectHandler {
     public execute(solutionConfig: ISolution, parentPromise: Promise<IPromiseResult<File>>): Promise<IPromiseResult<void>> {

@@ -1,4 +1,4 @@
-import { IPromiseResult } from "./Interfaces/IPromiseResult";
+import { IPromiseResult } from "./interfaces/iPromiseResult";
 
 export class PromiseResult<TValue> implements IPromiseResult<TValue> {
     public message: string;

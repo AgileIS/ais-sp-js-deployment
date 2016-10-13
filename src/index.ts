@@ -6,8 +6,8 @@ import * as childProcess from "child_process";
 import * as path from "path";
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { MyConsoleLogger } from "./Logger/MyConsoleLogger";
-import { IGlobalDeploymentConfig } from "./Interfaces/Config/GlobalDeploymentConfig";
-import { IForkProcessArguments } from "./Interfaces/Config/ForkProcessArguments";
+import { IGlobalDeploymentConfig } from "./interfaces/config/iGlobalDeploymentConfig";
+import { IForkProcessArguments } from "./interfaces/config/iForkProcessArguments";
 
 export namespace AisDeploy {
 

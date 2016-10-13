@@ -13,16 +13,16 @@ const confDestReg = /configDest\s=\s'.*'/;
 let confDest = 'configDest = \'../config/\'';
 const confPrefixReg = /partialConfigPrefix\s=\s'.*'/;
 let confDemoPrefix = 'partialConfigPrefix = \'democonfig_*.json\'';
-const deployScript = 'cd deploy && gulp && node deploy -f ../config/config_demo.json';
+const deployScript = 'cd deploy && gulp && cd .. && node ./deploy/deploy -f config/config_demo.json';
 
 function processGulpfile() {
     fs.exists(gulpDest, exists => {
         if (exists) {
             let file = fs.readFileSync(gulpDest, 'utf8');
             let fileConfDest = file.match(confDestReg);
-            if(fileConfDest) confDest = fileConfDest[0];
+            if (fileConfDest) confDest = fileConfDest[0];
             let fileConfDemoPrefix = file.match(confPrefixReg);
-            if(fileConfDemoPrefix) confDemoPrefix = fileConfDemoPrefix[0];
+            if (fileConfDemoPrefix) confDemoPrefix = fileConfDemoPrefix[0];
         }
         fs.rename(gulpSrc, gulpDest, error => {
             console.log("- copy gulpfile for config merge");
@@ -51,22 +51,24 @@ function processGulpfile() {
 function processDeployJs() {
     fs.rename(deploySrc, deployDest, error => {
         console.log('- copy deploy.js');
-        if (error) console.error(error);
-
-        fs.readFile(deployDest, 'utf8', (error, data) => {
-            console.log('- fix deploy.js requires');
-            if (error) {
-                console.error(error);
-            } else {
-                let result = data.replace('./index', packageName);
-                result = result.replace('//# sourceMappingURL=deploy.js.map', '');
-                fs.writeFile(deployDest, result, 'utf8', error => {
-                    if (error) {
-                        return console.error(error);
-                    };
-                });
-            }
-        });
+        if (error) {
+            console.error(error);
+        } else {
+            fs.readFile(deployDest, 'utf8', (error, data) => {
+                console.log('- fix deploy.js requires');
+                if (error) {
+                    console.error(error);
+                } else {
+                    let result = data.replace('./index', packageName);
+                    result = result.replace('//# sourceMappingURL=deploy.js.map', '');
+                    fs.writeFile(deployDest, result, 'utf8', error => {
+                        if (error) {
+                            return console.error(error);
+                        };
+                    });
+                }
+            });
+        }
     });
 }
 

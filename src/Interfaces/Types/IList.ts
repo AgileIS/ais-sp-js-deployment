@@ -1,11 +1,11 @@
-import { IFolder } from "./IFolder";
-import { IListFieldRef } from "./IListFieldRef";
-import { IField } from "./IField";
-import { IView } from "./IView";
-import { IFile } from "./IFile";
-import { IItem } from "./IItem";
-import { ISecurity } from "./ISecurity";
-import { IContentTypeBinding } from "./IContentTypeBinding";
+import { IFolder } from "./iFolder";
+import { IListFieldRef } from "./iListFieldRef";
+import { IField } from "./iField";
+import { IView } from "./iView";
+import { IFile } from "./iFile";
+import { IItem } from "./iItem";
+import { ISecurity } from "./iSecurity";
+import { IContentTypeBinding } from "./iContentTypeBinding";
 
 export interface IList {
     Title: string;

@@ -1,12 +1,12 @@
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
 import { ContentType } from "@agileis/sp-pnp-js/lib/sharepoint/rest/contenttypes";
-import { ISPObjectHandler } from "../Interfaces/ObjectHandler/ISPObjectHandler";
-import { IContentType } from "../Interfaces/Types/IContentType";
-import { IPromiseResult } from "../Interfaces/IPromiseResult";
-import { PromiseResult } from "../PromiseResult";
-import { ControlOption } from "../Constants/ControlOption";
-import { Util } from "../Util/Util";
+import { ISPObjectHandler } from "../interfaces/objectHandler/iSpObjectHandler";
+import { IContentType } from "../interfaces/types/iContentType";
+import { IPromiseResult } from "../interfaces/iPromiseResult";
+import { PromiseResult } from "../promiseResult";
+import { ControlOption } from "../constants/controlOption";
+import { Util } from "../util/util";
 
 export class ContentTypeHandler implements ISPObjectHandler {
     public execute(contentTypeConfig: IContentType, parentPromise: Promise<IPromiseResult<Web>>): Promise<IPromiseResult<void | ContentType>> {

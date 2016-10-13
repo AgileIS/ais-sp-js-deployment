@@ -1,4 +1,4 @@
-import { ISPObjectHandler } from "./ISPObjectHandler";
+import { ISPObjectHandler } from "./iSpObjectHandler";
 
 export interface ISPObjectHandlerCollection {
         Features: ISPObjectHandler;

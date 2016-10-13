@@ -7,8 +7,8 @@ import http = require("http");
 import https = require("https");
 import * as url from "url";
 import * as vm from "vm";
-import { ISiteDeploymentConfig } from "./Interfaces/Config/SiteDeploymentConfig";
-import { AuthenticationType } from "./Constants/AuthenticationType";
+import { ISiteDeploymentConfig } from "./interfaces/config/iSiteDeploymentConfig";
+import { AuthenticationType } from "./constants/authenticationType";
 import { Util } from "./Util/Util";
 
 declare var global: NodeJS.Global;

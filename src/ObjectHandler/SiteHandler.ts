@@ -1,10 +1,10 @@
 import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
 import { ISite } from "../Interfaces/Types/ISite";
 import * as PnP from "@agileis/sp-pnp-js";
-import { ISPObjectHandler } from "../Interfaces/ObjectHandler/ISPObjectHandler";
-import { IPromiseResult } from "../Interfaces/IPromiseResult";
-import { Util } from "../Util/Util";
-import { ControlOption } from "../Constants/ControlOption";
+import { ISPObjectHandler } from "../interfaces/objectHandler/iSpObjectHandler";
+import { IPromiseResult } from "../interfaces/iPromiseResult";
+import { Util } from "../util/util";
+import { ControlOption } from "../constants/controlOption";
 
 export class SiteHandler implements ISPObjectHandler {
     public execute(siteConfig: ISite, parentPromise: Promise<IPromiseResult<void>>): Promise<IPromiseResult<Web>> {

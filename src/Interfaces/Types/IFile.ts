@@ -1,6 +1,6 @@
-import { IWebPart } from "./IWebPart";
-import { IHiddenView } from "./IHiddenView";
-import { IDataConnection } from "./IDataConnection";
+import { IWebPart } from "./iWebPart";
+import { IHiddenView } from "./iHiddenView";
+import { IDataConnection } from "./iDataConnection";
 
 export interface IFile {
     Overwrite: boolean;

@@ -1,10 +1,10 @@
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
-import { ISPObjectHandler } from "../Interfaces/ObjectHandler/ISPObjectHandler";
-import { IPromiseResult } from "../Interfaces/IPromiseResult";
-import { INavigation } from "../Interfaces/Types/INavigation";
-import { INavigationNode } from "../Interfaces/Types/INavigationNode";
-import { Util } from "../Util/Util";
+import { ISPObjectHandler } from "../interfaces/objectHandler/iSpObjectHandler";
+import { IPromiseResult } from "../interfaces/iPromiseResult";
+import { INavigation } from "../interfaces/types/iNavigation";
+import { INavigationNode } from "../interfaces/types/iNavigationNode";
+import { Util } from "../util/util";
 
 export class NavigationHandler implements ISPObjectHandler {
     public execute(navigationConfig: INavigation, parentPromise: Promise<IPromiseResult<Web>>): Promise<IPromiseResult<void>> {

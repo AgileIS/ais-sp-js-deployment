@@ -1,4 +1,4 @@
-import { AuthenticationType } from "../../Constants/AuthenticationType";
+import { AuthenticationType } from "../../constants/authenticationType";
 
 export interface IUserConfig {
     username: string;

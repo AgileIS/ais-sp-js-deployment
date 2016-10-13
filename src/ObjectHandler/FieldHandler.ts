@@ -4,12 +4,12 @@ import { Fields } from "@agileis/sp-pnp-js/lib/sharepoint/rest/Fields";
 import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
 import { Field } from "@agileis/sp-pnp-js/lib/sharepoint/rest/fields";
 import { List } from "@agileis/sp-pnp-js/lib/sharepoint/rest/Lists";
-import { ISPObjectHandler } from "../Interfaces/ObjectHandler/ISPObjectHandler";
-import { IPromiseResult } from "../Interfaces/IPromiseResult";
-import { IField } from "../Interfaces/Types/IField";
-import { FieldTypeKind } from "../Constants/FieldTypeKind";
-import { ControlOption } from "../Constants/ControlOption";
-import { Util } from "../Util/Util";
+import { ISPObjectHandler } from "../interfaces/objectHandler/iSpObjectHandler";
+import { IPromiseResult } from "../interfaces/iPromiseResult";
+import { IField } from "../interfaces/types/iField";
+import { FieldTypeKind } from "../constants/fieldTypeKind";
+import { ControlOption } from "../constants/controlOption";
+import { Util } from "../util/util";
 
 class LookupFieldInfo {
     public clientContext: SP.ClientContext;

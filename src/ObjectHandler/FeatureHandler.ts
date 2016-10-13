@@ -1,9 +1,9 @@
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
-import { ISPObjectHandler } from "../Interfaces/ObjectHandler/ISPObjectHandler";
-import { IFeature } from "../Interfaces/Types/IFeature";
-import { IPromiseResult } from "../Interfaces/IPromiseResult";
-import { Util } from "../Util/Util";
+import { ISPObjectHandler } from "../interfaces/objectHandler/iSpObjectHandler";
+import { IFeature } from "../interfaces/types/iFeature";
+import { IPromiseResult } from "../interfaces/iPromiseResult";
+import { Util } from "../util/util";
 
 export class FeatureHandler implements ISPObjectHandler {
     private noRetry: boolean = false;

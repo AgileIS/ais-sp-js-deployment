@@ -1,4 +1,4 @@
-import { IFile } from "./ifile";
+import { IFile } from "./iFile";
 
 export interface IFolder {
     Name: string;
