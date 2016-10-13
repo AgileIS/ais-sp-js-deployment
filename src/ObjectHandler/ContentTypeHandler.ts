@@ -101,8 +101,8 @@ export class ContentTypeHandler implements ISPObjectHandler {
                     }
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, contentTypeConfig.Id,
-                        `Error while requesting content type with the id '${contentTypeConfig.Id}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject<void>(reject, contentTypeConfig.Id, `Error while requesting content type with the id '${contentTypeConfig.Id}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 });
         });
     }
@@ -230,8 +230,8 @@ export class ContentTypeHandler implements ISPObjectHandler {
                         .catch((error) => { reject(error); });
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, contentTypeConfig.Id,
-                        `Error while adding content type with the id '${contentTypeConfig.Id}':  ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject<void>(reject, contentTypeConfig.Id, `Error while adding content type with the id '${contentTypeConfig.Id}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 }
             );
         });
@@ -247,8 +247,8 @@ export class ContentTypeHandler implements ISPObjectHandler {
                     Util.Resolve<SP.ContentType>(resolve, contentTypeConfig.Id, `Updated content type: '${contentTypeConfig.Id}'.`, contentType);
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, contentTypeConfig.Id,
-                        `Error while updating content type with the id '${contentTypeConfig.Id}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject<void>(reject, contentTypeConfig.Id, `Error while updating content type with the id '${contentTypeConfig.Id}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 }
             );
         });
@@ -262,8 +262,8 @@ export class ContentTypeHandler implements ISPObjectHandler {
                     Util.Resolve<void>(resolve, contentTypeConfig.Id, `Deleted content type: '${contentTypeConfig.Id}'.`);
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, contentTypeConfig.Id,
-                        `Error while deleting content type with the id '${contentTypeConfig.Id}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject<void>(reject, contentTypeConfig.Id, `Error while deleting content type with the id '${contentTypeConfig.Id}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 }
             );
         });

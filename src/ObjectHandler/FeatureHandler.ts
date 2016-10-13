@@ -72,7 +72,8 @@ export class FeatureHandler implements ISPObjectHandler {
                     }
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, featureConfig.Id, `Error while requesting feature with the id '${featureConfig.Id}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject<void>(reject, featureConfig.Id, `Error while requesting feature with the id '${featureConfig.Id}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 }
             );
         });
@@ -91,7 +92,8 @@ export class FeatureHandler implements ISPObjectHandler {
                         Util.Resolve<void>(resolve, featureConfig.Id, `Activated feature: '${featureConfig.Id}'.`);
                     },
                     (sender, args) => {
-                        Util.Reject<void>(reject, featureConfig.Id, `Error while activating feature with the id '${featureConfig.Id}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                        Util.Reject<void>(reject, featureConfig.Id, `Error while activating feature with the id '${featureConfig.Id}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                     });
             } else {
                 this._noRetry = true;
@@ -111,7 +113,8 @@ export class FeatureHandler implements ISPObjectHandler {
                         Util.Resolve<void>(resolve, featureConfig.Id, `Deactivated feature: '${featureConfig.Id}'.`);
                     },
                     (sender, args) => {
-                        Util.Reject<void>(reject, featureConfig.Id, `Error while deactivating feature with the id '${featureConfig.Id}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                        Util.Reject<void>(reject, featureConfig.Id, `Error while deactivating feature with the id '${featureConfig.Id}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                     }
                 );
             } else {

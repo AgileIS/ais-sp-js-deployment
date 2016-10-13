@@ -69,8 +69,8 @@ export class SiteHandler implements ISPObjectHandler {
                     Util.Resolve<void>(resolve, siteConfig.Title, `Updated property bag entries in site with the title '${siteConfig.Title}'.`);
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, siteConfig.Title,
-                        `Error while updating property bag in the site with the title '${siteConfig.Title}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject<void>(reject, siteConfig.Title, `Error while updating property bag in the site with the title '${siteConfig.Title}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 });
         });
     }

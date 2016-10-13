@@ -36,12 +36,19 @@ export namespace Util {
         return normalizedUrl;
     }
 
-    export function getErrorMessage(error: any): any {
+    export function getErrorMessage(error: any) {
         let errorMessage = error;
         if (typeof error === "object") {
             if ((error as Object).hasOwnProperty("message")) { errorMessage = error.message; }
         }
         return errorMessage;
+    }
+
+    export function getErrorMessageFromQuery(message: string, stackTrace: string): string {
+        let error = "";
+        if (message) { error += message; }
+        if (stackTrace) { error += "\n" + stackTrace; }
+        return error;
     }
 
     export function tryToProcess<T>(configNodeIdentifier: string, executionFunction: () => Promise<T>, executionCount = 3, executionTimeOut = 0): Promise<T> {
@@ -60,9 +67,9 @@ export namespace Util {
                         .catch((error) => {
                             if ((executionCount - 1) >= 1) {
                                 if (executionTimeOut === 0) {
-                                    Logger.write(`Node processing failed for '${configNodeIdentifier}'.
-                                    ${Util.getErrorMessage(error)}
-                                    Start retry for maximum ${executionCount} times`, Logger.LogLevel.Warning);
+                                    Logger.write(`Node processing failed for '${configNodeIdentifier}'. \n`
+                                    + `${Util.getErrorMessage(error)} \n`
+                                    + `Start retry for maximum ${executionCount} times`, Logger.LogLevel.Warning);
                                 }
                                 let newExecutionTimeout = executionTimeOut + 2500;
                                 tryToProcess(configNodeIdentifier, executionFunction, executionCount - 1, newExecutionTimeout)

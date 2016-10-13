@@ -56,7 +56,8 @@ export class NavigationHandler implements ISPObjectHandler {
                     }
                 },
                 (sender, args) => {
-                    Util.Reject(reject, "Navigation > Quicklaunch", `Error while requesting quicklaunch node collection': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject(reject, "Navigation > Quicklaunch", `Error while requesting quicklaunch node collection': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 }
             );
         });

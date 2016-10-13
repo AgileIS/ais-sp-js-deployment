@@ -151,8 +151,8 @@ export class ViewHandler implements ISPObjectHandler {
                     Util.Resolve<void>(resolve, viewConfig.Title, `Added viewfields to view with the title '${viewConfig.Title}'.`);
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, viewConfig.Title,
-                        `Error while adding viewfields in the view with the title '${viewConfig.Title}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject<void>(reject, viewConfig.Title, `Error while adding viewfields in the view with the title '${viewConfig.Title}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 });
         });
     }

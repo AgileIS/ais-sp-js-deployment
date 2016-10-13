@@ -203,9 +203,8 @@ export class FieldHandler implements ISPObjectHandler {
                     Util.Resolve<LookupFieldInfo>(resolve, undefined, undefined, new LookupFieldInfo(context, lookupList, spFieldCollection));
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, fieldConfig.InternalName,
-                        `Error while requesting lookup list and lookup field collection in adding lookup field with internal name '${fieldConfig.InternalName}':
-                            ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject<void>(reject, fieldConfig.InternalName, `Error while requesting lookup list and lookup field collection in`
+                        + `adding lookup field with internal name '${fieldConfig.InternalName}': ${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 });
         });
     }
@@ -261,8 +260,8 @@ export class FieldHandler implements ISPObjectHandler {
                             Util.Resolve<Field>(resolve, fieldConfig.InternalName, `Added field: '${fieldConfig.InternalName}'.`, fieldCollection.getById(lookupField.get_id().toString()));
                         },
                         (sender, args) => {
-                            Util.Reject<void>(reject, fieldConfig.InternalName, `Error while adding and updating lookup field with internal name '${fieldConfig.InternalName}': ${args.get_message()}'`
-                                + `\n' ${args.get_stackTrace()}`);
+                            Util.Reject<void>(reject, fieldConfig.InternalName, `Error while adding and updating lookup field with internal name '${fieldConfig.InternalName}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                         });
                 })
                 .catch((error) => reject(error));

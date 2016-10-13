@@ -60,8 +60,8 @@ export class SolutionHandler implements ISPObjectHandler {
                         .catch((error) => { reject(error); });
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, solutionConfig.Title,
-                        `Error while requesting Solution with the title '${solutionConfig.Title}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject<void>(reject, solutionConfig.Title, `Error while requesting Solution with the title '${solutionConfig.Title}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 }
             );
         });
@@ -80,8 +80,8 @@ export class SolutionHandler implements ISPObjectHandler {
                         });
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, solutionConfig.Title,
-                        `Error while installing Solution with the title '${solutionConfig.Title}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject<void>(reject, solutionConfig.Title, `Error while installing Solution with the title '${solutionConfig.Title}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 });
         });
     }
@@ -94,8 +94,8 @@ export class SolutionHandler implements ISPObjectHandler {
                     Util.Resolve<void>(resolve, solutionConfig.Title, `Deactivated Solution with title : '${solutionConfig.Title}'.`);
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, solutionConfig.Title,
-                        `Error while deactivating Solution with the title '${solutionConfig.Title}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject<void>(reject, solutionConfig.Title, `Error while deactivating Solution with the title '${solutionConfig.Title}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 });
         });
     }
@@ -110,8 +110,8 @@ export class SolutionHandler implements ISPObjectHandler {
                         resolve();
                     },
                     (sender, args) => {
-                        Util.Reject<void>(reject, solutionConfig.Title,
-                            `Error while deleting Solution with the title '${solutionConfig.Title}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                        Util.Reject<void>(reject, solutionConfig.Title, `Error while deleting Solution with the title '${solutionConfig.Title}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                     });
             } else {
                 Util.Reject<void>(reject, solutionConfig.Title,
