@@ -8,3 +8,4 @@ typings/
 typings.json
 gulpfile.js
 .npmignore
+AisDeploy-*.log

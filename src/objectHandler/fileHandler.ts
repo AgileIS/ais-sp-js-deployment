@@ -34,14 +34,16 @@ export class FileHandler implements ISPObjectHandler {
                             if (parentResult.value instanceof List) {
                                 parent = new Folder(parentRequestResult.RootFolder.__deferred.uri);
                             }
+                            Util.tryToProcess(fileFolderConfig.Name, () => {
+                                let processing: Promise<IPromiseResult<File | Folder | void>>;
+                                if ((fileFolderConfig as IFile).Src) {
+                                    processing = this.processingFileConfig(fileFolderConfig as IFile, (parent as Folder).files);
+                                } else {
+                                    processing = this.processingFolderConfig(fileFolderConfig as IFolder, (parent as Folder).folders);
+                                }
+                                return processing;
 
-                            let processing: Promise<IPromiseResult<File | Folder | void>>;
-                            if ((fileFolderConfig as IFile).Src) {
-                                processing = this.processingFileConfig(fileFolderConfig as IFile, (parent as Folder).files);
-                            } else {
-                                processing = this.processingFolderConfig(fileFolderConfig as IFolder, (parent as Folder).folders);
-                            }
-                            processing
+                            })
                                 .then((fileFolderProcessingResult) => { resolve(fileFolderProcessingResult); })
                                 .catch((error) => { reject(error); });
                         }
@@ -291,7 +293,7 @@ export class FileHandler implements ISPObjectHandler {
                 },
                 (sender, args) => {
                     Util.Reject<void>(reject, fileConfig.Name, `Error while updating data connection for '${fileConfig.Name}': `
-                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
+                        + `${Util.getErrorMessageFromQuery(args.get_message(), args.get_stackTrace())}`);
                 }
             );
         });
