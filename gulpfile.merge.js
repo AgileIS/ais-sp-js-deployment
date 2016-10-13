@@ -8,10 +8,9 @@ const rename = require('gulp-rename');
 const concat = require('gulp-concat');
 const replace = require('gulp-replace');
 
-
-const userConfigPrefix = 'config/userconfig_*.json';
-const partialConfigPrefix = 'config/insiderverzeichnis_*.json';
-//const partialConfigPrefix = 'config/partialconfig_*.json';
+const configDest = 'config/';
+const userConfigPrefix = 'userconfig_*.json';
+const partialConfigPrefix = 'insiderverzeichnis_*.json';
 const configPrefix = 'config_';
 /*
  * value: string => merge by field
@@ -112,7 +111,7 @@ function merge(target, source) {
 
 function combine(userConfigName) {
 
-  return gulp.src([userConfigName, partialConfigPrefix])
+  return gulp.src([userConfigName, configDest + partialConfigPrefix])
     .pipe(jsoncombine(configPrefix + userConfigName.split('_')[1], (configs) => {
       let configNames = Object.getOwnPropertyNames(configs);
       let resultConfig = {};
@@ -124,13 +123,13 @@ function combine(userConfigName) {
       return new Buffer(JSON.stringify(resultConfig), 'utf8');
     }))
     .pipe(jsonFormat(4))
-    .pipe(gulp.dest('./config'));
+    .pipe(gulp.dest(configDest));
 }
 
 gulp.task('combineAll', () => {
   let streams = [];
 
-  streams.push(gulp.src(userConfigPrefix, {
+  streams.push(gulp.src(configDest + userConfigPrefix, {
       read: false
     })
     .pipe(foreach((stream, file) => {
