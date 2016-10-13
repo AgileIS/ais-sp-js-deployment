@@ -6,7 +6,7 @@ export namespace Util {
     /** Resolve with a IPromiseResult */
     export function Resolve<T>(resolve: (value?: PromiseResult<T> | Thenable<PromiseResult<T>>) => void, configNodeIdentifier: string, promiseResultMessage: string, promiseResultValue?: T) {
         if (configNodeIdentifier && promiseResultMessage) {
-            let errorMsg = `'${configNodeIdentifier}' - ${promiseResultMessage}`;
+            let errorMsg = `${configNodeIdentifier} - ${promiseResultMessage}`;
             Logger.write(errorMsg, Logger.LogLevel.Info);
         }
 
@@ -16,7 +16,7 @@ export namespace Util {
     /** Reject with a IPromiseResult */
     export function Reject<T>(reject: (error?: any) => void, configNodeIdentifier: string, promiseResultMessage: string, promiseResultValue?: T) {
         if (configNodeIdentifier && promiseResultMessage) {
-            let errorMsg = `'${configNodeIdentifier}' - ${promiseResultMessage}`;
+            let errorMsg = `${configNodeIdentifier} - ${promiseResultMessage}`;
             Logger.write(errorMsg, Logger.LogLevel.Error);
         }
 
@@ -54,16 +54,14 @@ export namespace Util {
     export function tryToProcess<T>(configNodeIdentifier: string, executionFunction: () => Promise<T>, executionCount = 3, executionTimeOut = 0): Promise<T> {
         return new Promise<T>((resolve, reject) => {
             if (executionCount < 1) {
-                reject(`Error in 'Retry<T>' function: Parameter 'executionCount' is lower than 1 for node '${configNodeIdentifier}'`);
+                reject(`Error in 'tryToProcess<T>' function: Parameter 'executionCount' is lower than 1 for node '${configNodeIdentifier}'`);
             } else {
                 setTimeout(() => {
                     if (executionTimeOut !== 0) {
                         Logger.write(`Retry node processing for '${configNodeIdentifier}'`, Logger.LogLevel.Warning);
                     }
                     executionFunction()
-                        .then((executionResult) => {
-                            resolve(executionResult);
-                        })
+                        .then((executionResult) => { resolve(executionResult); })
                         .catch((error) => {
                             if ((executionCount - 1) >= 1) {
                                 if (executionTimeOut === 0) {
@@ -73,15 +71,9 @@ export namespace Util {
                                 }
                                 let newExecutionTimeout = executionTimeOut + 2500;
                                 tryToProcess(configNodeIdentifier, executionFunction, executionCount - 1, newExecutionTimeout)
-                                    .then((retryResult) => {
-                                        resolve(retryResult);
-                                    })
-                                    .catch((retryError) => {
-                                        reject(retryError);
-                                    });
-                            } else {
-                                reject(error);
-                            }
+                                    .then((retryResult) => { resolve(retryResult); })
+                                    .catch((retryError) => { reject(retryError); });
+                            } else { reject(error); }
                         });
                 }, executionTimeOut);
             }

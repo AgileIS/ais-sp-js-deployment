@@ -28,6 +28,7 @@ import { Util } from "./util/util";
 import * as url from "url";
 
 export class DeploymentManager {
+    private className = "DeploymentManager";
     private siteDeploymentConfig: ISiteDeploymentConfig;
     private deployDependencies: Array<Promise<any>> = new Array();
     private objectHandlers: ISPObjectHandlerCollection = {
@@ -60,10 +61,10 @@ export class DeploymentManager {
         return Promise.all(this.deployDependencies).then(() => {
             return this.processDeploymentConfig()
                 .then(() => {
-                    Logger.write(`site collection '${this.siteDeploymentConfig.Site.Url}' processed`, Logger.LogLevel.Info);
+                    Logger.write(`${this.className} - Site collection '${this.siteDeploymentConfig.Site.Url}' processed`, Logger.LogLevel.Info);
                 })
                 .catch((error) => {
-                    Logger.write(`Error occured while processing site collection '${this.siteDeploymentConfig.Site.Url}' - ` + Util.getErrorMessage(error), Logger.LogLevel.Error);
+                    Logger.write(`${this.className} - Error occured while processing site collection '${this.siteDeploymentConfig.Site.Url}' - ` + Util.getErrorMessage(error), Logger.LogLevel.Error);
                 });
         });
     }
@@ -142,7 +143,7 @@ export class DeploymentManager {
                 processingPromisses.push(fileProcessingPromise);
             });
         } if (!filesHandler) {
-            Logger.write("Processing object handler is undefined while processing files deployment config.", Logger.LogLevel.Error);
+            Logger.write(`${this.className} - Processing object handler is undefined while processing files deployment config.`, Logger.LogLevel.Error);
             processingPromisses.push(Promise.reject(undefined));
         }
 
@@ -157,7 +158,7 @@ export class DeploymentManager {
                 processingPromisses.push(processingHandler.execute(processingConfig, dependentPromise));
             });
         } if (!processingHandler) {
-            Logger.write("Processing object handler is undefined while processing deployment config nodes parallel.", Logger.LogLevel.Error);
+            Logger.write(`${this.className} - Processing object handler is undefined while processing deployment config nodes parallel.`, Logger.LogLevel.Error);
             processingPromisses.push(Promise.reject(undefined));
         }
 
@@ -173,7 +174,7 @@ export class DeploymentManager {
                 });
             }, dependentPromise);
         } if (!processingHandler) {
-            Logger.write("Processing object handler is undefined while processing deployment config nodes sequential.", Logger.LogLevel.Error);
+            Logger.write(`${this.className} - Processing object handler is undefined while processing deployment config nodes sequential.`, Logger.LogLevel.Error);
             processingPromise = Promise.reject(undefined);
         }
 
@@ -189,8 +190,8 @@ export class DeploymentManager {
 
     private setupPnPJs(): void {
         let userConfig = this.siteDeploymentConfig.User;
-        Logger.write("Setup pnp-core-js", Logger.LogLevel.Info);
-        Logger.write(`pnp-core-js authentication type: ${userConfig.authtype}`, Logger.LogLevel.Info);
+        Logger.write(`${this.className} - Setup pnp-core-js`, Logger.LogLevel.Info);
+        Logger.write(`${this.className} - pnp-core-js authentication type: ${userConfig.authtype}`, Logger.LogLevel.Info);
 
         let pnpConfig: LibraryConfiguration;
         if (String(userConfig.authtype).toLowerCase() === AuthenticationType.NTLM.toLowerCase()) {

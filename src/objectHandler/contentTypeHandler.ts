@@ -9,11 +9,12 @@ import { ControlOption } from "../constants/controlOption";
 import { Util } from "../util/util";
 
 export class ContentTypeHandler implements ISPObjectHandler {
+    private handlerName = "ContentTypeHandler";
     public execute(contentTypeConfig: IContentType, parentPromise: Promise<IPromiseResult<Web>>): Promise<IPromiseResult<void | ContentType>> {
         return new Promise<IPromiseResult<ContentType>>((resolve, reject) => {
             parentPromise.then((promiseResult) => {
                 if (!promiseResult || !promiseResult.value) {
-                    Util.Reject<void>(reject, contentTypeConfig.Id,
+                    Util.Reject<void>(reject, this.handlerName,
                         `Content type handler parent promise value result is null or undefined for the content type with the id '${contentTypeConfig.Id}'!`);
                 } else {
                     if (contentTypeConfig && contentTypeConfig.Id && contentTypeConfig.Name) {
@@ -32,7 +33,7 @@ export class ContentTypeHandler implements ISPObjectHandler {
                             })
                             .catch((error) => { reject(error); });
                     } else {
-                        Util.Reject<void>(reject, "Unknown content type", `Error while processing content type: Content type id or/and name are undefined.`);
+                        Util.Reject<void>(reject, this.handlerName, `Error while processing content type: Content type id or/and name are undefined.`);
                     }
                 }
             });
@@ -43,7 +44,7 @@ export class ContentTypeHandler implements ISPObjectHandler {
         return new Promise<IPromiseResult<void | SP.ContentType>>((resolve, reject) => {
             let processingText = contentTypeConfig.ControlOption === ControlOption.ADD || contentTypeConfig.ControlOption === undefined || contentTypeConfig.ControlOption === ""
                 ? "Add" : contentTypeConfig.ControlOption;
-            Logger.write(`Processing ${processingText} content type: '${contentTypeConfig.Id}'.`, Logger.LogLevel.Info);
+            Logger.write(`${this.handlerName} - Processing ${processingText} content type: '${contentTypeConfig.Id}'.`, Logger.LogLevel.Info);
 
             let web = clientContext.get_web();
             let rootWeb = clientContext.get_site().get_rootWeb();
@@ -60,7 +61,7 @@ export class ContentTypeHandler implements ISPObjectHandler {
                                 processingPromise = this.deleteContentType(contentTypeConfig, contentTypeResult);
                                 break;
                             default:
-                                Util.Resolve<SP.ContentType>(resolve, contentTypeConfig.Id,
+                                Util.Resolve<SP.ContentType>(resolve, this.handlerName,
                                     `Content type with the id '${contentTypeConfig.Id}' does not have to be added, because it already exists.`, contentTypeResult);
                                 rejectOrResolved = true;
                                 break;
@@ -68,7 +69,7 @@ export class ContentTypeHandler implements ISPObjectHandler {
                     } else {
                         switch (contentTypeConfig.ControlOption) {
                             case ControlOption.DELETE:
-                                Util.Resolve<void>(resolve, contentTypeConfig.Id, `Content type with the id '${contentTypeConfig.Id}' does not have to be deleted, because it does not exist.`);
+                                Util.Resolve<void>(resolve, this.handlerName, `Content type with the id '${contentTypeConfig.Id}' does not have to be deleted, because it does not exist.`);
                                 rejectOrResolved = true;
                                 break;
                             case ControlOption.UPDATE:
@@ -84,10 +85,10 @@ export class ContentTypeHandler implements ISPObjectHandler {
                             .then((contentTypeProsssingResult) => { resolve(contentTypeProsssingResult); })
                             .catch((error) => { reject(error); });
                     } else if (!rejectOrResolved) {
-                        Logger.write(`Content type handler processing promise is undefined for the content type with the id '${contentTypeConfig.Id}'!`, Logger.LogLevel.Error);
+                        Logger.write(`${this.handlerName} - Content type handler processing promise is undefined for the content type with the id '${contentTypeConfig.Id}'!`, Logger.LogLevel.Error);
                     }
                 })
-                .catch(error => { Util.Reject<void>(reject, contentTypeConfig.Id, `Error while requesting content type with the id '${contentTypeConfig.Id}': ${Util.getErrorMessage(error)}`); });
+                .catch(error => { Util.Reject<void>(reject, this.handlerName, `Error while requesting content type with the id '${contentTypeConfig.Id}': ${Util.getErrorMessage(error)}`); });
         });
     }
 
@@ -207,22 +208,22 @@ export class ContentTypeHandler implements ISPObjectHandler {
                 (sender, args) => {
                     this.updateContentType(contentTypeConfig, newContentType, web)
                         .then((contentTypeUpdateResult) => {
-                            Util.Resolve<SP.ContentType>(resolve, contentTypeConfig.Id, `Created and updated content Type: '${contentTypeConfig.Id}'.`, contentTypeUpdateResult.value);
+                            Util.Resolve<SP.ContentType>(resolve, this.handlerName, `Created and updated content Type: '${contentTypeConfig.Id}'.`, contentTypeUpdateResult.value);
                         })
                         .catch((error) => {
                             this.tryToDeleteCorruptedContentType(contentTypeConfig, context, web)
                                 .then(() => {
-                                    Util.Reject<void>(reject, contentTypeConfig.Id,
+                                    Util.Reject<void>(reject, this.handlerName,
                                         `Error while adding ContentType with the id '${contentTypeConfig.Id}' - corrupted ContentType deleted`);
                                 })
                                 .catch(() => {
-                                    Util.Reject<void>(reject, contentTypeConfig.Id,
+                                    Util.Reject<void>(reject, this.handlerName,
                                         `Error while adding ContentType with the id '${contentTypeConfig.Id}' - corrupted ContentType not deleted`);
                                 });
                         });
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, contentTypeConfig.Id, `Error while adding content type with the id '${contentTypeConfig.Id}': `
+                    Util.Reject<void>(reject, this.handlerName, `Error while adding content type with the id '${contentTypeConfig.Id}': `
                         + `${Util.getErrorMessageFromQuery(args.get_message(), args.get_stackTrace())}`);
                 }
             );
@@ -236,10 +237,10 @@ export class ContentTypeHandler implements ISPObjectHandler {
             contentType.update(true);
             contentType.get_context().executeQueryAsync(
                 (sender, args) => {
-                    Util.Resolve<SP.ContentType>(resolve, contentTypeConfig.Id, `Updated content type: '${contentTypeConfig.Id}'.`, contentType);
+                    Util.Resolve<SP.ContentType>(resolve, this.handlerName, `Updated content type: '${contentTypeConfig.Id}'.`, contentType);
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, contentTypeConfig.Id, `Error while updating content type with the id '${contentTypeConfig.Id}': `
+                    Util.Reject<void>(reject, this.handlerName, `Error while updating content type with the id '${contentTypeConfig.Id}': `
                         + `${Util.getErrorMessageFromQuery(args.get_message(), args.get_stackTrace())}`);
                 }
             );
@@ -251,10 +252,10 @@ export class ContentTypeHandler implements ISPObjectHandler {
             contentType.deleteObject();
             contentType.get_context().executeQueryAsync(
                 (sender, args) => {
-                    Util.Resolve<void>(resolve, contentTypeConfig.Id, `Deleted content type: '${contentTypeConfig.Id}'.`);
+                    Util.Resolve<void>(resolve, this.handlerName, `Deleted content type: '${contentTypeConfig.Id}'.`);
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, contentTypeConfig.Id, `Error while deleting content type with the id '${contentTypeConfig.Id}': `
+                    Util.Reject<void>(reject, this.handlerName, `Error while deleting content type with the id '${contentTypeConfig.Id}': `
                         + `${Util.getErrorMessageFromQuery(args.get_message(), args.get_stackTrace())}`);
                 }
             );
@@ -263,14 +264,14 @@ export class ContentTypeHandler implements ISPObjectHandler {
 
     private tryToDeleteCorruptedContentType(contentTypeConfig: IContentType, clientContext: SP.ClientRuntimeContext, web: SP.Web): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
-            Logger.write(`Try to delete corrupted ContentType with id: '${contentTypeConfig.Id}'`);
+            Logger.write(`${this.handlerName} - Try to delete corrupted ContentType with id: '${contentTypeConfig.Id}'`);
             this.getContentType(contentTypeConfig, clientContext, web)
                 .then((contentTypeResult) => {
                     if (contentTypeResult) {
                         this.deleteContentType(contentTypeConfig, contentTypeResult)
                             .then(() => { resolve(); })
-                            .catch(error => { reject(error); });
-                    } else { reject(`No ContentType with ID '${contentTypeConfig.Id}' found`); }
+                            .catch(() => { reject(); });
+                    } else { reject(`${this.handlerName} - No ContentType with ID '${contentTypeConfig.Id}' found`); }
                 })
                 .catch((error) => { reject(error); });
         });
@@ -286,7 +287,7 @@ export class ContentTypeHandler implements ISPObjectHandler {
             clientContext.executeQueryAsync(
                 (sender, args) => {
                     if (!siteContentType.get_serverObjectIsNull() || !webContentType.get_serverObjectIsNull()) {
-                        Logger.write(`Found ContentType with id: '${contentTypeConfig.Id}'`);
+                        Logger.write(`${this.handlerName} - Found ContentType with id: '${contentTypeConfig.Id}'`);
                         if (!webContentType.get_serverObjectIsNull()) {
                             contentType = webContentType;
                         } else {

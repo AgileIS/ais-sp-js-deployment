@@ -7,12 +7,13 @@ import { Util } from "../util/util";
 
 export class FeatureHandler implements ISPObjectHandler {
     private noRetry: boolean = false;
+    private handlerName = "FeatureHandler";
 
     public execute(featureConfig: IFeature, parentPromise: Promise<IPromiseResult<Web>>): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             parentPromise.then((promiseResult) => {
                 if (!promiseResult || !promiseResult.value) {
-                    Util.Reject<void>(reject, featureConfig.Id,
+                    Util.Reject<void>(reject, this.handlerName,
                         `Feature handler parent promise value result is null or undefined for the feature with the id '${featureConfig.Id}'!`);
                 } else {
                     if (featureConfig.Id) {
@@ -21,7 +22,7 @@ export class FeatureHandler implements ISPObjectHandler {
                             .then((featureProcessingResult) => { resolve(featureProcessingResult); })
                             .catch((error) => { reject(error); });
                     } else {
-                        Util.Reject<void>(reject, "Unknow feature", `Error while processing feature: Feature id is undefined.`);
+                        Util.Reject<void>(reject, this.handlerName, `Error while processing feature: Feature id is undefined.`);
                     }
                 }
             });
@@ -31,7 +32,7 @@ export class FeatureHandler implements ISPObjectHandler {
     private processingFeatureConfig(featureConfig: IFeature, clientContext: SP.ClientContext): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             let processingCrlOption = featureConfig.Deactivate ? "Deactivate" : "Active";
-            Logger.write(`Processing ${processingCrlOption} feature: '${featureConfig.Id}'.`, Logger.LogLevel.Info);
+            Logger.write(`${this.handlerName} - Processing ${processingCrlOption} feature: '${featureConfig.Id}'.`, Logger.LogLevel.Info);
 
             let featureCollection = clientContext.get_site().get_features();
             let currUser = clientContext.get_web().get_currentUser();
@@ -47,16 +48,16 @@ export class FeatureHandler implements ISPObjectHandler {
                     let rejectOrResolved = false;
                     let processingPromise: Promise<IPromiseResult<void>> = undefined;
                     if (!feature.get_serverObjectIsNull()) {
-                        Logger.write(`Found Feature with id: '${featureConfig.Id}'`);
+                        Logger.write(`${this.handlerName} - Found Feature with id: '${featureConfig.Id}'`);
                         if (featureConfig.Deactivate) {
                             processingPromise = this.deactivateFeature(featureConfig, featureCollection, currUser);
                         } else {
-                            Util.Resolve<void>(resolve, featureConfig.Id, `Feature with the id '${featureConfig.Id}' does not have to be added, because it already exists.`);
+                            Util.Resolve<void>(resolve, this.handlerName, `Feature with the id '${featureConfig.Id}' does not have to be added, because it already exists.`);
                             rejectOrResolved = true;
                         }
                     } else {
                         if (featureConfig.Deactivate) {
-                            Util.Resolve<void>(resolve, featureConfig.Id, `Feature with id '${featureConfig.Id}' does not have to be deactivated, because it was not activated.`);
+                            Util.Resolve<void>(resolve, this.handlerName, `Feature with id '${featureConfig.Id}' does not have to be deactivated, because it was not activated.`);
                             rejectOrResolved = true;
                         } else {
                             processingPromise = this.activateFeature(featureConfig, featureCollection, currUser);
@@ -68,11 +69,11 @@ export class FeatureHandler implements ISPObjectHandler {
                             .then((listProcessingResult) => { resolve(listProcessingResult); })
                             .catch((error) => { reject(error); });
                     } else if (!rejectOrResolved) {
-                        Logger.write("Feature handler processing promise is undefined!", Logger.LogLevel.Error);
+                        Logger.write(`${this.handlerName} - Processing promise is undefined!`, Logger.LogLevel.Error);
                     }
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, featureConfig.Id, `Error while requesting feature with the id '${featureConfig.Id}': `
+                    Util.Reject<void>(reject, this.handlerName, `Error while requesting feature with the id '${featureConfig.Id}': `
                             + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 }
             );
@@ -89,15 +90,15 @@ export class FeatureHandler implements ISPObjectHandler {
                 featureCollection.add(new SP.Guid(featureConfig.Id), activateForce, scope as SP.FeatureDefinitionScope);
                 featureCollection.get_context().executeQueryAsync(
                     (sender, args) => {
-                        Util.Resolve<void>(resolve, featureConfig.Id, `Activated feature: '${featureConfig.Id}'.`);
+                        Util.Resolve<void>(resolve, this.handlerName, `Activated feature: '${featureConfig.Id}'.`);
                     },
                     (sender, args) => {
-                        Util.Reject<void>(reject, featureConfig.Id, `Error while activating feature with the id '${featureConfig.Id}': `
+                        Util.Reject<void>(reject, this.handlerName, `Error while activating feature with the id '${featureConfig.Id}': `
                             + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                     });
             } else {
                 this.noRetry = true;
-                Util.Reject<void>(reject, featureConfig.Id,
+                Util.Reject<void>(reject, this.handlerName,
                     `Error while activating feature with the id '${featureConfig.Id}' and feature scope '${featureConfig.Scope}': User '${currentUser.get_loginName()}' is no site administrator`);
             }
         });
@@ -110,16 +111,16 @@ export class FeatureHandler implements ISPObjectHandler {
                 featureCollection.remove(new SP.Guid(featureConfig.Id), true);
                 featureCollection.get_context().executeQueryAsync(
                     (sender, args) => {
-                        Util.Resolve<void>(resolve, featureConfig.Id, `Deactivated feature: '${featureConfig.Id}'.`);
+                        Util.Resolve<void>(resolve, this.handlerName, `Deactivated feature: '${featureConfig.Id}'.`);
                     },
                     (sender, args) => {
-                        Util.Reject<void>(reject, featureConfig.Id, `Error while deactivating feature with the id '${featureConfig.Id}': `
+                        Util.Reject<void>(reject, this.handlerName, `Error while deactivating feature with the id '${featureConfig.Id}': `
                             + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                     }
                 );
             } else {
                 this.noRetry = true;
-                Util.Reject<void>(reject, featureConfig.Id,
+                Util.Reject<void>(reject, this.handlerName,
                     `Error while deactivating feature with the id '${featureConfig.Id}' and feature scope '${featureConfig.Scope}': User '${currentUser.get_loginName()}' is no site administrator`);
             }
         });
