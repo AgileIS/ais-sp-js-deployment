@@ -18,16 +18,16 @@ class NodeHttpProxyImpl implements INodeHttpProxy {
 
     public url: url.Url;
 
-    private _httpSavedRequest = undefined;
-    private _httpsSavedRequest = undefined;
-    private _isActive: boolean = false;
+    private httpSavedRequest = undefined;
+    private httpsSavedRequest = undefined;
+    private active: boolean = false;
 
     public static httpRequest(options: http.RequestOptions, callback?: (res: http.IncomingMessage) => void): http.ClientRequest {
-        return NodeHttpProxyImpl.instance._httpSavedRequest(NodeHttpProxyImpl.setupProxy(options), callback);
+        return NodeHttpProxyImpl.instance.httpSavedRequest(NodeHttpProxyImpl.setupProxy(options), callback);
     }
 
     public static httpsRequest(options: http.RequestOptions, callback?: (res: http.IncomingMessage) => void): http.ClientRequest {
-        return NodeHttpProxyImpl.instance._httpsSavedRequest(NodeHttpProxyImpl.setupProxy(options), callback);
+        return NodeHttpProxyImpl.instance.httpsSavedRequest(NodeHttpProxyImpl.setupProxy(options), callback);
     }
 
     public static setupProxy(options: http.RequestOptions): http.RequestOptions {
@@ -53,8 +53,8 @@ class NodeHttpProxyImpl implements INodeHttpProxy {
             requestOptions.protocol = NodeHttpProxyImpl.instance.url.protocol;
             requestOptions.hostname = NodeHttpProxyImpl.instance.url.hostname;
             requestOptions.port = Number(NodeHttpProxyImpl.instance.url.port);
-            requestOptions.href = null;
-            requestOptions.host = null;
+            requestOptions.href = undefined;
+            requestOptions.host = undefined;
             return requestOptions;
         }
         return options;
@@ -65,36 +65,33 @@ class NodeHttpProxyImpl implements INodeHttpProxy {
     }
 
     public get isActive(): boolean {
-        return this._isActive;
+        return this.active;
     }
 
     public activate() {
-        if (!this._isActive) {
-            this._httpSavedRequest = http.request;
+        if (!this.active) {
+            this.httpSavedRequest = http.request;
             http.request = NodeHttpProxyImpl.httpRequest;
 
-            this._httpsSavedRequest = https.request;
+            this.httpsSavedRequest = https.request;
             https.request = NodeHttpProxyImpl.httpsRequest;
 
-            this._isActive = true;
+            this.active = true;
         }
     }
 
     public deactivate() {
-        if (this._isActive) {
-            http.request = this._httpSavedRequest;
-            this._httpSavedRequest = () => { ; };
+        if (this.active) {
+            http.request = this.httpSavedRequest;
+            this.httpSavedRequest = () => { ; };
 
-            https.request = this._httpsSavedRequest;
-            this._httpsSavedRequest = () => { ; };
+            https.request = this.httpsSavedRequest;
+            this.httpsSavedRequest = () => { ; };
 
-            this._isActive = false;
+            this.active = false;
         }
     }
 }
 
+// tslint:disable-next-line
 export let NodeHttpProxy: INodeHttpProxy = new NodeHttpProxyImpl();
-
-
-
-

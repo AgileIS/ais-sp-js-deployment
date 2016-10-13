@@ -28,9 +28,9 @@ import { Util } from "./Util/Util";
 import * as url from "url";
 
 export class DeploymentManager {
-    private _siteDeploymentConfig: ISiteDeploymentConfig;
-    private _deployDependencies: Array<Promise<any>> = new Array();
-    private _objectHandlers: ISPObjectHandlerCollection = {
+    private siteDeploymentConfig: ISiteDeploymentConfig;
+    private deployDependencies: Array<Promise<any>> = new Array();
+    private objectHandlers: ISPObjectHandlerCollection = {
         Features: new FeatureHandler(),
         Sites: new SiteHandler(),
         ContentTypes: new ContentTypeHandler(),
@@ -46,39 +46,39 @@ export class DeploymentManager {
     constructor(siteDeploymentConfig: ISiteDeploymentConfig) {
         if (siteDeploymentConfig.Site && siteDeploymentConfig.Site.Url) {
             let layoutsUrlPart = siteDeploymentConfig.Site.LayoutsHive ? `_layouts/${siteDeploymentConfig.Site.LayoutsHive}` : `_layouts/15`;
-            this._siteDeploymentConfig = <ISiteDeploymentConfig>JSON.parse(
+            this.siteDeploymentConfig = <ISiteDeploymentConfig>JSON.parse(
                 Util.replaceUrlTokens(JSON.stringify(siteDeploymentConfig), Util.getRelativeUrl(siteDeploymentConfig.Site.Url), layoutsUrlPart));
             this.setupProxy();
             this.setupPnPJs();
-            this._deployDependencies.push(NodeJsomHandler.initialize(siteDeploymentConfig));
+            this.deployDependencies.push(NodeJsomHandler.initialize(siteDeploymentConfig));
         } else {
             throw new Error("Deployment config site or site url is undefined");
         }
     }
 
     public deploy(): Promise<void> {
-        return Promise.all(this._deployDependencies).then(() => {
+        return Promise.all(this.deployDependencies).then(() => {
             return this.processDeploymentConfig()
                 .then(() => {
-                    Logger.write(`site collection '${this._siteDeploymentConfig.Site.Url}' processed`, Logger.LogLevel.Info);
+                    Logger.write(`site collection '${this.siteDeploymentConfig.Site.Url}' processed`, Logger.LogLevel.Info);
                 })
                 .catch((error) => {
-                    Logger.write(`Error occured while processing site collection '${this._siteDeploymentConfig.Site.Url}' - ` + Util.getErrorMessage(error), Logger.LogLevel.Error);
+                    Logger.write(`Error occured while processing site collection '${this.siteDeploymentConfig.Site.Url}' - ` + Util.getErrorMessage(error), Logger.LogLevel.Error);
                 });
         });
     }
 
     private processDeploymentConfig(): Promise<any> {
-        let siteProcessingPromise = this._objectHandlers.Sites.execute(this._siteDeploymentConfig.Site, Promise.resolve());
+        let siteProcessingPromise = this.objectHandlers.Sites.execute(this.siteDeploymentConfig.Site, Promise.resolve());
 
         let nodeProcessingOrder: string[] = ["Features", "Fields", "ContentTypes", "Lists", "Navigation", "Files", "Solutions"];
-        let existingSiteNodes = Object.keys(this._siteDeploymentConfig.Site);
+        let existingSiteNodes = Object.keys(this.siteDeploymentConfig.Site);
 
         return nodeProcessingOrder.reduce((dependentPromise, processingKey, proecssingIndex, array): Promise<any> => {
             return dependentPromise
                 .then(() => {
-                    let processingConfig = (<any>this._siteDeploymentConfig.Site)[processingKey];
-                    let processingHandler = this._objectHandlers[processingKey];
+                    let processingConfig = (<any>this.siteDeploymentConfig.Site)[processingKey];
+                    let processingHandler = this.objectHandlers[processingKey];
                     let processingPromise: Promise<any> = Promise.resolve();
 
                     if (existingSiteNodes.indexOf(processingKey) > -1 && processingHandler) {
@@ -114,13 +114,13 @@ export class DeploymentManager {
                 let listPromise = listPromiseDictionary[listConfig.InternalName];
                 return dependentPromise
                     .then(() => {
-                        return this.processDeploymentConfigNodesSequential(this._objectHandlers.Fields, listConfig.Fields, listPromise);
+                        return this.processDeploymentConfigNodesSequential(this.objectHandlers.Fields, listConfig.Fields, listPromise);
                     })
                     .then(() => {
                         return Promise.all([
-                            this.processDeploymentConfigNodesParallel(this._objectHandlers.Views, listConfig.Views, listPromise),
-                            this.processDeploymentConfigNodesParallel(this._objectHandlers.Items, listConfig.Items, listPromise),
-                            this.processFilesDeploymentConfig(this._objectHandlers.Files, listConfig.Files, listPromise),
+                            this.processDeploymentConfigNodesParallel(this.objectHandlers.Views, listConfig.Views, listPromise),
+                            this.processDeploymentConfigNodesParallel(this.objectHandlers.Items, listConfig.Items, listPromise),
+                            this.processFilesDeploymentConfig(this.objectHandlers.Files, listConfig.Files, listPromise),
                         ]);
                     });
             }, Promise.resolve());
@@ -181,19 +181,19 @@ export class DeploymentManager {
     }
 
     private setupProxy(): void {
-        if (this._siteDeploymentConfig.User.proxyUrl) {
-            NodeHttpProxy.url = url.parse(this._siteDeploymentConfig.User.proxyUrl);
+        if (this.siteDeploymentConfig.User.proxyUrl) {
+            NodeHttpProxy.url = url.parse(this.siteDeploymentConfig.User.proxyUrl);
             NodeHttpProxy.activate();
         }
     }
 
     private setupPnPJs(): void {
-        let userConfig = this._siteDeploymentConfig.User;
+        let userConfig = this.siteDeploymentConfig.User;
         Logger.write("Setup pnp-core-js", Logger.LogLevel.Info);
         Logger.write(`pnp-core-js authentication type: ${userConfig.authtype}`, Logger.LogLevel.Info);
 
         let pnpConfig: LibraryConfiguration;
-        if (String(userConfig.authtype).toLowerCase() === AuthenticationType.Ntlm.toLowerCase()) {
+        if (String(userConfig.authtype).toLowerCase() === AuthenticationType.NTLM.toLowerCase()) {
             let userAndDommain = userConfig.username.split("\\");
             if (!userConfig.workstation) {
                 userConfig.workstation = "";
@@ -203,21 +203,21 @@ export class DeploymentManager {
                 nodeHttpNtlmClientOptions: {
                     domain: userAndDommain[0],
                     password: userConfig.password,
-                    siteUrl: this._siteDeploymentConfig.Site.Url,
+                    siteUrl: this.siteDeploymentConfig.Site.Url,
                     username: userAndDommain[1],
                     workstation: userConfig.workstation,
                 },
             };
-        } else if (String(userConfig.authtype).toLowerCase() === AuthenticationType.Basic.toLowerCase()) {
+        } else if (String(userConfig.authtype).toLowerCase() === AuthenticationType.BASIC.toLowerCase()) {
             pnpConfig = {
                 nodeHttpBasicClientOptions: {
                     password: userConfig.password,
-                    siteUrl: this._siteDeploymentConfig.Site.Url,
+                    siteUrl: this.siteDeploymentConfig.Site.Url,
                     username: userConfig.username,
                 },
             };
         } else {
-            throw new Error(`Unsupported authentication type. Use ${AuthenticationType.Ntlm} or ${AuthenticationType.Basic} `);
+            throw new Error(`Unsupported authentication type. Use ${AuthenticationType.NTLM} or ${AuthenticationType.BASIC} `);
         }
 
         if (pnpConfig) {

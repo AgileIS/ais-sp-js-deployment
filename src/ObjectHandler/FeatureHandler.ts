@@ -6,7 +6,7 @@ import { IPromiseResult } from "../Interfaces/IPromiseResult";
 import { Util } from "../Util/Util";
 
 export class FeatureHandler implements ISPObjectHandler {
-    private _noRetry: boolean = false;
+    private noRetry: boolean = false;
 
     public execute(featureConfig: IFeature, parentPromise: Promise<IPromiseResult<Web>>): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
@@ -96,7 +96,7 @@ export class FeatureHandler implements ISPObjectHandler {
                             + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                     });
             } else {
-                this._noRetry = true;
+                this.noRetry = true;
                 Util.Reject<void>(reject, featureConfig.Id,
                     `Error while activating feature with the id '${featureConfig.Id}' and feature scope '${featureConfig.Scope}': User '${currentUser.get_loginName()}' is no site administrator`);
             }
@@ -118,7 +118,7 @@ export class FeatureHandler implements ISPObjectHandler {
                     }
                 );
             } else {
-                this._noRetry = true;
+                this.noRetry = true;
                 Util.Reject<void>(reject, featureConfig.Id,
                     `Error while deactivating feature with the id '${featureConfig.Id}' and feature scope '${featureConfig.Scope}': User '${currentUser.get_loginName()}' is no site administrator`);
             }

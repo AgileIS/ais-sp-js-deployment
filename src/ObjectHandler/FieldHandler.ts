@@ -40,7 +40,7 @@ export class FieldHandler implements ISPObjectHandler {
 
     private processingFieldConfig(fieldConfig: IField, fieldCollection: Fields): Promise<IPromiseResult<void | Field>> {
         return new Promise<IPromiseResult<void | Field>>((resolve, reject) => {
-            let processingText = fieldConfig.ControlOption === ControlOption.Add || fieldConfig.ControlOption === undefined || fieldConfig.ControlOption === ""
+            let processingText = fieldConfig.ControlOption === ControlOption.ADD || fieldConfig.ControlOption === undefined || fieldConfig.ControlOption === ""
                 ? "Add" : fieldConfig.ControlOption;
             Logger.write(`Processing ${processingText} field: '${fieldConfig.Title}'.`, Logger.LogLevel.Info);
 
@@ -53,14 +53,14 @@ export class FieldHandler implements ISPObjectHandler {
                         Logger.write(`Found Field with the internal name: '${fieldConfig.InternalName}'`, Logger.LogLevel.Info);
                         let field = fieldCollection.getById(fieldRequestResults[0].Id);
                         switch (fieldConfig.ControlOption) {
-                            case ControlOption.Update:
+                            case ControlOption.UPDATE:
                                 processingPromise = this.updateField(fieldConfig, field);
                                 break;
-                            case ControlOption.Delete:
+                            case ControlOption.DELETE:
                                 processingPromise = this.deleteField(fieldConfig, field);
                                 break;
                             default:
-                                fieldConfig.ControlOption = ControlOption.Update;
+                                fieldConfig.ControlOption = ControlOption.UPDATE;
                                 Util.Resolve<Field>(resolve, fieldConfig.InternalName, `Field with the internal name '${fieldConfig.InternalName}'` +
                                     ` does not have to be added, because it already exists.`, field);
                                 rejectOrResolved = true;
@@ -68,12 +68,12 @@ export class FieldHandler implements ISPObjectHandler {
                         }
                     } else {
                         switch (fieldConfig.ControlOption) {
-                            case ControlOption.Delete:
+                            case ControlOption.DELETE:
                                 Util.Resolve<void>(resolve, fieldConfig.InternalName, `Field with internal name '${fieldConfig.InternalName}' does not have to be deleted, because it does not exist.`);
                                 rejectOrResolved = true;
                                 break;
-                            case ControlOption.Update:
-                                fieldConfig.ControlOption = ControlOption.Add;
+                            case ControlOption.UPDATE:
+                                fieldConfig.ControlOption = ControlOption.ADD;
                             default:
                                 processingPromise = this.addField(fieldConfig, fieldCollection);
                                 break;
@@ -102,7 +102,7 @@ export class FieldHandler implements ISPObjectHandler {
             switch (FieldTypeKind[fieldConfig.FieldType]) {
                 case undefined:
                 case "":
-                case null:
+                case null: // tslint:disable-line
                     Util.Reject<void>(reject, fieldConfig.InternalName, `Field type kind could not be resolved for the field with the internal name ${fieldConfig.InternalName}`);
                     break;
                 case FieldTypeKind.Lookup:
@@ -129,7 +129,7 @@ export class FieldHandler implements ISPObjectHandler {
             let properties = this.createProperties(fieldConfig);
             fieldCollection.add(fieldConfig.InternalName, "SP.Field", properties)
                 .then((fieldAddResult) => {
-                    fieldConfig.ControlOption = ControlOption.Update;
+                    fieldConfig.ControlOption = ControlOption.UPDATE;
                     this.updateField(fieldConfig, fieldAddResult.field)
                         .then((fieldUpdateResult) => {
                             Util.Resolve<Field>(resolve, fieldConfig.InternalName, `Added field: '${fieldConfig.InternalName}'.`, fieldUpdateResult.value);
@@ -158,7 +158,7 @@ export class FieldHandler implements ISPObjectHandler {
             let properties = this.createProperties(fieldConfig);
             fieldCollection.addCalculated(fieldConfig.InternalName, fieldConfig.Formula, Types.DateTimeFieldFormatType[fieldConfig.DateFormat], Types.FieldTypes[fieldConfig.OutputType], properties)
                 .then((fieldAddResult) => {
-                    fieldConfig.ControlOption = ControlOption.Update;
+                    fieldConfig.ControlOption = ControlOption.UPDATE;
                     this.updateField(fieldConfig, fieldAddResult.field)
                         .then((fieldUpdateResult) => {
                             Util.Resolve<Field>(resolve, fieldConfig.InternalName, `Added field: '${fieldConfig.InternalName}'.`, fieldUpdateResult.value);
@@ -318,7 +318,7 @@ export class FieldHandler implements ISPObjectHandler {
         stringifiedObject = JSON.stringify(fieldConfig);
         let parsedObject = JSON.parse(stringifiedObject);
         switch (fieldConfig.ControlOption) {
-            case ControlOption.Update:
+            case ControlOption.UPDATE:
                 delete parsedObject.ControlOption;
                 delete parsedObject.InternalName;
                 delete parsedObject.FieldType;
@@ -366,4 +366,3 @@ export class FieldHandler implements ISPObjectHandler {
         return JSON.parse(stringifiedObject);
     }
 }
-

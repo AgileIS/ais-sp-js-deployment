@@ -57,7 +57,7 @@ export class FileHandler implements ISPObjectHandler {
 
     private processingFolderConfig(folderConfig: IFolder, parentFolder: Folders): Promise<IPromiseResult<Folder | void>> {
         return new Promise<IPromiseResult<Folder | void>>((resolve, reject) => {
-            let processingText = folderConfig.ControlOption === ControlOption.Add || folderConfig.ControlOption === undefined || folderConfig.ControlOption === ""
+            let processingText = folderConfig.ControlOption === ControlOption.ADD || folderConfig.ControlOption === undefined || folderConfig.ControlOption === ""
                 ? "Add" : folderConfig.ControlOption;
             Logger.write(`Processing ${processingText} folder: '${folderConfig.Name}' to ${parentFolder.toUrl()}`, Logger.LogLevel.Info);
 
@@ -65,12 +65,12 @@ export class FileHandler implements ISPObjectHandler {
             folder.get()
                 .then(folderRequestResult => {
                     switch (folderConfig.ControlOption) {
-                        case ControlOption.Delete:
+                        case ControlOption.DELETE:
                             this.deleteFolder(folderConfig, folder)
                                 .then((folderProcessingResult) => { resolve(folderProcessingResult); })
                                 .catch((error) => { reject(error); });
                             break;
-                        case ControlOption.Update:
+                        case ControlOption.UPDATE:
                         default: // tslint:disable-line
                             Util.Resolve<Folder>(resolve, folderConfig.Name, `Folder with the name '${folderConfig.Name}' already exists in '${parentFolder.toUrl()}'`, folder);
                             break;
@@ -79,10 +79,10 @@ export class FileHandler implements ISPObjectHandler {
                 .catch((error) => {
                     if (error === "Error making GET request: Not Found") {
                         switch (folderConfig.ControlOption) {
-                            case ControlOption.Delete:
+                            case ControlOption.DELETE:
                                 Util.Reject<void>(reject, folderConfig.Name, `Folder with Name '${folderConfig.Name}' does not exists in '${folder.parentFolder}'`);
                                 break;
-                            case ControlOption.Update:
+                            case ControlOption.UPDATE:
                             default: // tslint:disable-line
                                 this.addFolder(folderConfig, parentFolder)
                                     .then((folderProcessingResult) => { resolve(folderProcessingResult); })
@@ -99,7 +99,7 @@ export class FileHandler implements ISPObjectHandler {
 
     private processingFileConfig(fileConfig: IFile, parentFolder: Files): Promise<IPromiseResult<File | void>> {
         return new Promise<IPromiseResult<File | void>>((resolve, reject) => {
-            let processingText = fileConfig.ControlOption === ControlOption.Add || fileConfig.ControlOption === undefined || fileConfig.ControlOption === ""
+            let processingText = fileConfig.ControlOption === ControlOption.ADD || fileConfig.ControlOption === undefined || fileConfig.ControlOption === ""
                 ? "Add" : fileConfig.ControlOption;
             Logger.write(`Processing ${processingText} file: '${fileConfig.Name}' in ${parentFolder.toUrl()}`, Logger.LogLevel.Info);
 
@@ -108,10 +108,10 @@ export class FileHandler implements ISPObjectHandler {
                 .then(folderRequestResult => {
                     let processingPromise: Promise<IPromiseResult<File | void>> = undefined;
                     switch (fileConfig.ControlOption) {
-                        case ControlOption.Delete:
+                        case ControlOption.DELETE:
                             processingPromise = this.deleteFile(fileConfig, file);
                             break;
-                        case ControlOption.Update:
+                        case ControlOption.UPDATE:
                             processingPromise = this.addFile(fileConfig, parentFolder, true, this.resolvePreTask(fileConfig));
                             break;
                         default:
@@ -130,10 +130,10 @@ export class FileHandler implements ISPObjectHandler {
                 .catch((error) => {
                     if (error === "Error making GET request: Not Found") {
                         switch (fileConfig.ControlOption) {
-                            case ControlOption.Delete:
+                            case ControlOption.DELETE:
                                 Util.Reject<void>(reject, fileConfig.Name, `File with Name '${fileConfig.Name}' does not exists in '${parentFolder.toUrl()}'`);
                                 break;
-                            case ControlOption.Update:
+                            case ControlOption.UPDATE:
                             default: // tslint:disable-line
                                 this.addFile(fileConfig, parentFolder, fileConfig.Overwrite === true, this.resolvePreTask(fileConfig))
                                     .then((folderProcessingResult) => {

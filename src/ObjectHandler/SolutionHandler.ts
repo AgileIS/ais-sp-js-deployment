@@ -42,10 +42,10 @@ export class SolutionHandler implements ISPObjectHandler {
                     packageInfo.set_packageName(solutionConfig.Title);
                     let fileRelativeUrl = listRootFolder.get_serverRelativeUrl() + "/" + solutionConfig.Src + solutionConfig.FileName;
                     switch (solutionConfig.ControlOption) {
-                        case ControlOption.Delete:
+                        case ControlOption.DELETE:
                             processingPromise = this.uninstallSolution(solutionConfig, clientContext, packageInfo);
                             break;
-                        case ControlOption.Update:
+                        case ControlOption.UPDATE:
                             this.uninstallSolution(solutionConfig, clientContext, packageInfo)
                                 .then(() => { processingPromise = this.installSolution(solutionConfig, clientContext, packageInfo, fileRelativeUrl); })
                                 .catch((error) => {

@@ -13,12 +13,12 @@ export class SiteHandler implements ISPObjectHandler {
                 PnP.sp.web.get()
                     .then((result) => {
                         switch (siteConfig.ControlOption) {
-                            case ControlOption.Update:
+                            case ControlOption.UPDATE:
                                 this.updateSiteProperties(siteConfig, PnP.sp.web)
                                     .then((siteProcessingResult) => { resolve(siteProcessingResult); })
                                     .catch((error) => { reject(error); });
                                 break;
-                            case ControlOption.Delete:
+                            case ControlOption.DELETE:
                                 Util.Reject<void>(reject, siteConfig.Url, `Error delete a site is not supported`);
                                 break;
                             default:
@@ -101,7 +101,7 @@ export class SiteHandler implements ISPObjectHandler {
         delete parsedObject.Identifier;
 
         switch (viewConfig.ControlOption) {
-            case ControlOption.Update:
+            case ControlOption.UPDATE:
                 break;
             default:
                 delete parsedObject.Title;

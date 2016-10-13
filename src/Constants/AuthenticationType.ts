@@ -1,4 +1,4 @@
 export class AuthenticationType {
-    public static Basic = "Basic";
-    public static Ntlm = "Ntlm";
+    public static BASIC = "Basic";
+    public static NTLM = "Ntlm";
 }

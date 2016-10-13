@@ -1,7 +1,5 @@
 export class ControlOption {
-    public static Add = "Add";
-    public static Update = "Update";
-    public static Delete = "Delete";
+    public static ADD = "Add";
+    public static UPDATE = "Update";
+    public static DELETE = "Delete";
 }
-
-

@@ -1,8 +1,7 @@
 {
     "User": {
-        "username": "dev\\tuser",
+        "username": "agile\\ytasyol",
         "authtype": "Ntlm",
-        "password": "Start@123",
         "proxyUrl": "http://localhost:8888"
     },
     "Sites": [

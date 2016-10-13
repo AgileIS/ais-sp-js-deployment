@@ -107,8 +107,8 @@ export class NavigationHandler implements ISPObjectHandler {
                         let nodeCreationInfo = new SP.NavigationNodeCreationInformation();
                         nodeCreationInfo.set_title(nodeConfig.Title);
                         nodeCreationInfo.set_url(nodeConfig.Url);
-                        let IsExternal = nodeConfig.IsExternal === true;
-                        nodeCreationInfo.set_isExternal(IsExternal);
+                        let isExternal = nodeConfig.IsExternal === true;
+                        nodeCreationInfo.set_isExternal(isExternal);
                         nodeCreationInfo.set_asLastNode(true);
 
                         let navNode = navigationNodeCollection.add(nodeCreationInfo);
@@ -160,10 +160,10 @@ export class NavigationHandler implements ISPObjectHandler {
                                 let navNode = this.getNavigationNodeByTitle(nodeConfig.Title, navigationNodeCollection);
                                 if (navNode) {
                                     switch (nodeConfig.ControlOption) {
-                                        case ControlOption.Update:
+                                        case ControlOption.UPDATE:
                                             navNode
                                             break;
-                                        case ControlOption.Delete:
+                                        case ControlOption.DELETE:
                                             navNode.deleteObject();
                                             break;
                                         default:
@@ -172,10 +172,10 @@ export class NavigationHandler implements ISPObjectHandler {
                                     }
                                 } else {
                                     switch (nodeConfig.ControlOption) {
-                                        case ControlOption.Delete:
+                                        case ControlOption.DELETE:
                                             Resolve(resolve, `Deleted quicklaunch navigation node with title '${nodeConfig.Title}'.`, "Navigation > Quicklaunch");
                                             break;
-                                        case ControlOption.Update:
+                                        case ControlOption.UPDATE:
             
                                         default:
                                             processingPromise = this.addView(viewConfig, parentList);

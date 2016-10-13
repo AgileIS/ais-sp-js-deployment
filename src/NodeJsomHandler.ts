@@ -31,25 +31,25 @@ interface INtlmOptions {
 
 class NodeJsomHandlerImpl implements INodeJsomHandler {
     public static instance: NodeJsomHandlerImpl;
-    private static _agents: { [id: string]: http.Agent } = {};
-    private static _authType: AuthenticationType;
-    private static _authOptions: string | INtlmOptions;
+    private static agents: { [id: string]: http.Agent } = {};
+    private static authType: AuthenticationType;
+    private static authOptions: string | INtlmOptions;
 
-    private _httpSavedRequest = undefined;
-    private _httpsSavedRequest = undefined;
+    private httpSavedRequest = undefined;
+    private httpsSavedRequest = undefined;
 
     public static httpRequest(options: http.RequestOptions, callback?: (res: http.IncomingMessage) => void): http.ClientRequest {
         if (typeof options !== "string" && !options.protocol) {
             options.protocol = "http:";
         }
-        return NodeJsomHandlerImpl.instance._httpSavedRequest(NodeJsomHandlerImpl.setRequiredOptions(options), callback);
+        return NodeJsomHandlerImpl.instance.httpSavedRequest(NodeJsomHandlerImpl.setRequiredOptions(options), callback);
     }
 
     public static httpsRequest(options: http.RequestOptions, callback?: (res: http.IncomingMessage) => void): http.ClientRequest {
         if (typeof options !== "string" && !options.protocol) {
             options.protocol = "https:";
         }
-        return NodeJsomHandlerImpl.instance._httpsSavedRequest(NodeJsomHandlerImpl.setRequiredOptions(options), callback);
+        return NodeJsomHandlerImpl.instance.httpsSavedRequest(NodeJsomHandlerImpl.setRequiredOptions(options), callback);
     }
 
     private static setRequiredOptions(options: http.RequestOptions): http.RequestOptions {
@@ -62,10 +62,10 @@ class NodeJsomHandlerImpl implements INodeJsomHandler {
                 if (!requestOptions.url) {
                     requestOptions.url = Util.JoinAndNormalizeUrl([options.protocol, options.host, options.path]);
                 }
-                if (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) {
-                    requestOptions.agent = NodeJsomHandlerImpl._agents[requestOptions.url.split("/_")[0]];
+                if (NodeJsomHandlerImpl.authType === AuthenticationType.NTLM) {
+                    requestOptions.agent = NodeJsomHandlerImpl.agents[requestOptions.url.split("/_")[0]];
                 } else {
-                    requestOptions.headers.Authorization = NodeJsomHandlerImpl._authOptions;
+                    requestOptions.headers.Authorization = NodeJsomHandlerImpl.authOptions;
                 }
             }
         } else {
@@ -80,16 +80,16 @@ class NodeJsomHandlerImpl implements INodeJsomHandler {
     }
 
     public initialize(siteDeploymentConfig: ISiteDeploymentConfig): Promise<void> {
-        this._httpSavedRequest = http.request;
+        this.httpSavedRequest = http.request;
         http.request = NodeJsomHandlerImpl.httpRequest;
-        this._httpsSavedRequest = https.request;
+        this.httpsSavedRequest = https.request;
         https.request = NodeJsomHandlerImpl.httpsRequest;
 
         let promises = new Array<Promise<void>>();
-        NodeJsomHandlerImpl._authType = siteDeploymentConfig.User.authtype;
+        NodeJsomHandlerImpl.authType = siteDeploymentConfig.User.authtype;
 
-        if (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) {
-            NodeJsomHandlerImpl._authOptions = {
+        if (NodeJsomHandlerImpl.authType === AuthenticationType.NTLM) {
+            NodeJsomHandlerImpl.authOptions = {
                 domain: siteDeploymentConfig.User.username.split("\\")[0],
                 password: siteDeploymentConfig.User.password,
                 username: siteDeploymentConfig.User.username.split("\\")[1],
@@ -97,7 +97,7 @@ class NodeJsomHandlerImpl implements INodeJsomHandler {
             };
             promises.push(this.setupSiteContext(siteDeploymentConfig.Site.Url));
         } else {
-            NodeJsomHandlerImpl._authOptions = `Basic ${new Buffer(`${siteDeploymentConfig.User.username}:${siteDeploymentConfig.User.password}`).toString("base64")}`;
+            NodeJsomHandlerImpl.authOptions = `Basic ${new Buffer(`${siteDeploymentConfig.User.username}:${siteDeploymentConfig.User.password}`).toString("base64")}`;
         }
 
         return Promise.all(promises)
@@ -107,14 +107,15 @@ class NodeJsomHandlerImpl implements INodeJsomHandler {
     }
 
     private setupSiteContext(siteUrl: string): Promise<void> {
+        // tslint:disable-next-line
         const Agent = siteUrl.indexOf("https") > -1 ? https.Agent : http.Agent;
         const get = siteUrl.indexOf("https") > -1 ? https.get : http.get;
         let reqUrl = Util.JoinAndNormalizeUrl([siteUrl, "_api/web/title"]);
         let parsedUrl = url.parse(reqUrl as string);
-        let authValue = NodeJsomHandlerImpl._authOptions;
-        if (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) {
-            authValue = NTLM.createType1Message(NodeJsomHandlerImpl._authOptions);
-            NodeJsomHandlerImpl._agents[siteUrl] = new Agent({ keepAlive: true, maxSockets: 1, keepAliveMsecs: 100 });
+        let authValue = NodeJsomHandlerImpl.authOptions;
+        if (NodeJsomHandlerImpl.authType === AuthenticationType.NTLM) {
+            authValue = NTLM.createType1Message(NodeJsomHandlerImpl.authOptions);
+            NodeJsomHandlerImpl.agents[siteUrl] = new Agent({ keepAlive: true, maxSockets: 1, keepAliveMsecs: 100 });
         }
         let options = {
             hostname: parsedUrl.hostname,
@@ -125,21 +126,21 @@ class NodeJsomHandlerImpl implements INodeJsomHandler {
                 connection: "keep-alive",
                 "Authorization": authValue,
             },
-            agent: (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) ? NodeJsomHandlerImpl._agents[siteUrl] : false,
+            agent: (NodeJsomHandlerImpl.authType === AuthenticationType.NTLM) ? NodeJsomHandlerImpl.agents[siteUrl] : false,
         };
 
         return new Promise<void>((resolve, reject) => {
             get(options, firstResponse => {
-                firstResponse.on("data", () => null);
+                firstResponse.on("data", () => undefined);
                 firstResponse.on("end", () => {
                     if (firstResponse.statusCode === 401) {
                         let type2msg = NTLM.parseType2Message(firstResponse.headers["www-authenticate"], error => {
                             Util.Reject<void>(reject, "NodeJsom", `JSOM Ntlm initialize error: cannot generate Ntlm type 2 message` + error);
                         });
-                        let type3msg = NTLM.createType3Message(type2msg, NodeJsomHandlerImpl._authOptions);
+                        let type3msg = NTLM.createType3Message(type2msg, NodeJsomHandlerImpl.authOptions);
                         options.headers.Authorization = type3msg;
                         get(options, secondResponse => {
-                            secondResponse.on("data", () => null);
+                            secondResponse.on("data", () => undefined);
                             secondResponse.on("end", () => {
                                 if (secondResponse.statusCode !== 200) {
                                     Util.Reject<void>(reject, "NodeJsom", `JSOM Ntlm initialize error: ${secondResponse.statusCode} after handshake!` + secondResponse.statusMessage);
@@ -186,12 +187,12 @@ class NodeJsomHandlerImpl implements INodeJsomHandler {
             URL: window.location.href,
             cookie: "",
             documentElement: {},
-            getElementsByName: function (name) {
+            getElementsByName: (name) => {
                 if (name === "__REQUESTDIGEST") {
                     return [global.window.formdigest];
                 }
             },
-            getElementsByTagName: function (name) {
+            getElementsByTagName: (name) => {
                 return [];
             },
         };
@@ -217,15 +218,15 @@ class NodeJsomHandlerImpl implements INodeJsomHandler {
 
                         let reqUrl = Util.JoinAndNormalizeUrl([siteUrl, currentValue]);
                         let parsedUrl = url.parse(reqUrl as string);
-                        let authValue = NodeJsomHandlerImpl._authOptions;
+                        let authValue = NodeJsomHandlerImpl.authOptions;
                         let options = {
                             hostname: parsedUrl.hostname,
                             path: parsedUrl.path,
                             url: reqUrl,
                             method: "GET",
-                            headers: (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) ?
+                            headers: (NodeJsomHandlerImpl.authType === AuthenticationType.NTLM) ?
                                 { connection: "keep-alive" } : { "Authorization": authValue },
-                            agent: (NodeJsomHandlerImpl._authType === AuthenticationType.Ntlm) ? NodeJsomHandlerImpl._agents[siteUrl] : false,
+                            agent: (NodeJsomHandlerImpl.authType === AuthenticationType.NTLM) ? NodeJsomHandlerImpl.agents[siteUrl] : false,
                         };
 
                         const request = get(options, response => {
@@ -254,4 +255,5 @@ class NodeJsomHandlerImpl implements INodeJsomHandler {
     }
 }
 
+// tslint:disable-next-line
 export let NodeJsomHandler: INodeJsomHandler = new NodeJsomHandlerImpl();

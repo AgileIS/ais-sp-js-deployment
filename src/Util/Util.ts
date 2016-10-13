@@ -88,8 +88,6 @@ export namespace Util {
         });
     }
 
-
-
     export function getRelativeUrl(absoluteUrl: string): string {
         let urlObject = url.parse(absoluteUrl, true, true);
 

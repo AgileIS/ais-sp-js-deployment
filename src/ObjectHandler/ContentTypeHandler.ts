@@ -41,7 +41,7 @@ export class ContentTypeHandler implements ISPObjectHandler {
 
     private processingContentTypeConfig(contentTypeConfig: IContentType, clientContext: SP.ClientContext): Promise<IPromiseResult<void | SP.ContentType>> {
         return new Promise<IPromiseResult<void | SP.ContentType>>((resolve, reject) => {
-            let processingText = contentTypeConfig.ControlOption === ControlOption.Add || contentTypeConfig.ControlOption === undefined || contentTypeConfig.ControlOption === ""
+            let processingText = contentTypeConfig.ControlOption === ControlOption.ADD || contentTypeConfig.ControlOption === undefined || contentTypeConfig.ControlOption === ""
                 ? "Add" : contentTypeConfig.ControlOption;
             Logger.write(`Processing ${processingText} content type: '${contentTypeConfig.Id}'.`, Logger.LogLevel.Info);
 
@@ -66,10 +66,10 @@ export class ContentTypeHandler implements ISPObjectHandler {
                         }
 
                         switch (contentTypeConfig.ControlOption) {
-                            case ControlOption.Update:
+                            case ControlOption.UPDATE:
                                 processingPromise = this.updateContentType(contentTypeConfig, contentType, web);
                                 break;
-                            case ControlOption.Delete:
+                            case ControlOption.DELETE:
                                 processingPromise = this.deleteContentType(contentTypeConfig, contentType);
                                 break;
                             default:
@@ -80,12 +80,12 @@ export class ContentTypeHandler implements ISPObjectHandler {
                         }
                     } else {
                         switch (contentTypeConfig.ControlOption) {
-                            case ControlOption.Delete:
+                            case ControlOption.DELETE:
                                 Util.Resolve<void>(resolve, contentTypeConfig.Id, `Content type with the id '${contentTypeConfig.Id}' does not have to be deleted, because it does not exist.`);
                                 rejectOrResolved = true;
                                 break;
-                            case ControlOption.Update:
-                                contentTypeConfig.ControlOption = ControlOption.Add;
+                            case ControlOption.UPDATE:
+                                contentTypeConfig.ControlOption = ControlOption.ADD;
                             default:
                                 processingPromise = this.addContentType(contentTypeConfig, rootWeb.get_contentTypes(), web);
                                 break;

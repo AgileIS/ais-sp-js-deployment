@@ -86,7 +86,6 @@ export namespace NTLM {
         let pos = 0;
         let buf = new Buffer(BODY_LENGTH + domain.length + workstation.length);
 
-
         buf.write(protocol, pos, protocol.length); pos += protocol.length; // protocol
         buf.writeUInt32LE(1, pos); pos += 4;          // type 1
         buf.writeUInt32LE(type1flags, pos); pos += 4; // TYPE1 flag
@@ -380,22 +379,22 @@ export namespace NTLM {
         return new Buffer(md4.digest());
     }
 
-    function calc_resp(password_hash, server_challenge) {
+    function calc_resp(passwordHash, serverChallenge) {
         // padding with zeros to make the hash 21 bytes long
         let passHashPadded = new Buffer(21);
         passHashPadded.fill("\0");
-        password_hash.copy(passHashPadded, 0, 0, password_hash.length);
+        passwordHash.copy(passHashPadded, 0, 0, passwordHash.length);
 
         let resArray = [];
 
         let des = crypto.createCipheriv("DES-ECB", insertZerosEvery7Bits(passHashPadded.slice(0, 7)), "");
-        resArray.push(des.update(server_challenge.slice(0, 8)));
+        resArray.push(des.update(serverChallenge.slice(0, 8)));
 
         des = crypto.createCipheriv("DES-ECB", insertZerosEvery7Bits(passHashPadded.slice(7, 14)), "");
-        resArray.push(des.update(server_challenge.slice(0, 8)));
+        resArray.push(des.update(serverChallenge.slice(0, 8)));
 
         des = crypto.createCipheriv("DES-ECB", insertZerosEvery7Bits(passHashPadded.slice(14, 21)), "");
-        resArray.push(des.update(server_challenge.slice(0, 8)));
+        resArray.push(des.update(serverChallenge.slice(0, 8)));
 
         return Buffer.concat(resArray);
     }

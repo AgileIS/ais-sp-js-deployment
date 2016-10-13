@@ -26,7 +26,7 @@ export class ItemHandler implements ISPObjectHandler {
 
     private processingItemConfig(itemConfig: IItem, list: List): Promise<IPromiseResult<void | Item>> {
         return new Promise<IPromiseResult<void | Item>>((resolve, reject) => {
-            let processingText = itemConfig.ControlOption === ControlOption.Add || itemConfig.ControlOption === undefined || itemConfig.ControlOption === ""
+            let processingText = itemConfig.ControlOption === ControlOption.ADD || itemConfig.ControlOption === undefined || itemConfig.ControlOption === ""
                 ? "Add" : itemConfig.ControlOption;
             Logger.write(`Processing ${processingText} item: '${itemConfig.Title}'.`, Logger.LogLevel.Info);
 
@@ -39,10 +39,10 @@ export class ItemHandler implements ISPObjectHandler {
                         Logger.write(`Found Item with the title: '${itemConfig.Title}'`, Logger.LogLevel.Info);
                         let item = list.items.getById(itemRequestResults[0].Id);
                         switch (itemConfig.ControlOption) {
-                            case ControlOption.Update:
+                            case ControlOption.UPDATE:
                                 processingPromise = this.updateItem(itemConfig, item);
                                 break;
-                            case ControlOption.Delete:
+                            case ControlOption.DELETE:
                                 processingPromise = this.deleteItem(itemConfig, item);
                                 break;
                             default:
@@ -52,12 +52,12 @@ export class ItemHandler implements ISPObjectHandler {
                         }
                     } else {
                         switch (itemConfig.ControlOption) {
-                            case ControlOption.Delete:
+                            case ControlOption.DELETE:
                                 Util.Resolve<void>(resolve, itemConfig.Title, `Item with Title '${itemConfig.Title}' does not have to be deleted, because it does not exist.`);
                                 rejectOrResolved = true;
                                 break;
-                            case ControlOption.Update:
-                                itemConfig.ControlOption = ControlOption.Add;
+                            case ControlOption.UPDATE:
+                                itemConfig.ControlOption = ControlOption.ADD;
                             default:
                                 processingPromise = this.addItem(itemConfig, list);
                                 break;
@@ -107,7 +107,7 @@ export class ItemHandler implements ISPObjectHandler {
         stringifiedObject = JSON.stringify(itemConfig);
         let parsedObject = JSON.parse(stringifiedObject);
         switch (itemConfig.ControlOption) {
-            case ControlOption.Update:
+            case ControlOption.UPDATE:
                 delete parsedObject.ControlOption;
                 break;
             default:

@@ -1,6 +1,7 @@
 var gulp = require('gulp'),
     tsc = require('gulp-typescript'),
-    tslint = require('gulp-tslint'),
+    gulpTslint = require("gulp-tslint");
+    tslint = require('tslint'),
     sourcemaps = require('gulp-sourcemaps'),
     del = require('del'),
     path = require('path'),
@@ -8,12 +9,14 @@ var gulp = require('gulp'),
     chug = require('gulp-chug');
 
 var tsProject = tsc.createProject('tsconfig.json');
+var tslintProgram = tslint.createProgram("tsconfig.json");
 
 gulp.task('ts-lint', ['clean-ts'], function () {
-    return gulp.src(['./**/*.ts', '!typings/**/*.ts', '!node_modules/**/*.ts']).pipe(tslint({
-            formatter: "prose"
+    return gulp.src(['./**/*.ts', '!typings/**/*.ts', '!node_modules/**/*.ts']).pipe(gulpTslint({
+            formatter: "prose",
+            program: tslintProgram
         }))
-        .pipe(tslint.report());
+        .pipe(gulpTslint.report());
 });
 
 gulp.task('compile-ts', ['ts-lint'], function () {
