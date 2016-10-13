@@ -276,7 +276,7 @@ export class ContentTypeHandler implements ISPObjectHandler {
         });
     }
 
-    private getContentType(contentTypeConfig: IContentType, clientContext: SP.ClientRuntimeContext, web: SP.Web): Promise<SP.ContentType | void> {
+    private getContentType(contentTypeConfig: IContentType, clientContext: SP.ClientRuntimeContext, web: SP.Web): Promise<SP.ContentType> {
         return new Promise<SP.ContentType | void>((resolve, reject) => {
             let webContentType = web.get_contentTypes().getById(contentTypeConfig.Id);
             let siteContentType = web.get_availableContentTypes().getById(contentTypeConfig.Id);
