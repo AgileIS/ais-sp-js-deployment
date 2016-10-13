@@ -6,8 +6,8 @@ import * as childProcess from "child_process";
 import * as path from "path";
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { MyConsoleLogger } from "./Logger/MyConsoleLogger";
-import { GlobalDeploymentConfig } from "./Interfaces/Config/GlobalDeploymentConfig";
-import { ForkProcessArguments } from "./Interfaces/Config/ForkProcessArguments";
+import { IGlobalDeploymentConfig } from "./Interfaces/Config/GlobalDeploymentConfig";
+import { IForkProcessArguments } from "./Interfaces/Config/ForkProcessArguments";
 
 export namespace AisDeploy {
 
@@ -25,7 +25,7 @@ export namespace AisDeploy {
         Logger.write("child disconnect " + this.pid, Logger.LogLevel.Info);
     }
 
-    function processGlobalDeploymentConfig(globalDeploymentConfig: GlobalDeploymentConfig, loglevel: Logger.LogLevel, runChildProcessInhDebugMode: boolean) {
+    function processGlobalDeploymentConfig(globalDeploymentConfig: IGlobalDeploymentConfig, loglevel: Logger.LogLevel, runChildProcessInhDebugMode: boolean) {
         if (globalDeploymentConfig.Sites && globalDeploymentConfig.Sites instanceof Array && globalDeploymentConfig.Sites.length > 0) {
             globalDeploymentConfig.Sites.forEach((siteCollection, index, array) => {
                 let forkOptions: childProcess.ForkOptions = { silent: false };
@@ -33,7 +33,7 @@ export namespace AisDeploy {
                     forkOptions.execArgv = [`--debug-brk=5858${index}`];
                 }
 
-                let forkArgs: ForkProcessArguments = {
+                let forkArgs: IForkProcessArguments = {
                     siteDeploymentConfig: {
                         User: globalDeploymentConfig.User,
                         Site: siteCollection,
@@ -57,7 +57,7 @@ export namespace AisDeploy {
         Logger.write("Start deployment", Logger.LogLevel.Info);
 
         if (deploymentConfigPath) {
-            let globalDeploymentConfig: GlobalDeploymentConfig = JSON.parse(FileSystem.readFileSync(deploymentConfigPath, "utf8"));
+            let globalDeploymentConfig: IGlobalDeploymentConfig = JSON.parse(FileSystem.readFileSync(deploymentConfigPath, "utf8"));
             if (globalDeploymentConfig) {
                 Logger.write(`Loaded deployment config: ${deploymentConfigPath} `);
                 // Logger.write(JSON.stringify(globalDeploymentConfig), 0);

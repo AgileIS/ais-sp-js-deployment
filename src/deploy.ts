@@ -1,14 +1,14 @@
 import * as minimist from "minimist";
 import { AisDeploy } from "./index";
 
-interface ConsoleArguments {
+interface IConsoleArguments {
     deploymentConfigPath: string;
     userPassword: string;
     logLevel: string;
     runChildProcessInhDebugMode: boolean;
 }
 
-let clArgs: ConsoleArguments = <any>minimist(global.process.argv.slice(2), {
+let clArgs: IConsoleArguments = <any>minimist(global.process.argv.slice(2), {
     alias: {
         f: "deploymentConfigPath",
         l: "logLevel",

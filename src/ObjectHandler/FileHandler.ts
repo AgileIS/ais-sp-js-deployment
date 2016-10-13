@@ -16,7 +16,7 @@ import * as fs from "fs";
 import * as mime from "mime";
 
 declare var window: Window;
-interface Window {
+interface Window { // tslint:disable-line
     _spPageContextInfo: any;
 }
 

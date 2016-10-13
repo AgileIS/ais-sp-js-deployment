@@ -1,17 +1,19 @@
 /// <reference path="../typings/index.d.ts" />
 
-import * as http from "http";
-import * as https from "https";
+// import * as http from "http";
+// import * as https from "https";
+import http = require("http");
+import https = require("https");
 import * as url from "url";
 
-interface NodeHttpProxy {
+interface INodeHttpProxy {
     url: url.Url;
     isActive: boolean;
     activate();
     deactivate();
 }
 
-class NodeHttpProxyImpl implements NodeHttpProxy {
+class NodeHttpProxyImpl implements INodeHttpProxy {
     public static instance: NodeHttpProxyImpl;
 
     public url: url.Url;
@@ -91,7 +93,7 @@ class NodeHttpProxyImpl implements NodeHttpProxy {
     }
 }
 
-export let NodeHttpProxy: NodeHttpProxy = new NodeHttpProxyImpl();
+export let NodeHttpProxy: INodeHttpProxy = new NodeHttpProxyImpl();
 
 
 

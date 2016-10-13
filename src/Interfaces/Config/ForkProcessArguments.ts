@@ -1,6 +1,6 @@
-import { SiteDeploymentConfig } from "./SiteDeploymentConfig";
+import { ISiteDeploymentConfig } from "./SiteDeploymentConfig";
 
-export interface ForkProcessArguments {
-    siteDeploymentConfig: SiteDeploymentConfig;
+export interface IForkProcessArguments {
+    siteDeploymentConfig: ISiteDeploymentConfig;
     logLevel: number;
 }

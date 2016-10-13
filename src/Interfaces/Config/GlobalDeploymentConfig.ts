@@ -1,7 +1,7 @@
-import { UserConfig } from "./UserConfig";
-import { SiteConfig } from "./SiteConfig";
+import { IUserConfig } from "./UserConfig";
+import { ISiteConfig } from "./SiteConfig";
 
-export interface GlobalDeploymentConfig {
-    User: UserConfig;
-    Sites: SiteConfig[];
+export interface IGlobalDeploymentConfig {
+    User: IUserConfig;
+    Sites: ISiteConfig[];
 }

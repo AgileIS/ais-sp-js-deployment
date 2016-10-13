@@ -1,37 +1,39 @@
 "use strict";
 
 import { NTLM } from "./ntlm";
-import * as http from "http";
-import * as https from "https";
+// import * as http from "http";
+// import * as https from "https";
+import http = require("http");
+import https = require("https");
 import * as url from "url";
 import * as vm from "vm";
-import { SiteDeploymentConfig } from "./Interfaces/Config/SiteDeploymentConfig";
+import { ISiteDeploymentConfig } from "./Interfaces/Config/SiteDeploymentConfig";
 import { AuthenticationType } from "./Constants/AuthenticationType";
 import { Util } from "./Util/Util";
 
 declare var global: NodeJS.Global;
 declare namespace NodeJS {
-    interface Global {
+    interface Global { // tslint:disable-line
         window: any;
     }
 }
 
-interface NodeJsomHandler {
-    initialize(siteDeploymentConfig: SiteDeploymentConfig): Promise<void>;
+interface INodeJsomHandler {
+    initialize(siteDeploymentConfig: ISiteDeploymentConfig): Promise<void>;
 }
 
-interface NtlmOptions {
+interface INtlmOptions {
     domain: string;
     password: string;
     username: string;
     workstation: string;
 }
 
-class NodeJsomHandlerImpl implements NodeJsomHandler {
+class NodeJsomHandlerImpl implements INodeJsomHandler {
     public static instance: NodeJsomHandlerImpl;
     private static _agents: { [id: string]: http.Agent } = {};
     private static _authType: AuthenticationType;
-    private static _authOptions: string | NtlmOptions;
+    private static _authOptions: string | INtlmOptions;
 
     private _httpSavedRequest = undefined;
     private _httpsSavedRequest = undefined;
@@ -77,7 +79,7 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
         NodeJsomHandlerImpl.instance = this;
     }
 
-    public initialize(siteDeploymentConfig: SiteDeploymentConfig): Promise<void> {
+    public initialize(siteDeploymentConfig: ISiteDeploymentConfig): Promise<void> {
         this._httpSavedRequest = http.request;
         http.request = NodeJsomHandlerImpl.httpRequest;
         this._httpsSavedRequest = https.request;
@@ -252,4 +254,4 @@ class NodeJsomHandlerImpl implements NodeJsomHandler {
     }
 }
 
-export let NodeJsomHandler: NodeJsomHandler = new NodeJsomHandlerImpl();
+export let NodeJsomHandler: INodeJsomHandler = new NodeJsomHandlerImpl();

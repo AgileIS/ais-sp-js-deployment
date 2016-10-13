@@ -1,6 +1,6 @@
 import { AuthenticationType } from "../../Constants/AuthenticationType";
 
-export interface UserConfig {
+export interface IUserConfig {
     username: string;
     password: string;
     workstation: string;

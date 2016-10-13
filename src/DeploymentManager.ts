@@ -4,7 +4,7 @@ import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { Folder } from "@agileis/sp-pnp-js/lib/sharepoint/rest/folders";
 import { List } from "@agileis/sp-pnp-js/lib/sharepoint/rest/lists";
-import { SiteDeploymentConfig } from "./Interfaces/Config/SiteDeploymentConfig";
+import { ISiteDeploymentConfig } from "./Interfaces/Config/SiteDeploymentConfig";
 import { ISPObjectHandler } from "./Interfaces/ObjectHandler/ISPObjectHandler";
 import { ISPObjectHandlerCollection } from "./Interfaces/ObjectHandler/ISPObjectHandlerCollection";
 import { IList } from "./Interfaces/Types/IList";
@@ -28,7 +28,7 @@ import { Util } from "./Util/Util";
 import * as url from "url";
 
 export class DeploymentManager {
-    private _siteDeploymentConfig: SiteDeploymentConfig;
+    private _siteDeploymentConfig: ISiteDeploymentConfig;
     private _deployDependencies: Array<Promise<any>> = new Array();
     private _objectHandlers: ISPObjectHandlerCollection = {
         Features: new FeatureHandler(),
@@ -43,10 +43,10 @@ export class DeploymentManager {
         Solutions: new SolutionHandler(),
     };
 
-    constructor(siteDeploymentConfig: SiteDeploymentConfig) {
+    constructor(siteDeploymentConfig: ISiteDeploymentConfig) {
         if (siteDeploymentConfig.Site && siteDeploymentConfig.Site.Url) {
             let layoutsUrlPart = siteDeploymentConfig.Site.LayoutsHive ? `_layouts/${siteDeploymentConfig.Site.LayoutsHive}` : `_layouts/15`;
-            this._siteDeploymentConfig = <SiteDeploymentConfig>JSON.parse(
+            this._siteDeploymentConfig = <ISiteDeploymentConfig>JSON.parse(
                 Util.replaceUrlTokens(JSON.stringify(siteDeploymentConfig), Util.getRelativeUrl(siteDeploymentConfig.Site.Url), layoutsUrlPart));
             this.setupProxy();
             this.setupPnPJs();
