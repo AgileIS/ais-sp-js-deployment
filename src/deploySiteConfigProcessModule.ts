@@ -8,7 +8,7 @@ let forkConfig: IForkProcessArguments = JSON.parse(process.argv[2]);
 let siteDeploymentConfig: ISiteDeploymentConfig = forkConfig.siteDeploymentConfig;
 let logLevel: number = forkConfig.logLevel;
 
-Logger.subscribe(new MyConsoleLogger(siteDeploymentConfig.Site.Url));
+Logger.subscribe(new MyConsoleLogger(process.pid.toString()));
 Logger.activeLogLevel = logLevel ? logLevel : Logger.LogLevel.Verbose;
 
 try {

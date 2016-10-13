@@ -41,6 +41,7 @@ export namespace AisDeploy {
                     logLevel: loglevel,
                 };
                 let child = childProcess.fork(__dirname + path.sep + "DeploySiteConfigProcessModule.js", [JSON.stringify(forkArgs)], forkOptions);
+                Logger.write(`child process (PID: '${child.pid}') started for site: '${siteCollection.Url}'`);
                 child.on("disconnect", onChildProcessDisconnect);
                 child.on("exit", onChildProcessExit);
                 processCount++;
@@ -51,7 +52,7 @@ export namespace AisDeploy {
     }
 
     export function deploy(deploymentConfigPath: string, logLevel?: string, runChildProcessInhDebugMode?: boolean): void {
-        Logger.subscribe(new MyConsoleLogger());
+        Logger.subscribe(new MyConsoleLogger("main"));
         Logger.activeLogLevel = Logger.LogLevel[logLevel ? logLevel : "Verbose"];
 
         Logger.write("Start deployment", Logger.LogLevel.Info);
