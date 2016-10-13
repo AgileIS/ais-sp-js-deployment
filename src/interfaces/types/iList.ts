@@ -1,0 +1,44 @@
+import { IFolder } from "./iFolder";
+import { IListFieldRef } from "./iListFieldRef";
+import { IField } from "./iField";
+import { IView } from "./iView";
+import { IFile } from "./iFile";
+import { IItem } from "./iItem";
+import { ISecurity } from "./iSecurity";
+import { IContentTypeBinding } from "./iContentTypeBinding";
+
+export interface IList {
+    Title: string;
+    Url: string;
+    Description: string;
+    DocumentTemplate: string;
+    OnQuickLaunch: boolean;
+    TemplateType: string;
+    EnableVersioning: boolean;
+    EnableMinorVersions: boolean;
+    EnableModeration: boolean;
+    EnableFolderCreation: boolean;
+    EnableAttachments: boolean;
+    RemoveExistingContentTypes: boolean;
+    RemoveExistingViews: boolean;
+    NoCrawl: boolean;
+    DefaultDisplayFormUrl: string;
+    DefaultEditFormUrl: string;
+    DefaultNewFormUrl: string;
+    DraftVersionVisibility: string;
+    ImageUrl: string;
+    Hidden: boolean;
+    ForceCheckout: boolean;
+    ContentTypeBindings: Array<IContentTypeBinding>;
+    FieldRefs: Array<IListFieldRef>;
+    Fields: Array<IField>;
+    Folders: Array<IFolder>;
+    Views: Array<IView>;
+    DataRows: Array<Object>;
+    Security: ISecurity;
+    InternalName: string;
+    EnableContentTypes: boolean;
+    ControlOption: string;
+    Files: Array<IFile | IFolder>;
+    Items: Array<IItem>;
+}
