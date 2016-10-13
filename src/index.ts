@@ -6,6 +6,7 @@ import * as childProcess from "child_process";
 import * as path from "path";
 import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
 import { MyConsoleLogger } from "./Logger/MyConsoleLogger";
+import { FileLogger } from "./Logger/fileLogger";
 import { IGlobalDeploymentConfig } from "./interfaces/config/iGlobalDeploymentConfig";
 import { IForkProcessArguments } from "./interfaces/config/iForkProcessArguments";
 
@@ -53,6 +54,7 @@ export namespace AisDeploy {
 
     export function deploy(deploymentConfigPath: string, logLevel?: string, runChildProcessInhDebugMode?: boolean): void {
         Logger.subscribe(new MyConsoleLogger("main"));
+        Logger.subscribe(new FileLogger());
         Logger.activeLogLevel = Logger.LogLevel[logLevel ? logLevel : "Verbose"];
 
         Logger.write("Start deployment", Logger.LogLevel.Info);
