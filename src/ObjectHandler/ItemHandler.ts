@@ -16,14 +16,9 @@ export class ItemHandler implements ISPObjectHandler {
                         `Item handler parent promise value result is null or undefined for the item with the title '${itemConfig.Title}'!`);
                 } else {
                     let list = promiseResult.value;
-                    this.processingItemConfig(itemConfig, list)
-                        .then((itemProsssingResult) => { resolve(itemProsssingResult); })
-                        .catch((error) => {
-                            Util.Retry(error, itemConfig.Title,
-                                () => {
-                                    return this.processingItemConfig(itemConfig, list);
-                                });
-                        });
+                    Util.tryToProcess(itemConfig.Title, () => { return this.processingItemConfig(itemConfig, list); })
+                        .then((itemProcessingResult) => { resolve(itemProcessingResult); })
+                        .catch((error) => { reject(error); });
                 }
             });
         });
@@ -74,7 +69,7 @@ export class ItemHandler implements ISPObjectHandler {
                             .then((itemProcessingResult) => { resolve(itemProcessingResult); })
                             .catch((error) => { reject(error); });
                     } else if (!rejectOrResolved) {
-                        Logger.write("List handler processing promise is undefined!", Logger.LogLevel.Error);
+                        Logger.write("Item handler processing promise is undefined!", Logger.LogLevel.Error);
                     }
                 })
                 .catch((error) => { Util.Reject<void>(reject, itemConfig.Title, `Error while requesting item with the title '${itemConfig.Title}': ` + Util.getErrorMessage(error)); });

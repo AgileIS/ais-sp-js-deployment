@@ -17,19 +17,9 @@ export class FeatureHandler implements ISPObjectHandler {
                 } else {
                     if (featureConfig.Id) {
                         let context = SP.ClientContext.get_current();
-                        this.processingFeatureConfig(featureConfig, context)
+                        Util.tryToProcess(featureConfig.Id, () => { return this.processingFeatureConfig(featureConfig, context); })
                             .then((featureProcessingResult) => { resolve(featureProcessingResult); })
-                            .catch((error) => {
-                                if (this._noRetry) {
-                                    Util.Reject<void>(reject, featureConfig.Id, error);
-                                } else {
-                                    Util.Retry(error, featureConfig.Id,
-                                        () => {
-                                            return this.processingFeatureConfig(featureConfig, context);
-                                        });
-                                }
-
-                            });
+                            .catch((error) => { reject(error); });
                     } else {
                         Util.Reject<void>(reject, "Unknow feature", `Error while processing feature: Feature id is undefined.`);
                     }
@@ -82,7 +72,8 @@ export class FeatureHandler implements ISPObjectHandler {
                     }
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, featureConfig.Id, `Error while requesting feature with the id '${featureConfig.Id}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject<void>(reject, featureConfig.Id, `Error while requesting feature with the id '${featureConfig.Id}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 }
             );
         });
@@ -101,7 +92,8 @@ export class FeatureHandler implements ISPObjectHandler {
                         Util.Resolve<void>(resolve, featureConfig.Id, `Activated feature: '${featureConfig.Id}'.`);
                     },
                     (sender, args) => {
-                        Util.Reject<void>(reject, featureConfig.Id, `Error while activating feature with the id '${featureConfig.Id}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                        Util.Reject<void>(reject, featureConfig.Id, `Error while activating feature with the id '${featureConfig.Id}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                     });
             } else {
                 this._noRetry = true;
@@ -121,7 +113,8 @@ export class FeatureHandler implements ISPObjectHandler {
                         Util.Resolve<void>(resolve, featureConfig.Id, `Deactivated feature: '${featureConfig.Id}'.`);
                     },
                     (sender, args) => {
-                        Util.Reject<void>(reject, featureConfig.Id, `Error while deactivating feature with the id '${featureConfig.Id}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                        Util.Reject<void>(reject, featureConfig.Id, `Error while deactivating feature with the id '${featureConfig.Id}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                     }
                 );
             } else {

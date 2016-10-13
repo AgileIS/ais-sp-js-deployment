@@ -16,14 +16,9 @@ export class SolutionHandler implements ISPObjectHandler {
                 } else {
                     if (solutionConfig.Title) {
                         let context = SP.ClientContext.get_current();
-                        this.processingSolutionConfig(solutionConfig, context)
-                            .then(() => { resolve(); })
-                            .catch((error) => {
-                                Util.Retry(error, solutionConfig.Title,
-                                    () => {
-                                        return this.processingSolutionConfig(solutionConfig, context);
-                                    });
-                            });
+                        Util.tryToProcess(solutionConfig.Title, () => { return this.processingSolutionConfig(solutionConfig, context); })
+                            .then(solutionProcessingResult => { resolve(solutionProcessingResult); })
+                            .catch(error => { reject(error); });
                     } else {
                         Util.Reject<void>(reject, "Unknow Solution", `Error while processing Solution: Solution Title is undefined.`);
                     }
@@ -65,8 +60,8 @@ export class SolutionHandler implements ISPObjectHandler {
                         .catch((error) => { reject(error); });
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, solutionConfig.Title,
-                        `Error while requesting Solution with the title '${solutionConfig.Title}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject<void>(reject, solutionConfig.Title, `Error while requesting Solution with the title '${solutionConfig.Title}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 }
             );
         });
@@ -77,7 +72,7 @@ export class SolutionHandler implements ISPObjectHandler {
             SP.Publishing.DesignPackage.install(clientContext, clientContext.get_site(), packageInfo, filerelativeurl);
             clientContext.executeQueryAsync(
                 (sender, args) => {
-                    this.removeSolutionFile(clientContext, filerelativeurl)
+                    this.removeSolutionFile(solutionConfig, clientContext, filerelativeurl)
                         .then(() => { Util.Resolve<void>(resolve, solutionConfig.Title, `Activated Solution with title : '${solutionConfig.Title}'.`); })
                         .catch((error) => {
                             Util.Reject<void>(reject, solutionConfig.Title,
@@ -85,8 +80,8 @@ export class SolutionHandler implements ISPObjectHandler {
                         });
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, solutionConfig.Title,
-                        `Error while installing Solution with the title '${solutionConfig.Title}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject<void>(reject, solutionConfig.Title, `Error while installing Solution with the title '${solutionConfig.Title}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 });
         });
     }
@@ -99,23 +94,30 @@ export class SolutionHandler implements ISPObjectHandler {
                     Util.Resolve<void>(resolve, solutionConfig.Title, `Deactivated Solution with title : '${solutionConfig.Title}'.`);
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, solutionConfig.Title,
-                        `Error while deactivating Solution with the title '${solutionConfig.Title}': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject<void>(reject, solutionConfig.Title, `Error while deactivating Solution with the title '${solutionConfig.Title}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 });
         });
     }
 
-    private removeSolutionFile(clientContext: SP.ClientContext, fileRelativeUrl: string) {
+    private removeSolutionFile(solutionConfig: ISolution, clientContext: SP.ClientContext, fileRelativeUrl: string) {
         return new Promise<boolean>((resolve, reject) => {
             let item = clientContext.get_web().getFileByServerRelativeUrl(fileRelativeUrl);
-            item.deleteObject();
-            clientContext.executeQueryAsync(
-                (sender, args) => {
-                    resolve();
-                },
-                (sender, args) => {
-                    reject();
-                });
+            if (!item.get_serverObjectIsNull) {
+                item.deleteObject();
+                clientContext.executeQueryAsync(
+                    (sender, args) => {
+                        resolve();
+                    },
+                    (sender, args) => {
+                        Util.Reject<void>(reject, solutionConfig.Title, `Error while deleting Solution with the title '${solutionConfig.Title}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
+                    });
+            } else {
+                Util.Reject<void>(reject, solutionConfig.Title,
+                    `Error while deleting Solutionfile '${solutionConfig.FileName}'' - file not found`);
+            }
+
         });
     }
 }

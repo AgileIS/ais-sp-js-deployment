@@ -15,14 +15,9 @@ export class NavigationHandler implements ISPObjectHandler {
                         `Navigation handler parent promise value result is null or undefined !`);
                 } else {
                     let context = SP.ClientContext.get_current();
-                    this.processingQuicklaunchNavigationConfig(navigationConfig, context)
-                        .then((NavigationProsssingResult) => { resolve(NavigationProsssingResult); })
-                        .catch((error) => {
-                            Util.Retry(error, "Navigation > Quicklaunch",
-                                () => {
-                                    return this.processingQuicklaunchNavigationConfig(navigationConfig, context);
-                                });
-                        });
+                    Util.tryToProcess("Navigation", () => { return this.processingQuicklaunchNavigationConfig(navigationConfig, context); })
+                        .then(navigationProcessingResult => { resolve(navigationProcessingResult); })
+                        .catch(error => { reject(error); });
                 }
             });
         });
@@ -61,7 +56,8 @@ export class NavigationHandler implements ISPObjectHandler {
                     }
                 },
                 (sender, args) => {
-                    Util.Reject(reject, "Navigation > Quicklaunch", `Error while requesting quicklaunch node collection': ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject(reject, "Navigation > Quicklaunch", `Error while requesting quicklaunch node collection': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 }
             );
         });

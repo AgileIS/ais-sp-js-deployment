@@ -42,7 +42,7 @@ export class FileHandler implements ISPObjectHandler {
                                 processing = this.processingFolderConfig(fileFolderConfig as IFolder, (parent as Folder).folders);
                             }
                             processing
-                                .then((fileFolderProsssingResult) => { resolve(fileFolderProsssingResult); })
+                                .then((fileFolderProcessingResult) => { resolve(fileFolderProcessingResult); })
                                 .catch((error) => { reject(error); });
                         }
 
@@ -290,8 +290,8 @@ export class FileHandler implements ISPObjectHandler {
                     ps.stdin.end();
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, fileConfig.Name,
-                        `Error while updating data connection for '${fileConfig.Name}':  ${args.get_message()} '\n' ${args.get_stackTrace()}`);
+                    Util.Reject<void>(reject, fileConfig.Name, `Error while updating data connection for '${fileConfig.Name}': `
+                            + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 }
             );
         });
