@@ -83,7 +83,7 @@ export class ListHandler implements ISPObjectHandler {
 
     private addList(listConfig: IList, web: Web): Promise<IPromiseResult<List>> {
         return new Promise<IPromiseResult<List>>((resolve, reject) => {
-            if (listConfig.TemplateType) {
+            if (listConfig.TemplateType && ListTemplates[listConfig.TemplateType]) {
                 let properties = this.createProperties(listConfig);
                 web.lists.add(listConfig.InternalName, listConfig.Description, ListTemplates[(listConfig.TemplateType as string)], listConfig.EnableContentTypes, properties)
                     .then((listAddResult) => {
