@@ -7,11 +7,12 @@ import { ControlOption } from "../constants/controlOption";
 import { Util } from "../util/util";
 
 export class SolutionHandler implements ISPObjectHandler {
+    private handlerName = "SolutionHandler";
     public execute(solutionConfig: ISolution, parentPromise: Promise<IPromiseResult<File>>): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             parentPromise.then((promiseResult) => {
                 if (!promiseResult || !promiseResult.value) {
-                    Util.Reject<void>(reject, solutionConfig.Title,
+                    Util.Reject<void>(reject, this.handlerName,
                         `Solution handler parent promise value result is null or undefined for the solution with the Title '${solutionConfig.Title}'!`);
                 } else {
                     if (solutionConfig.Title) {
@@ -20,7 +21,7 @@ export class SolutionHandler implements ISPObjectHandler {
                             .then(solutionProcessingResult => { resolve(solutionProcessingResult); })
                             .catch(error => { reject(error); });
                     } else {
-                        Util.Reject<void>(reject, "Unknow Solution", `Error while processing Solution: Solution Title is undefined.`);
+                        Util.Reject<void>(reject, this.handlerName, `Error while processing Solution: Solution Title is undefined.`);
                     }
                 }
             });
@@ -29,7 +30,7 @@ export class SolutionHandler implements ISPObjectHandler {
 
     private processingSolutionConfig(solutionConfig: ISolution, clientContext: SP.ClientContext): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
-            Logger.write(`Processing Solution: '${solutionConfig.Title}'.`, Logger.LogLevel.Info);
+            Logger.write(`${this.handlerName} - Processing Solution: '${solutionConfig.Title}'.`, Logger.LogLevel.Info);
             let listRootFolder = clientContext.get_web().get_lists().getByTitle(solutionConfig.Library).get_rootFolder();
             clientContext.load(listRootFolder);
             clientContext.executeQueryAsync(
@@ -60,7 +61,7 @@ export class SolutionHandler implements ISPObjectHandler {
                         .catch((error) => { reject(error); });
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, solutionConfig.Title, `Error while requesting Solution with the title '${solutionConfig.Title}': `
+                    Util.Reject<void>(reject, this.handlerName, `Error while requesting Solution with the title '${solutionConfig.Title}': `
                             + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 }
             );
@@ -73,14 +74,14 @@ export class SolutionHandler implements ISPObjectHandler {
             clientContext.executeQueryAsync(
                 (sender, args) => {
                     this.removeSolutionFile(solutionConfig, clientContext, filerelativeurl)
-                        .then(() => { Util.Resolve<void>(resolve, solutionConfig.Title, `Activated Solution with title : '${solutionConfig.Title}'.`); })
+                        .then(() => { Util.Resolve<void>(resolve, this.handlerName, `Activated Solution with title : '${solutionConfig.Title}'.`); })
                         .catch((error) => {
-                            Util.Reject<void>(reject, solutionConfig.Title,
+                            Util.Reject<void>(reject, this.handlerName,
                                 `Error while deleting Solution File with the title '${solutionConfig.Title}': ${Util.getErrorMessage(error)}`);
                         });
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, solutionConfig.Title, `Error while installing Solution with the title '${solutionConfig.Title}': `
+                    Util.Reject<void>(reject, this.handlerName, `Error while installing Solution with the title '${solutionConfig.Title}': `
                             + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 });
         });
@@ -91,10 +92,10 @@ export class SolutionHandler implements ISPObjectHandler {
             SP.Publishing.DesignPackage.unInstall(clientContext, clientContext.get_site(), packageInfo);
             clientContext.executeQueryAsync(
                 (sender, args) => {
-                    Util.Resolve<void>(resolve, solutionConfig.Title, `Deactivated Solution with title : '${solutionConfig.Title}'.`);
+                    Util.Resolve<void>(resolve, this.handlerName, `Deactivated Solution with title : '${solutionConfig.Title}'.`);
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, solutionConfig.Title, `Error while deactivating Solution with the title '${solutionConfig.Title}': `
+                    Util.Reject<void>(reject, this.handlerName, `Error while deactivating Solution with the title '${solutionConfig.Title}': `
                             + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 });
         });
@@ -110,11 +111,11 @@ export class SolutionHandler implements ISPObjectHandler {
                         resolve();
                     },
                     (sender, args) => {
-                        Util.Reject<void>(reject, solutionConfig.Title, `Error while deleting Solution with the title '${solutionConfig.Title}': `
+                        Util.Reject<void>(reject, this.handlerName, `Error while deleting Solution with the title '${solutionConfig.Title}': `
                             + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                     });
             } else {
-                Util.Reject<void>(reject, solutionConfig.Title,
+                Util.Reject<void>(reject, this.handlerName,
                     `Error while deleting Solutionfile '${solutionConfig.FileName}'' - file not found`);
             }
 

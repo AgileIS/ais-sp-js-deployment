@@ -21,6 +21,7 @@ interface Window { // tslint:disable-line
 }
 
 export class FileHandler implements ISPObjectHandler {
+    private handlerName = "FileHandler";
     public execute(fileFolderConfig: IFile | IFolder, parentPromise: Promise<IPromiseResult<Web | Folder | List>>): Promise<IPromiseResult<File | Folder | void>> {
         return new Promise<IPromiseResult<File | Folder | void>>((resolve, reject) => {
             parentPromise.then(parentResult => {
@@ -29,7 +30,7 @@ export class FileHandler implements ISPObjectHandler {
                         let parent = parentResult.value;
                         if (parentResult.value instanceof Web) {
                             parent = new Folder(parentResult.value.toUrl(), (fileFolderConfig as IFile).Src ? "" : `GetFolderByServerRelativeUrl('${fileFolderConfig.Name}')`);
-                            Util.Resolve<Folder>(resolve, fileFolderConfig.Name, `'${fileFolderConfig.Name}' is RootFolder`, parent as Folder);
+                            Util.Resolve<Folder>(resolve, this.handlerName, `'${fileFolderConfig.Name}' is RootFolder`, parent as Folder);
                         } else {
                             if (parentResult.value instanceof List) {
                                 parent = new Folder(parentRequestResult.RootFolder.__deferred.uri);
@@ -50,7 +51,7 @@ export class FileHandler implements ISPObjectHandler {
 
                     })
                     .catch(error => {
-                        Util.Reject<void>(reject, fileFolderConfig.Name,
+                        Util.Reject<void>(reject, this.handlerName,
                             `Error while requesting parent ('${parentResult.value.toUrl()}') for element: '${fileFolderConfig.Name}': ` + Util.getErrorMessage(error));
                     });
             });
@@ -61,7 +62,7 @@ export class FileHandler implements ISPObjectHandler {
         return new Promise<IPromiseResult<Folder | void>>((resolve, reject) => {
             let processingText = folderConfig.ControlOption === ControlOption.ADD || folderConfig.ControlOption === undefined || folderConfig.ControlOption === ""
                 ? "Add" : folderConfig.ControlOption;
-            Logger.write(`Processing ${processingText} folder: '${folderConfig.Name}' to ${parentFolder.toUrl()}`, Logger.LogLevel.Info);
+            Logger.write(`${this.handlerName} - Processing ${processingText} folder: '${folderConfig.Name}' to ${parentFolder.toUrl()}`, Logger.LogLevel.Info);
 
             let folder = parentFolder.getByName(folderConfig.Name);
             folder.get()
@@ -74,7 +75,7 @@ export class FileHandler implements ISPObjectHandler {
                             break;
                         case ControlOption.UPDATE:
                         default: // tslint:disable-line
-                            Util.Resolve<Folder>(resolve, folderConfig.Name, `Folder with the name '${folderConfig.Name}' already exists in '${parentFolder.toUrl()}'`, folder);
+                            Util.Resolve<Folder>(resolve, this.handlerName, `Folder with the name '${folderConfig.Name}' already exists in '${parentFolder.toUrl()}'`, folder);
                             break;
                     }
                 })
@@ -82,7 +83,7 @@ export class FileHandler implements ISPObjectHandler {
                     if (error === "Error making GET request: Not Found") {
                         switch (folderConfig.ControlOption) {
                             case ControlOption.DELETE:
-                                Util.Reject<void>(reject, folderConfig.Name, `Folder with Name '${folderConfig.Name}' does not exists in '${folder.parentFolder}'`);
+                                Util.Reject<void>(reject, this.handlerName, `Folder with Name '${folderConfig.Name}' does not exists in '${folder.parentFolder}'`);
                                 break;
                             case ControlOption.UPDATE:
                             default: // tslint:disable-line
@@ -92,7 +93,7 @@ export class FileHandler implements ISPObjectHandler {
                                 break;
                         }
                     } else {
-                        Util.Reject<void>(reject, folderConfig.Name,
+                        Util.Reject<void>(reject, this.handlerName,
                             `Error while requesting folder with the title '${folderConfig.Name}' from parent '${folder.parentFolder}': ` + Util.getErrorMessage(error));
                     }
                 });
@@ -103,7 +104,7 @@ export class FileHandler implements ISPObjectHandler {
         return new Promise<IPromiseResult<File | void>>((resolve, reject) => {
             let processingText = fileConfig.ControlOption === ControlOption.ADD || fileConfig.ControlOption === undefined || fileConfig.ControlOption === ""
                 ? "Add" : fileConfig.ControlOption;
-            Logger.write(`Processing ${processingText} file: '${fileConfig.Name}' in ${parentFolder.toUrl()}`, Logger.LogLevel.Info);
+            Logger.write(`${this.handlerName} - Processing ${processingText} file: '${fileConfig.Name}' in ${parentFolder.toUrl()}`, Logger.LogLevel.Info);
 
             let file = parentFolder.getByName(fileConfig.Name);
             file.get()
@@ -117,7 +118,7 @@ export class FileHandler implements ISPObjectHandler {
                             processingPromise = this.addFile(fileConfig, parentFolder, true, this.resolvePreTask(fileConfig));
                             break;
                         default:
-                            Util.Resolve<File>(resolve, fileConfig.Name, `File with the name '${fileConfig.Name}' already exists in '${parentFolder.toUrl()}'`, file);
+                            Util.Resolve<File>(resolve, this.handlerName, `File with the name '${fileConfig.Name}' already exists in '${parentFolder.toUrl()}'`, file);
                             break;
                     }
 
@@ -126,14 +127,14 @@ export class FileHandler implements ISPObjectHandler {
                             .then((fileProcessingResult) => { resolve(fileProcessingResult); })
                             .catch((error) => { reject(error); });
                     } else {
-                        Logger.write("File handler processing promise is undefined!", Logger.LogLevel.Error);
+                        Logger.write(`${this.handlerName} - Processing promise is undefined!`, Logger.LogLevel.Error);
                     }
                 })
                 .catch((error) => {
                     if (error === "Error making GET request: Not Found") {
                         switch (fileConfig.ControlOption) {
                             case ControlOption.DELETE:
-                                Util.Reject<void>(reject, fileConfig.Name, `File with Name '${fileConfig.Name}' does not exists in '${parentFolder.toUrl()}'`);
+                                Util.Reject<void>(reject, this.handlerName, `File with Name '${fileConfig.Name}' does not exists in '${parentFolder.toUrl()}'`);
                                 break;
                             case ControlOption.UPDATE:
                             default: // tslint:disable-line
@@ -145,7 +146,7 @@ export class FileHandler implements ISPObjectHandler {
                                 break;
                         }
                     } else {
-                        Util.Reject<void>(reject, fileConfig.Name,
+                        Util.Reject<void>(reject, this.handlerName,
                             `Error while requesting file with the title '${fileConfig.Name}' from parent '${parentFolder.toUrl()}': ` + Util.getErrorMessage(error));
                     }
                 });
@@ -155,16 +156,16 @@ export class FileHandler implements ISPObjectHandler {
     private addFolder(folderConfig: IFolder, parentFolder: Folders): Promise<IPromiseResult<Folder>> {
         return new Promise<IPromiseResult<Folder>>((resolve, reject) => {
             parentFolder.add(folderConfig.Name)
-                .then((folderAddResult) => { Util.Resolve<Folder>(resolve, folderConfig.Name, `Added item: '${folderConfig.Name}'`, folderAddResult.folder); })
-                .catch((error) => { Util.Reject<void>(reject, folderConfig.Name, `Error while adding folder with name '${folderConfig.Name}': ` + Util.getErrorMessage(error)); });
+                .then((folderAddResult) => { Util.Resolve<Folder>(resolve, this.handlerName, `Added item: '${folderConfig.Name}'`, folderAddResult.folder); })
+                .catch((error) => { Util.Reject<void>(reject, this.handlerName, `Error while adding folder with name '${folderConfig.Name}': ` + Util.getErrorMessage(error)); });
         });
     }
 
     private deleteFolder(folderConfig: IFolder, folder: Folder): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             folder.delete()
-                .then(() => { Util.Resolve<void>(resolve, folderConfig.Name, `Deleted folder: '${folderConfig.Name}'`); })
-                .catch((error) => { Util.Reject<void>(reject, `Error while deleting folder with name '${folderConfig.Name}': ` + Util.getErrorMessage(error), folderConfig.Name); });
+                .then(() => { Util.Resolve<void>(resolve, this.handlerName, `Deleted folder: '${folderConfig.Name}'`); })
+                .catch((error) => { Util.Reject<void>(reject, this.handlerName, `Error while deleting folder with name '${folderConfig.Name}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -181,27 +182,27 @@ export class FileHandler implements ISPObjectHandler {
                             if (fileConfig.Properties) {
                                 this.updateFileProperties(fileConfig, fileAddResult.file)
                                     .then((fileUpdateResult) => {
-                                        Util.Resolve<File>(resolve, fileConfig.Name, `Added file: '${fileConfig.Name}'`, fileAddResult.file);
+                                        Util.Resolve<File>(resolve, this.handlerName, `Added file: '${fileConfig.Name}'`, fileAddResult.file);
                                     })
                                     .catch((error) => {
-                                        Util.Reject<void>(reject, fileConfig.Name, `Error while updating file item fields with name '${fileConfig.Name}': ` + Util.getErrorMessage(error));
+                                        Util.Reject<void>(reject, this.handlerName, `Error while updating file item fields with name '${fileConfig.Name}': ` + Util.getErrorMessage(error));
                                     });
                             } else {
-                                Util.Resolve<File>(resolve, fileConfig.Name, `Added file: '${fileConfig.Name}'`, fileAddResult.file);
+                                Util.Resolve<File>(resolve, this.handlerName, `Added file: '${fileConfig.Name}'`, fileAddResult.file);
                             }
 
                         })
-                        .catch((error) => { Util.Reject<void>(reject, fileConfig.Name, `Error while adding file with name '${fileConfig.Name}': ` + Util.getErrorMessage(error)); });
+                        .catch((error) => { Util.Reject<void>(reject, this.handlerName, `Error while adding file with name '${fileConfig.Name}': ` + Util.getErrorMessage(error)); });
                 })
-                .catch((error) => { Util.Reject<void>(reject, fileConfig.Name, `Error while proccesing preTask for file with name '${fileConfig.Name}': ` + Util.getErrorMessage(error)); });
+                .catch((error) => { Util.Reject<void>(reject, this.handlerName, `Error while proccesing preTask for file with name '${fileConfig.Name}': ` + Util.getErrorMessage(error)); });
         });
     }
 
     private deleteFile(fileConfig: IFile, file: File): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             file.delete()
-                .then(() => { Util.Resolve<void>(resolve, fileConfig.Name, `Deleted file: '${fileConfig.Name}'`); })
-                .catch((error) => { Util.Reject(reject, fileConfig.Name, `Error while deleting file with name '${fileConfig.Name}': ` + Util.getErrorMessage(error)); });
+                .then(() => { Util.Resolve<void>(resolve, this.handlerName, `Deleted file: '${fileConfig.Name}'`); })
+                .catch((error) => { Util.Reject(reject, this.handlerName, `Error while deleting file with name '${fileConfig.Name}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -211,10 +212,10 @@ export class FileHandler implements ISPObjectHandler {
             properties.__metadata = { type: "SP.ListItem" };
             file.listItemAllFields.update(properties)
                 .then((itemUpdateResult) => {
-                    Util.Resolve<Item>(resolve, fileConfig.Name, `Updated item: '${fileConfig.Name}'`, itemUpdateResult.item);
+                    Util.Resolve<Item>(resolve, this.handlerName, `Updated item: '${fileConfig.Name}'`, itemUpdateResult.item);
                 })
                 .catch((error) => {
-                    Util.Reject<void>(reject, fileConfig.Name, `Error while updating item with title '${fileConfig.Name}': ` + Util.getErrorMessage(error));
+                    Util.Reject<void>(reject, this.handlerName, `Error while updating item with title '${fileConfig.Name}': ` + Util.getErrorMessage(error));
                 });
         });
     }
@@ -279,10 +280,10 @@ export class FileHandler implements ISPObjectHandler {
                             fileConfig.DataConnectionTemplate,
                         ]);
                     ps.stdout.on("data", (data) => {
-                        Logger.write(`Processing data connection for file '${fileConfig.Name}': '${data}'`, Logger.LogLevel.Info);
+                        Logger.write(`${this.handlerName} - Processing data connection for file '${fileConfig.Name}': '${data}'`, Logger.LogLevel.Info);
                     });
                     ps.stderr.on("data", (data) => {
-                        Util.Reject<void>(reject, fileConfig.Name,
+                        Util.Reject<void>(reject, this.handlerName,
                             `Error while updating data connection for '${fileConfig.Name}':  ${data}`);
                     });
                     ps.on("exit", () => {
@@ -292,7 +293,7 @@ export class FileHandler implements ISPObjectHandler {
                     ps.stdin.end();
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, fileConfig.Name, `Error while updating data connection for '${fileConfig.Name}': `
+                    Util.Reject<void>(reject, this.handlerName, `Error while updating data connection for '${fileConfig.Name}': `
                         + `${Util.getErrorMessageFromQuery(args.get_message(), args.get_stackTrace())}`);
                 }
             );

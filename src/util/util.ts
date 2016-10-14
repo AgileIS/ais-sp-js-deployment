@@ -4,9 +4,9 @@ import { PromiseResult } from "../promiseResult";
 
 export namespace Util {
     /** Resolve with a IPromiseResult */
-    export function Resolve<T>(resolve: (value?: PromiseResult<T> | Thenable<PromiseResult<T>>) => void, configNodeIdentifier: string, promiseResultMessage: string, promiseResultValue?: T) {
-        if (configNodeIdentifier && promiseResultMessage) {
-            let errorMsg = `${configNodeIdentifier} - ${promiseResultMessage}`;
+    export function Resolve<T>(resolve: (value?: PromiseResult<T> | Thenable<PromiseResult<T>>) => void, sourceIdentifier: string, promiseResultMessage: string, promiseResultValue?: T) {
+        if (sourceIdentifier && promiseResultMessage) {
+            let errorMsg = `${sourceIdentifier} - ${promiseResultMessage}`;
             Logger.write(errorMsg, Logger.LogLevel.Info);
         }
 
@@ -14,9 +14,9 @@ export namespace Util {
     }
 
     /** Reject with a IPromiseResult */
-    export function Reject<T>(reject: (error?: any) => void, configNodeIdentifier: string, promiseResultMessage: string, promiseResultValue?: T) {
-        if (configNodeIdentifier && promiseResultMessage) {
-            let errorMsg = `${configNodeIdentifier} - ${promiseResultMessage}`;
+    export function Reject<T>(reject: (error?: any) => void, sourceIdentifier: string, promiseResultMessage: string, promiseResultValue?: T) {
+        if (sourceIdentifier && promiseResultMessage) {
+            let errorMsg = `${sourceIdentifier} - ${promiseResultMessage}`;
             Logger.write(errorMsg, Logger.LogLevel.Error);
         }
 

@@ -7,6 +7,7 @@ import { Util } from "../util/util";
 import { ControlOption } from "../constants/controlOption";
 
 export class SiteHandler implements ISPObjectHandler {
+    private handlerName = "SiteHandler";
     public execute(siteConfig: ISite, parentPromise: Promise<IPromiseResult<void>>): Promise<IPromiseResult<Web>> {
         return new Promise<IPromiseResult<Web>>((resolve, reject) => {
             if (siteConfig && siteConfig.Url) {
@@ -19,15 +20,15 @@ export class SiteHandler implements ISPObjectHandler {
                                     .catch((error) => { reject(error); });
                                 break;
                             case ControlOption.DELETE:
-                                Util.Reject<void>(reject, siteConfig.Url, `Error delete a site is not supported`);
+                                Util.Reject<void>(reject, this.handlerName, `Error delete a site is not supported`);
                                 break;
                             default:
-                                Util.Resolve<Web>(resolve, siteConfig.Url, `Web '${siteConfig.Url}' already exists.`, PnP.sp.web);
+                                Util.Resolve<Web>(resolve, this.handlerName, `Web '${siteConfig.Url}' already exists.`, PnP.sp.web);
                         }
                     })
-                    .catch((error) => { Util.Reject<void>(reject, siteConfig.Url, `Error while requesting web with the url '${siteConfig.Url}': ` + Util.getErrorMessage(error)); });
+                    .catch((error) => { Util.Reject<void>(reject, this.handlerName, `Error while requesting web with the url '${siteConfig.Url}': ` + Util.getErrorMessage(error)); });
             } else {
-                Util.Reject<void>(reject, "Unknown site", `Error while processing site: site url is undefined.`);
+                Util.Reject<void>(reject, this.handlerName, `Error while processing site: site url is undefined.`);
             }
         });
     };
@@ -40,17 +41,17 @@ export class SiteHandler implements ISPObjectHandler {
                     if (siteConfig.PropertyBagEntries) {
                         this.updatePropertyBag(siteConfig, siteUpdateResult.web)
                             .then(() => {
-                                Util.Resolve<Web>(resolve, siteConfig.Title, `Updated site properties: '${siteConfig.Title}' and added PropertyBagEntries.`, siteUpdateResult.web);
+                                Util.Resolve<Web>(resolve, this.handlerName, `Updated site properties: '${siteConfig.Title}' and added PropertyBagEntries.`, siteUpdateResult.web);
                             })
                             .catch((error) => {
-                                Util.Reject<void>(reject, siteConfig.Title,
+                                Util.Reject<void>(reject, this.handlerName,
                                     `Error while adding PropertyBagEntries in the site with the title '${siteConfig.Title}': ` + Util.getErrorMessage(error));
                             });
                     } else {
-                        Util.Resolve<Web>(resolve, siteConfig.Title, `Updated site properties: '${siteConfig.Title}'.`, siteUpdateResult.web);
+                        Util.Resolve<Web>(resolve, this.handlerName, `Updated site properties: '${siteConfig.Title}'.`, siteUpdateResult.web);
                     }
                 })
-                .catch((error) => { Util.Reject<void>(reject, siteConfig.Title, `Error while updating site with the title '${siteConfig.Title}': ` + Util.getErrorMessage(error)); });
+                .catch((error) => { Util.Reject<void>(reject, this.handlerName, `Error while updating site with the title '${siteConfig.Title}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -66,10 +67,10 @@ export class SiteHandler implements ISPObjectHandler {
             web.update();
             context.executeQueryAsync(
                 (sender, args) => {
-                    Util.Resolve<void>(resolve, siteConfig.Title, `Updated property bag entries in site with the title '${siteConfig.Title}'.`);
+                    Util.Resolve<void>(resolve, this.handlerName, `Updated property bag entries in site with the title '${siteConfig.Title}'.`);
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, siteConfig.Title, `Error while updating property bag in the site with the title '${siteConfig.Title}': `
+                    Util.Reject<void>(reject, this.handlerName, `Error while updating property bag in the site with the title '${siteConfig.Title}': `
                             + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 });
         });

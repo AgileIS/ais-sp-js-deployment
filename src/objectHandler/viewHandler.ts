@@ -8,11 +8,12 @@ import { ControlOption } from "../constants/controlOption";
 import { Util } from "../util/util";
 
 export class ViewHandler implements ISPObjectHandler {
+    private handlerName = "ViewHandler";
     public execute(viewConfig: IView, parentPromise: Promise<IPromiseResult<List>>): Promise<IPromiseResult<void | View>> {
         return new Promise<IPromiseResult<void | View>>((resolve, reject) => {
             parentPromise.then((promiseResult) => {
                 if (!promiseResult || !promiseResult.value) {
-                    Util.Reject<void>(reject, viewConfig.Title,
+                    Util.Reject<void>(reject, this.handlerName,
                         `View handler parent promise value result is null or undefined for the view with the title '${viewConfig.Title}'!`);
                 } else {
                     let list = promiseResult.value;
@@ -28,7 +29,7 @@ export class ViewHandler implements ISPObjectHandler {
         return new Promise<IPromiseResult<void | View>>((resolve, reject) => {
             let processingText = viewConfig.ControlOption === ControlOption.ADD || viewConfig.ControlOption === undefined || viewConfig.ControlOption === ""
                 ? "Add" : viewConfig.ControlOption;
-            Logger.write(`Processing '${processingText}' view: '${viewConfig.Title}.`, Logger.LogLevel.Info);
+            Logger.write(`${this.handlerName} - Processing '${processingText}' view: '${viewConfig.Title}.`, Logger.LogLevel.Info);
 
             list.views.filter(`substringof('${viewConfig.InternalName}',ServerRelativeUrl) eq true`).select("Id", "Title").get()
                 .then((viewRequestResults) => {
@@ -38,7 +39,7 @@ export class ViewHandler implements ISPObjectHandler {
                     if (viewRequestResults && viewRequestResults.length === 1) {
                         viewConfig.NewTitle = viewConfig.Title;
                         viewConfig.Title = viewRequestResults[0].Title;
-                        Logger.write(`Found view with title: '${viewConfig.Title}'`, Logger.LogLevel.Info);
+                        Logger.write(`${this.handlerName} - Found view with title: '${viewConfig.Title}'`, Logger.LogLevel.Info);
                         let view = list.views.getByTitle(viewConfig.Title);
                         switch (viewConfig.ControlOption) {
                             case ControlOption.UPDATE:
@@ -55,7 +56,7 @@ export class ViewHandler implements ISPObjectHandler {
                     } else {
                         switch (viewConfig.ControlOption) {
                             case ControlOption.DELETE:
-                                Util.Resolve<void>(reject, viewConfig.Title, `View with the title '${viewConfig.Title}' does not have to be deleted, because it does not exist.`);
+                                Util.Resolve<void>(reject, this.handlerName, `View with the title '${viewConfig.Title}' does not have to be deleted, because it does not exist.`);
                                 rejectOrResolved = true;
                                 break;
                             case ControlOption.UPDATE:
@@ -68,13 +69,13 @@ export class ViewHandler implements ISPObjectHandler {
 
                     if (processingPromise) {
                         processingPromise
-                            .then((viewProsssingResult) => { resolve(viewProsssingResult); })
+                            .then((viewProcessingResult) => { resolve(viewProcessingResult); })
                             .catch((error) => { reject(error); });
                     } else if (!rejectOrResolved) {
-                        Logger.write("View handler processing promise is undefined!", Logger.LogLevel.Error);
+                        Logger.write(`${this.handlerName} - View handler processing promise is undefined!`, Logger.LogLevel.Error);
                     }
                 })
-                .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while requesting view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
+                .catch((error) => { Util.Reject<void>(reject, this.handlerName, `Error while requesting view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -84,13 +85,13 @@ export class ViewHandler implements ISPObjectHandler {
             list.views.add(viewConfig.Title, viewConfig.PersonalView, properties)
                 .then((viewAddResult) => {
                     this.addViewFields(viewConfig, viewAddResult.view)
-                        .then(() => { Util.Resolve<View>(resolve, viewConfig.Title, `Added view: '${viewConfig.Title}' and added all Viewfields.`, viewAddResult.view); })
+                        .then(() => { Util.Resolve<View>(resolve, this.handlerName, `Added view: '${viewConfig.Title}' and added all Viewfields.`, viewAddResult.view); })
                         .catch((error) => {
-                            Util.Reject<void>(reject, viewConfig.Title,
+                            Util.Reject<void>(reject, this.handlerName,
                                 `Error while adding Viewfields in the view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error));
                         });
                 })
-                .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while adding view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
+                .catch((error) => { Util.Reject<void>(reject, this.handlerName, `Error while adding view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -102,22 +103,22 @@ export class ViewHandler implements ISPObjectHandler {
                     let viewTitle = this.getTitleFromConfig(viewConfig);
                     this.addViewFields(viewConfig, viewUpdateResult.view)
                         .then(() => {
-                            Util.Resolve<View>(resolve, viewTitle, `Updated view: '${viewTitle}' and added all Viewfields.`, viewUpdateResult.view);
+                            Util.Resolve<View>(resolve, this.handlerName, `Updated view: '${viewTitle}' and added all Viewfields.`, viewUpdateResult.view);
                         })
                         .catch((error) => {
-                            Util.Reject<void>(reject, viewTitle,
+                            Util.Reject<void>(reject, this.handlerName,
                                 `Error while adding Viewfields in the view with the title '${viewTitle}': ` + Util.getErrorMessage(error));
                         });
                 })
-                .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while updating view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
+                .catch((error) => { Util.Reject<void>(reject, this.handlerName, `Error while updating view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
         });
     }
 
     private deleteView(viewConfig: IView, view: View): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             view.delete()
-                .then(() => { Util.Resolve<void>(resolve, viewConfig.Title, `Deleted view: '${viewConfig.Title}'.`); })
-                .catch((error) => { Util.Reject<void>(reject, viewConfig.Title, `Error while deleting view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
+                .then(() => { Util.Resolve<void>(resolve, this.handlerName, `Deleted view: '${viewConfig.Title}'.`); })
+                .catch((error) => { Util.Reject<void>(reject, this.handlerName, `Error while deleting view with the title '${viewConfig.Title}': ` + Util.getErrorMessage(error)); });
         });
     }
 
@@ -127,7 +128,7 @@ export class ViewHandler implements ISPObjectHandler {
             let viewUrl = view.toUrl();
             let listUrlParts = viewUrl.split("'");
             let viewTitle = this.getTitleFromConfig(viewConfig);
-            Logger.write(`Updating all viewfields from view with the title '${viewConfig.Title}' on the list '${listUrlParts[1]}'. `, Logger.LogLevel.Verbose);
+            Logger.write(`${this.handlerName} - Updating all viewfields from view with the title '${viewConfig.Title}' on the list '${listUrlParts[1]}'. `, Logger.LogLevel.Verbose);
             let context = SP.ClientContext.get_current();
             if (listUrlParts[1].match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
                 spView = context.get_web().get_lists().getById(listUrlParts[1]).get_views().getByTitle(viewTitle);
@@ -148,10 +149,10 @@ export class ViewHandler implements ISPObjectHandler {
             spView.update();
             context.executeQueryAsync(
                 (sender, args) => {
-                    Util.Resolve<void>(resolve, viewConfig.Title, `Added viewfields to view with the title '${viewConfig.Title}'.`);
+                    Util.Resolve<void>(resolve, this.handlerName, `Added viewfields to view with the title '${viewConfig.Title}'.`);
                 },
                 (sender, args) => {
-                    Util.Reject<void>(reject, viewConfig.Title, `Error while adding viewfields in the view with the title '${viewConfig.Title}': `
+                    Util.Reject<void>(reject, this.handlerName, `Error while adding viewfields in the view with the title '${viewConfig.Title}': `
                             + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 });
         });

@@ -7,11 +7,12 @@ import { INavigationNode } from "../interfaces/types/iNavigationNode";
 import { Util } from "../util/util";
 
 export class NavigationHandler implements ISPObjectHandler {
+    private handlerName = "NavigationHandler";
     public execute(navigationConfig: INavigation, parentPromise: Promise<IPromiseResult<Web>>): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
             parentPromise.then(promiseResult => {
                 if (!promiseResult || !promiseResult.value) {
-                    Util.Reject<void>(reject, "Navigation > Quicklaunch",
+                    Util.Reject<void>(reject, this.handlerName,
                         `Navigation handler parent promise value result is null or undefined !`);
                 } else {
                     let context = SP.ClientContext.get_current();
@@ -25,14 +26,14 @@ export class NavigationHandler implements ISPObjectHandler {
 
     private processingQuicklaunchNavigationConfig(navigationConfig: INavigation, clientContext: SP.ClientContext): Promise<IPromiseResult<void>> {
         return new Promise<IPromiseResult<void>>((resolve, reject) => {
-            Logger.write(`Processing quicklaunch navigation nodes.`, Logger.LogLevel.Info);
+            Logger.write(`${this.handlerName} - Processing quicklaunch navigation nodes.`, Logger.LogLevel.Info);
 
             let web = clientContext.get_web();
             let navigation = web.get_navigation();
             let quicklaunch = navigation.get_quickLaunch();
 
             let useSharedNavigation = navigationConfig.UseShared === true ? navigationConfig.UseShared : false;
-            Logger.write(`Set use shared navigation to ${useSharedNavigation}.`, Logger.LogLevel.Info);
+            Logger.write(`${this.handlerName} - Set use shared navigation to ${useSharedNavigation}.`, Logger.LogLevel.Info);
             navigation.set_useShared(useSharedNavigation);
 
             clientContext.load(quicklaunch, "Include(Title,Url,IsExternal,Children)");
@@ -52,11 +53,11 @@ export class NavigationHandler implements ISPObjectHandler {
                             .then((quicklaunchProcessingResult) => { resolve(); })
                             .catch((error) => { reject(error); });
                     } else if (!rejectOrResolved) {
-                        Logger.write("Navigation handler processing promise is undefined!", Logger.LogLevel.Error);
+                        Logger.write("${this.handlerName} - Processing promise is undefined!", Logger.LogLevel.Error);
                     }
                 },
                 (sender, args) => {
-                    Util.Reject(reject, "Navigation > Quicklaunch", `Error while requesting quicklaunch node collection': `
+                    Util.Reject(reject, this.handlerName, `Error while requesting quicklaunch node collection': `
                             + `${Util.getErrorMessageFromQuery(args.get_message(),args.get_stackTrace())}`);
                 }
             );
@@ -65,24 +66,24 @@ export class NavigationHandler implements ISPObjectHandler {
 
     private recreatingNavigationNodes(navigationNodeCollection: SP.NavigationNodeCollection, navigatioNodes: Array<INavigationNode>): Promise<IPromiseResult<SP.NavigationNodeCollection>> {
         return new Promise<IPromiseResult<SP.NavigationNodeCollection>>((resolve, reject) => {
-            Logger.write("Recreating quicklaunch.", Logger.LogLevel.Info);
+            Logger.write(`${this.handlerName} - Recreating quicklaunch.`, Logger.LogLevel.Info);
 
             this.clearNavigationNodeCollection(navigationNodeCollection);
             this.addNavNodesToNavCollection(navigationNodeCollection, navigatioNodes);
 
             navigationNodeCollection.get_context().executeQueryAsync(
                 (sender2, args2) => {
-                    Util.Resolve<SP.NavigationNodeCollection>(resolve, "Navigation > Quicklaunch", `Recreated quicklaunch.`, navigationNodeCollection);
+                    Util.Resolve<SP.NavigationNodeCollection>(resolve, this.handlerName, `Recreated quicklaunch.`, navigationNodeCollection);
                 },
                 (sender2, args2) => {
-                    Util.Reject<void>(reject, "Navigation > Quicklaunch", `Error while recreating quicklaunch: ${args2.get_message()} '\n' ${args2.get_stackTrace()}`);
+                    Util.Reject<void>(reject, this.handlerName, `Error while recreating quicklaunch: ${args2.get_message()} '\n' ${args2.get_stackTrace()}`);
                 }
             );
         });
     }
 
     private clearNavigationNodeCollection(navigationNodeCollection: SP.NavigationNodeCollection): void {
-        Logger.write("Clearing navigation node collection.", Logger.LogLevel.Info);
+        Logger.write(`${this.handlerName} - Clearing navigation node collection.`, Logger.LogLevel.Info);
 
         let nodeEnumurator = navigationNodeCollection.getEnumerator();
         let toDeleteNodes: Array<SP.NavigationNode> = new Array<SP.NavigationNode>();
@@ -98,7 +99,7 @@ export class NavigationHandler implements ISPObjectHandler {
     }
 
     private addNavNodesToNavCollection(navigationNodeCollection: SP.NavigationNodeCollection, navigatioNodes: Array<INavigationNode>): void {
-        Logger.write("Adding navigation nodes to navigation node collection.", Logger.LogLevel.Info);
+        Logger.write(`${this.handlerName} - Adding navigation nodes to navigation node collection.`, Logger.LogLevel.Info);
 
         if (navigatioNodes) {
             navigatioNodes.forEach(
@@ -112,13 +113,13 @@ export class NavigationHandler implements ISPObjectHandler {
                         nodeCreationInfo.set_asLastNode(true);
 
                         let navNode = navigationNodeCollection.add(nodeCreationInfo);
-                        Logger.write(`Added navigation node: ${nodeConfig.Title} - ${nodeConfig.Url}.`, Logger.LogLevel.Info);
+                        Logger.write(`${this.handlerName} - Added navigation node: ${nodeConfig.Title} - ${nodeConfig.Url}.`, Logger.LogLevel.Info);
 
                         if (nodeConfig.Children) {
                             this.addNavNodesToNavCollection(navNode.get_children(), nodeConfig.Children);
                         }
                     } else {
-                        Logger.write(`QuickLaunch navigation node ${index} missing title or/and url.`, Logger.LogLevel.Error);
+                        Logger.write(`${this.handlerName} - QuickLaunch navigation node ${index} missing title or/and url.`, Logger.LogLevel.Error);
                     }
                 }
             );
@@ -152,8 +153,8 @@ export class NavigationHandler implements ISPObjectHandler {
 
     private updateNavigationNodeCollection(navigationNodeCollection: SP.NavigationNodeCollection, navigationNodes: Array<INavigationNode>): Promise<IPromiseResult<SP.NavigationNodeCollection>> {
         return new Promise<IPromiseResult<SP.NavigationNodeCollection>>((resolve, reject) => {
-            Logger.write("Updating quicklaunch.", Logger.LogLevel.Info);
-            Util.Resolve<SP.NavigationNodeCollection>(resolve, "Navigation > Quicklaunch", "Updated quicklaunch.", navigationNodeCollection);
+            Logger.write(`${this.handlerName} - Updating quicklaunch.`, Logger.LogLevel.Info);
+            Util.Resolve<SP.NavigationNodeCollection>(resolve, this.handlerName, "Updated quicklaunch.", navigationNodeCollection);
             /* todo:
                         if (navigatioNodes) {
                             navigatioNodes.forEach((nodeConfig, index, array) => {
