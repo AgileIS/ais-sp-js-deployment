@@ -9,7 +9,7 @@ export class MyConsoleLogger implements LogListener {
 
     public log(entry: LogEntry) {
         // let now = new Date();
-        // let log = `${this.logPrefix}# ${now.getDay()}.${now.getMonth()}.${now.getFullYear()}  ${now.getHours()}:${now.getMinutes()}:${now.getMilliseconds()}: ${entry.message}`;
+        // let log = `${this.logPrefix}# ${now.getDate()}.${now.getMonth() + 1}.${now.getFullYear()}  ${now.getHours()}:${now.getMinutes()}:${now.getMilliseconds()}: ${entry.message}`;
         let log = `${this.logPrefix}# ${entry.message}`;
 
         if (entry.data) {
