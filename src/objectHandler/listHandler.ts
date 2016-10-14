@@ -19,7 +19,7 @@ export class ListHandler implements ISPObjectHandler {
                         `List handler parent promise value result is null or undefined for the list with the internal name '${listConfig.InternalName}'!`);
                 } else {
                     let web = promiseResult.value;
-                    Util.tryToProcess(listConfig.InternalName, () => { return this.processingListConfig(listConfig, web); })
+                    Util.tryToProcess(listConfig.InternalName, () => { return this.processingListConfig(listConfig, web); }, this.handlerName)
                         .then(listProcessingResult => { resolve(listProcessingResult); })
                         .catch(error => { reject(error); });
                 }

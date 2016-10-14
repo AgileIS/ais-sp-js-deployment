@@ -44,7 +44,7 @@ export class FileHandler implements ISPObjectHandler {
                                 }
                                 return processing;
 
-                            })
+                            }, this.handlerName)
                                 .then((fileFolderProcessingResult) => { resolve(fileFolderProcessingResult); })
                                 .catch((error) => { reject(error); });
                         }
@@ -109,6 +109,7 @@ export class FileHandler implements ISPObjectHandler {
             let file = parentFolder.getByName(fileConfig.Name);
             file.get()
                 .then(folderRequestResult => {
+                    let rejectOrResolved = false;
                     let processingPromise: Promise<IPromiseResult<File | void>> = undefined;
                     switch (fileConfig.ControlOption) {
                         case ControlOption.DELETE:
@@ -119,6 +120,7 @@ export class FileHandler implements ISPObjectHandler {
                             break;
                         default:
                             Util.Resolve<File>(resolve, this.handlerName, `File with the name '${fileConfig.Name}' already exists in '${parentFolder.toUrl()}'`, file);
+                            rejectOrResolved = true;
                             break;
                     }
 
@@ -126,7 +128,7 @@ export class FileHandler implements ISPObjectHandler {
                         processingPromise
                             .then((fileProcessingResult) => { resolve(fileProcessingResult); })
                             .catch((error) => { reject(error); });
-                    } else {
+                    } else if (!rejectOrResolved) {
                         Logger.write(`${this.handlerName} - Processing promise is undefined!`, Logger.LogLevel.Error);
                     }
                 })

@@ -22,7 +22,7 @@ export class ContentTypeHandler implements ISPObjectHandler {
                         let context = new SP.ClientContext(_spPageContextInfo.webAbsoluteUrl);
                         Util.tryToProcess(contentTypeConfig.Id, () => {
                             context = new SP.ClientContext(_spPageContextInfo.webAbsoluteUrl);
-                            return this.processingContentTypeConfig(contentTypeConfig, context); })
+                            return this.processingContentTypeConfig(contentTypeConfig, context); }, this.handlerName)
                             .then((contentTypeProcessingResult) => {
                                 let resolveValue = undefined;
                                 if (contentTypeProcessingResult.value) {

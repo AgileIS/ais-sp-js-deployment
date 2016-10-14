@@ -16,7 +16,7 @@ export class NavigationHandler implements ISPObjectHandler {
                         `Navigation handler parent promise value result is null or undefined !`);
                 } else {
                     let context = SP.ClientContext.get_current();
-                    Util.tryToProcess("Navigation", () => { return this.processingQuicklaunchNavigationConfig(navigationConfig, context); })
+                    Util.tryToProcess("Navigation", () => { return this.processingQuicklaunchNavigationConfig(navigationConfig, context); }, this.handlerName)
                         .then(navigationProcessingResult => { resolve(navigationProcessingResult); })
                         .catch(error => { reject(error); });
                 }

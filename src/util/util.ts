@@ -51,26 +51,26 @@ export namespace Util {
         return error;
     }
 
-    export function tryToProcess<T>(configNodeIdentifier: string, executionFunction: () => Promise<T>, executionCount = 3, executionTimeOut = 0): Promise<T> {
+    export function tryToProcess<T>(configNodeIdentifier: string, executionFunction: () => Promise<T>, callingHandler: string, executionCount = 3, executionTimeOut = 0): Promise<T> {
         return new Promise<T>((resolve, reject) => {
             if (executionCount < 1) {
-                reject(`Error in 'tryToProcess<T>' function: Parameter 'executionCount' is lower than 1 for node '${configNodeIdentifier}'`);
+                reject(`TryToProcess called from ${callingHandler} - Error in 'tryToProcess<T>' function: Parameter 'executionCount' is lower than 1 for node '${configNodeIdentifier}'`);
             } else {
                 setTimeout(() => {
                     if (executionTimeOut !== 0) {
-                        Logger.write(`Retry node processing for '${configNodeIdentifier}'`, Logger.LogLevel.Warning);
+                        Logger.write(`TryToProcess called from ${callingHandler} - Retry node processing for '${configNodeIdentifier}'`, Logger.LogLevel.Warning);
                     }
                     executionFunction()
                         .then((executionResult) => { resolve(executionResult); })
                         .catch((error) => {
                             if ((executionCount - 1) >= 1) {
                                 if (executionTimeOut === 0) {
-                                    Logger.write(`Node processing failed for '${configNodeIdentifier}'. \n`
+                                    Logger.write(`TryToProcess called from ${callingHandler} - Node processing failed for '${configNodeIdentifier}'. \n`
                                     + `${Util.getErrorMessage(error)} \n`
                                     + `Start retry for maximum ${executionCount} times`, Logger.LogLevel.Warning);
                                 }
                                 let newExecutionTimeout = executionTimeOut + 2500;
-                                tryToProcess(configNodeIdentifier, executionFunction, executionCount - 1, newExecutionTimeout)
+                                tryToProcess(configNodeIdentifier, executionFunction, callingHandler, executionCount - 1, newExecutionTimeout)
                                     .then((retryResult) => { resolve(retryResult); })
                                     .catch((retryError) => { reject(retryError); });
                             } else { reject(error); }

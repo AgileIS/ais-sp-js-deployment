@@ -17,7 +17,7 @@ export class ItemHandler implements ISPObjectHandler {
                         `Item handler parent promise value result is null or undefined for the item with the title '${itemConfig.Title}'!`);
                 } else {
                     let list = promiseResult.value;
-                    Util.tryToProcess(itemConfig.Title, () => { return this.processingItemConfig(itemConfig, list); })
+                    Util.tryToProcess(itemConfig.Title, () => { return this.processingItemConfig(itemConfig, list); }, this.handlerName)
                         .then((itemProcessingResult) => { resolve(itemProcessingResult); })
                         .catch((error) => { reject(error); });
                 }

@@ -31,7 +31,7 @@ export class FieldHandler implements ISPObjectHandler {
                     Util.Reject<void>(reject, this.handlerName,
                         `Field handler parent promise value result is null or undefined for the field with the internal name '${fieldConfig.InternalName}'!`);
                 } else {
-                    Util.tryToProcess(fieldConfig.InternalName, () => { return this.processingFieldConfig(fieldConfig, promiseResult.value.fields); })
+                    Util.tryToProcess(fieldConfig.InternalName, () => { return this.processingFieldConfig(fieldConfig, promiseResult.value.fields); }, this.handlerName)
                         .then((fieldProcessingResult) => { resolve(fieldProcessingResult); })
                         .catch((error) => { reject(error); });
                 }

@@ -17,7 +17,7 @@ export class SolutionHandler implements ISPObjectHandler {
                 } else {
                     if (solutionConfig.Title) {
                         let context = SP.ClientContext.get_current();
-                        Util.tryToProcess(solutionConfig.Title, () => { return this.processingSolutionConfig(solutionConfig, context); })
+                        Util.tryToProcess(solutionConfig.Title, () => { return this.processingSolutionConfig(solutionConfig, context); }, this.handlerName)
                             .then(solutionProcessingResult => { resolve(solutionProcessingResult); })
                             .catch(error => { reject(error); });
                     } else {
