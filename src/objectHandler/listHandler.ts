@@ -183,7 +183,7 @@ export class ListHandler implements ISPObjectHandler {
             let identifierPropertyName = "Name";
 
             Logger.write(`${this.handlerName} - Deleting list content type with the ${identifierPropertyName.toLocaleLowerCase()}`
-                 + `'${identifierValue}' on the list: '${listConfig.InternalName}'.`, Logger.LogLevel.Info);
+                 + ` '${identifierValue}' on the list: '${listConfig.InternalName}'.`, Logger.LogLevel.Info);
 
             if (contentTypeBinding.ContentTypeId) {
                 identifierValue = contentTypeBinding.ContentTypeId;

@@ -7,6 +7,8 @@ import { List } from "@agileis/sp-pnp-js/lib/sharepoint/rest/lists";
 import { ISiteDeploymentConfig } from "./interfaces/config/iSiteDeploymentConfig";
 import { ISPObjectHandler } from "./interfaces/objectHandler/iSpObjectHandler";
 import { ISPObjectHandlerCollection } from "./interfaces/objectHandler/iSpObjectHandlerCollection";
+import { IBasicAuthenticationOptions } from "./interfaces/iBasicAuthenticationOptions";
+import { INtlmAuthenticationOptions } from "./interfaces/iNtlmAuthenticationOptions";
 import { IList } from "./interfaces/types/iList";
 import { IFile } from "./interfaces/types/iFile";
 import { IFolder } from "./interfaces/types/iFolder";
@@ -51,22 +53,26 @@ export class DeploymentManager {
                 Util.replaceUrlTokens(JSON.stringify(siteDeploymentConfig), Util.getRelativeUrl(siteDeploymentConfig.Site.Url), layoutsUrlPart));
             this.setupProxy();
             this.setupPnPJs();
-            this.deployDependencies.push(NodeJsomHandler.initialize(siteDeploymentConfig));
+            this.deployDependencies.push(this.setupNodeJsom());
         } else {
-            throw new Error("Deployment config site or site url is undefined");
+            throw new Error(`${this.className} - Deployment config site or site url is undefined. Site identifier: ${siteDeploymentConfig.Site.Identifier}.`);
         }
     }
 
     public deploy(): Promise<void> {
-        return Promise.all(this.deployDependencies).then(() => {
-            return this.processDeploymentConfig()
-                .then(() => {
-                    Logger.write(`${this.className} - Site collection '${this.siteDeploymentConfig.Site.Url}' processed`, Logger.LogLevel.Info);
-                })
-                .catch((error) => {
-                    Logger.write(`${this.className} - Error occured while processing site collection '${this.siteDeploymentConfig.Site.Url}' - ` + Util.getErrorMessage(error), Logger.LogLevel.Error);
-                });
-        });
+        return Promise.all(this.deployDependencies)
+            .then(() => {
+                return this.processDeploymentConfig()
+                    .then(() => {
+                        Logger.write(`${this.className} - Site collection '${this.siteDeploymentConfig.Site.Url}' processed.`, Logger.LogLevel.Info);
+                    })
+                    .catch((error) => {
+                        Logger.write(`${this.className} - Error occured while processing site collection '${this.siteDeploymentConfig.Site.Url}'` +
+                            ` - ${Util.getErrorMessage(error)}`, Logger.LogLevel.Error);
+                    });
+            }).catch((error) => {
+                Logger.write(`${this.className} - Initialize deploy dependencies failed.`, Logger.LogLevel.Error);
+            });
     }
 
     private processDeploymentConfig(): Promise<any> {
@@ -143,7 +149,8 @@ export class DeploymentManager {
                 processingPromisses.push(fileProcessingPromise);
             });
         } if (!filesHandler) {
-            Logger.write(`${this.className} - Processing object handler is undefined while processing files deployment config.`, Logger.LogLevel.Error);
+            Logger.write(`${this.className} - Processing object file handler is undefined while processing files deployment config.`
+                + `Nodes: ${JSON.stringify(filesDeploymentConfig)}`, Logger.LogLevel.Error);
             processingPromisses.push(Promise.reject(undefined));
         }
 
@@ -158,7 +165,8 @@ export class DeploymentManager {
                 processingPromisses.push(processingHandler.execute(processingConfig, dependentPromise));
             });
         } if (!processingHandler) {
-            Logger.write(`${this.className} - Processing object handler is undefined while processing deployment config nodes parallel.`, Logger.LogLevel.Error);
+            Logger.write(`${this.className} - Processing object handler is undefined while processing deployment config nodes parallel.`
+                + `Nodes: ${JSON.stringify(deploymentConfigNodes)}`, Logger.LogLevel.Error);
             processingPromisses.push(Promise.reject(undefined));
         }
 
@@ -174,7 +182,8 @@ export class DeploymentManager {
                 });
             }, dependentPromise);
         } if (!processingHandler) {
-            Logger.write(`${this.className} - Processing object handler is undefined while processing deployment config nodes sequential.`, Logger.LogLevel.Error);
+            Logger.write(`${this.className} - Processing object handler is undefined while processing deployment config nodes sequential.\n` +
+                `Nodes: ${JSON.stringify(deploymentConfigNodes)}`, Logger.LogLevel.Error);
             processingPromise = Promise.reject(undefined);
         }
 
@@ -183,6 +192,7 @@ export class DeploymentManager {
 
     private setupProxy(): void {
         if (this.siteDeploymentConfig.User.proxyUrl) {
+            Logger.write(`${this.className} - Setup node proxy: ${this.siteDeploymentConfig.User.proxyUrl}.`, Logger.LogLevel.Info);
             NodeHttpProxy.url = url.parse(this.siteDeploymentConfig.User.proxyUrl);
             NodeHttpProxy.activate();
         }
@@ -191,7 +201,7 @@ export class DeploymentManager {
     private setupPnPJs(): void {
         let userConfig = this.siteDeploymentConfig.User;
         Logger.write(`${this.className} - Setup pnp-core-js`, Logger.LogLevel.Info);
-        Logger.write(`${this.className} - pnp-core-js authentication type: ${userConfig.authtype}`, Logger.LogLevel.Info);
+        Logger.write(`${this.className} - pnp-core-js authentication type: ${userConfig.authtype}.`, Logger.LogLevel.Info);
 
         let pnpConfig: LibraryConfiguration;
         if (String(userConfig.authtype).toLowerCase() === AuthenticationType.NTLM.toLowerCase()) {
@@ -218,11 +228,31 @@ export class DeploymentManager {
                 },
             };
         } else {
-            throw new Error(`Unsupported authentication type. Use ${AuthenticationType.NTLM} or ${AuthenticationType.BASIC} `);
+            throw new Error(`${this.className} - Unsupported authentication type. Use '${AuthenticationType.NTLM}' or '${AuthenticationType.BASIC}'.`);
         }
 
         if (pnpConfig) {
             PnP.setup(pnpConfig);
         }
+    }
+
+    private setupNodeJsom(): Promise<IPromiseResult<void>> {
+        let authenticationOptions: INtlmAuthenticationOptions | IBasicAuthenticationOptions = { username: "", password: "" };
+        if (this.siteDeploymentConfig.User.authtype === AuthenticationType.NTLM) {
+            let domanUsername = this.siteDeploymentConfig.User.username.split("\\");
+            authenticationOptions = <INtlmAuthenticationOptions>{
+                domain: domanUsername[0],
+                username: domanUsername[1],
+                password: this.siteDeploymentConfig.User.password,
+                workstation: this.siteDeploymentConfig.User.workstation,
+            };
+        } else if (this.siteDeploymentConfig.User.authtype === AuthenticationType.BASIC) {
+            authenticationOptions = <IBasicAuthenticationOptions>{
+                username: this.siteDeploymentConfig.User.username,
+                password: this.siteDeploymentConfig.User.password,
+            };
+        }
+        return NodeJsomHandler.initialize(this.siteDeploymentConfig.Site.Url, this.siteDeploymentConfig.Site.WebApplicationUrl,
+            this.siteDeploymentConfig.User.authtype, authenticationOptions);
     }
 }

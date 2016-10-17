@@ -1,9 +1,7 @@
 /// <reference path="../typings/index.d.ts" />
 
-// import * as http from "http";
-// import * as https from "https";
-import http = require("http");
-import https = require("https");
+import * as http from "http";
+import * as https from "https";
 import * as url from "url";
 
 interface INodeHttpProxy {
@@ -71,10 +69,10 @@ class NodeHttpProxyImpl implements INodeHttpProxy {
     public activate() {
         if (!this.active) {
             this.httpSavedRequest = http.request;
-            http.request = NodeHttpProxyImpl.httpRequest;
+            (<any>http).request = NodeHttpProxyImpl.httpRequest;
 
             this.httpsSavedRequest = https.request;
-            https.request = NodeHttpProxyImpl.httpsRequest;
+            (<any>https).request = NodeHttpProxyImpl.httpsRequest;
 
             this.active = true;
         }
@@ -82,10 +80,10 @@ class NodeHttpProxyImpl implements INodeHttpProxy {
 
     public deactivate() {
         if (this.active) {
-            http.request = this.httpSavedRequest;
+            (<any>http).request = this.httpSavedRequest;
             this.httpSavedRequest = () => { ; };
 
-            https.request = this.httpsSavedRequest;
+            (<any>https).request = this.httpsSavedRequest;
             this.httpsSavedRequest = () => { ; };
 
             this.active = false;

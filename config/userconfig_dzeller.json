@@ -8,6 +8,7 @@
     "Sites": [
         {
             "Identifier": "insidervz",
+            "WebApplicationUrl": "http://dev2013vm4",
             "Url": "http://dev2013vm4/sites/insidervz"
         }
     ]

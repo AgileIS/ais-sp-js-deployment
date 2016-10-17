@@ -4,20 +4,21 @@ import { PromiseResult } from "../promiseResult";
 
 export namespace Util {
     /** Resolve with a IPromiseResult */
-    export function Resolve<T>(resolve: (value?: PromiseResult<T> | Thenable<PromiseResult<T>>) => void, sourceIdentifier: string, promiseResultMessage: string, promiseResultValue?: T) {
+    export function Resolve<T>(resolve: (value?: PromiseResult<T> | Thenable<PromiseResult<T>>) => void, sourceIdentifier: string, promiseResultMessage: string,
+        promiseResultValue?: T, loglevel = Logger.LogLevel.Info) {
         if (sourceIdentifier && promiseResultMessage) {
             let errorMsg = `${sourceIdentifier} - ${promiseResultMessage}`;
-            Logger.write(errorMsg, Logger.LogLevel.Info);
+            Logger.write(errorMsg, loglevel);
         }
 
         resolve(new PromiseResult<T>(promiseResultMessage, promiseResultValue));
     }
 
     /** Reject with a IPromiseResult */
-    export function Reject<T>(reject: (error?: any) => void, sourceIdentifier: string, promiseResultMessage: string, promiseResultValue?: T) {
+    export function Reject<T>(reject: (error?: any) => void, sourceIdentifier: string, promiseResultMessage: string, promiseResultValue?: T, loglevel = Logger.LogLevel.Error): void {
         if (sourceIdentifier && promiseResultMessage) {
             let errorMsg = `${sourceIdentifier} - ${promiseResultMessage}`;
-            Logger.write(errorMsg, Logger.LogLevel.Error);
+            Logger.write(errorMsg, loglevel);
         }
 
         reject(new PromiseResult<T>(promiseResultMessage, promiseResultValue));
@@ -66,8 +67,8 @@ export namespace Util {
                             if ((executionCount - 1) >= 1) {
                                 if (executionTimeOut === 0) {
                                     Logger.write(`TryToProcess called from ${callingHandler} - Node processing failed for '${configNodeIdentifier}'. \n`
-                                    + `${Util.getErrorMessage(error)} \n`
-                                    + `Start retry for maximum ${executionCount} times`, Logger.LogLevel.Warning);
+                                        + `${Util.getErrorMessage(error)} \n`
+                                        + `Start retry for maximum ${executionCount} times`, Logger.LogLevel.Warning);
                                 }
                                 let newExecutionTimeout = executionTimeOut + 2500;
                                 tryToProcess(configNodeIdentifier, executionFunction, callingHandler, executionCount - 1, newExecutionTimeout)
@@ -147,5 +148,19 @@ export namespace Util {
         outputContent = replaceEncodedLayoutsToken(outputContent, relativeUrlWithLayouts);
 
         return outputContent;
+    }
+
+    export function hasHeader(header, headerCollection) {
+        let found = false;
+        if (header && headerCollection) {
+            let lHeader = header.toLowerCase();
+            for (let key in headerCollection) {
+                if (key.toLocaleLowerCase() === lHeader) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        return found;
     }
 }

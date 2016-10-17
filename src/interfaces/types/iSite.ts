@@ -11,6 +11,7 @@ import { IPropertyBagEntry } from "./iPropertyBagEntry";
 
 export interface ISite {
     Url: string;
+    WebApplicationUrl: string;
     ContentTypes: Array<IContentType>;
     Lists: Array<IList>;
     Files: Array<IFile>;

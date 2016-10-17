@@ -1,7 +1,7 @@
 import { IUserConfig } from "./iUserConfig";
-import { ISiteConfig } from "./iSiteConfig";
+import { ISite } from "../types/iSite";
 
 export interface ISiteDeploymentConfig {
     User: IUserConfig;
-    Site: ISiteConfig;
+    Site: ISite;
 }
