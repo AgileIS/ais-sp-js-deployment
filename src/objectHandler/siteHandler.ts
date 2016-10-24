@@ -82,6 +82,7 @@ export class SiteHandler implements ISPObjectHandler {
         let parsedObject: ISite = JSON.parse(stringifiedObject);
 
         delete parsedObject.ControlOption;
+        delete parsedObject.WebApplicationUrl;
         delete parsedObject.Url;
         delete parsedObject.ContentTypes;
         delete parsedObject.Lists;

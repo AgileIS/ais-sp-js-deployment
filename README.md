@@ -22,3 +22,6 @@ node deploy -f config/<config>.json
 
 ##run with child process debug
 node deploy -f config/<config>.json -d
+
+#Publish
+npm publish
