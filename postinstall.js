@@ -1,5 +1,6 @@
 const fs = require('fs');
 const fse = require('fs.extra');
+var cmd = require('node-cmd');
 
 const destPath = '../../deploy';
 const gulpSrc = 'gulpfile.merge.js';
@@ -89,21 +90,25 @@ function createPackageScript() {
     });
 }
 
-console.log('Initialize ais-sp-js-deployment package: ');
-fs.exists(destPath, exists => {
-    if (!exists) fs.mkdirSync(destPath);
-});
+if(__dirname.includes("node_modules")) {
+    console.log('Initialize ais-sp-js-deployment package: ');
+    fs.exists(destPath, exists => {
+        if (!exists) fs.mkdirSync(destPath);
+    });
 
-processGulpfile();
-processDeployJs();
+    processGulpfile();
+    processDeployJs();
 
-fs.exists(demoSrc, exists => {
-    if (!exists) {
-        fse.copyRecursive(demoSrc, demoDest, error => {
-            console.log('- copy demo configs');
-            if (error) console.error(error);
-        });
-    }
-});
+    fs.exists(demoSrc, exists => {
+        if (!exists) {
+            fse.copyRecursive(demoSrc, demoDest, error => {
+                console.log('- copy demo configs');
+                if (error) console.error(error);
+            });
+        }
+    });
 
-createPackageScript();
+    createPackageScript();
+} else {
+    cmd.run('typings install');
+}

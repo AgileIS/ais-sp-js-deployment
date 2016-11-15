@@ -9,3 +9,4 @@ typings.json
 gulpfile.js
 .npmignore
 AisDeploy-*.log
+AISDEPLOY-*.log
