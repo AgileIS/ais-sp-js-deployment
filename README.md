@@ -8,13 +8,21 @@ The package provides a powerful client side deployment engine for SharePoint 201
 
 * You definitely need nodejs on your system.
 * Create a new provisioning project
-    * mkdir \<your project dir name\>
-    * npm init 
+  * mkdir \<your project dir name\>
+  * npm init 
+
+### Install npm package
+
+Add the npm package ais-sp-js-deployment to your new deployment project
+```
+$ npm install ais-sp-js-deployment --save 
+```
+
+## Usage
 
 
-Add the npm package ais-sp-js-deployment to your 
 
-# Deployment / Provisioning mit nodejs
+## Development
 
 # parameters
 -f : <configfile>
@@ -40,6 +48,3 @@ node deploy -f config/<config>.json
 
 ## run with child process debug
 node deploy -f config/<config>.json -d
-
-# Publish
-npm publish
