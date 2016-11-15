@@ -1,27 +1,27 @@
 # Deployment / Provisioning mit nodejs
 
-#parameters
+# parameters
 -f : <configfile>
 
-##dev
+## dev
 npm install
 typings install
 tsc || tsc -w (mit watch)
 
-##dev-run
+## dev-run
 node dist/deploy -f config/<config>.json
 
-##build
+## build
 gulp && npm pack || npm publish
 
-##install
+## install
 npm install ais-sp-js-deployment [--save]
 
-##run
+## run
 node deploy -f config/<config>.json
 
-##run with child process debug
+## run with child process debug
 node deploy -f config/<config>.json -d
 
-#Publish
+# Publish
 npm publish
