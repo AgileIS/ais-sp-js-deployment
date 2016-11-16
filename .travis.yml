@@ -7,4 +7,9 @@ script:
     - gulp
 after_success:
     - npm version patch
-    - npm publish
+deploy:
+    provider: npm
+    api_key: "81070ff9-12a1-454b-8f51-c31be5298fd9"
+    email: bhofmann@agile-is.de
+    on:
+        branch: master
