@@ -1,6 +1,6 @@
 {
   "name": "ais-sp-js-deployment",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Basic deployment package for sharepoint provisioning",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -16,9 +16,15 @@
     "jsom"
   ],
   "author": "Boris Hofmann <bhofmann@agile-is.de> (http://www.agile-is.de)",
+  "contributors": [
+    "Boris Hofmann <bhofmann@agile-is.de> (http://www.agile-is.de)",
+    "Patrick Hasenauer <phasenauer@agile-is.de> (http://www.agile-is.de)",
+    "Yücel Tasyol <ytasyol@agile-is.de> (http://www.agile-is.de)",
+    "Daniel Zeller <dzeller@agile-is.de> (http://www.agile-is.de)"
+  ],
   "license": "Apache-2.0",
   "dependencies": {
-    "@agileis/sp-pnp-js": "^1.0.4",
+    "sp-pnp-js": "AgileIS/PnP-JS-Core",
     "fs.extra": "^1.3.2",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
@@ -46,7 +52,6 @@
     "gulp-tslint": "^6.1.2",
     "gulp-typescript": "^3.0.2",
     "merge2": "^1.0.2",
-    "node-cmd": "^1.1.1",
     "path": "^0.12.7",
     "tslint": "^3.15.1",
     "typescript": "^2.0.3"

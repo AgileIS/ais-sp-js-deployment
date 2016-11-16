@@ -6,7 +6,7 @@ The package provides a powerful client side deployment engine for SharePoint 201
 
 ### Prerequisites
 
-* You definitely need nodejs on your system.
+* You definitely need nodejs on your system. :)
 * Create a new provisioning project
   * mkdir \<your project dir name\>
   * npm init 
@@ -20,16 +20,15 @@ $ npm install ais-sp-js-deployment --save
 
 ## Usage
 
+hier fehlen noch die Demofiles und ich habe noch einen deployment Fehler
 
 
-## Development
 
-# parameters
+parameters
 -f : <configfile>
 
 ## dev
 npm install
-typings install
 tsc || tsc -w (mit watch)
 
 ## dev-run
