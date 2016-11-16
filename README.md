@@ -102,6 +102,6 @@ node deploy -f config/<config>.json -d
 
 ---
 
-## Feel free to contribute, report bugs and share your thoughts.
+Feel free to contribute, report bugs and share your thoughts.
 
 ---
