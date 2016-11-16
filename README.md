@@ -68,7 +68,7 @@ node .\deploy\deploy.js -f .\config\<filename>.json
 ### Clone and Install
 
 ```cmd
-git clone https://github.com/agileis/
+git clone https://github.com/AgileIS/ais-sp-js-deployment.git
 npm install
 tsc || tsc -w (watch)
 ```
