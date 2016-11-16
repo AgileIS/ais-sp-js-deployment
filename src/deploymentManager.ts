@@ -252,7 +252,7 @@ export class DeploymentManager {
                 password: this.siteDeploymentConfig.User.password,
             };
         }
-        return NodeJsomHandler.initialize(this.siteDeploymentConfig.Site.Url, this.siteDeploymentConfig.Site.WebApplicationUrl,
+        return NodeJsomHandler.initialize(this.siteDeploymentConfig.Site.Url, this.siteDeploymentConfig.Site.Url.substring(0,this.siteDeploymentConfig.Site.Url.indexOf("/", 8)),
             this.siteDeploymentConfig.User.authtype, authenticationOptions);
     }
 }

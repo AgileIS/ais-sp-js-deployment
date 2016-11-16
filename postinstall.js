@@ -13,8 +13,9 @@ const packageName = 'ais-sp-js-deployment';
 const confDestReg = /configDest\s=\s'.*'/;
 let confDest = 'configDest = \'../config/\'';
 const confPrefixReg = /partialConfigPrefix\s=\s'.*'/;
-let confDemoPrefix = 'partialConfigPrefix = \'democonfig_*.json\'';
+let confDemoPrefix = 'partialConfigPrefix = \'partial_*.json\'';
 const deployScript = 'cd deploy && gulp && cd .. && node ./deploy/deploy -f config/config_demo.json';
+const buildConfigScript = 'cd deploy && gulp';
 
 function processGulpfile() {
     fs.exists(gulpDest, exists => {
