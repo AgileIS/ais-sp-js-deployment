@@ -1,5 +1,5 @@
 import { IList } from "./iList";
-import { ICustomAction } from "./iCustomaction";
+import { ICustomAction } from "./iCustomAction";
 import { IFeature } from "./iFeature";
 import { IFile } from "./iFile";
 import { IField } from "./iField";
