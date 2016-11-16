@@ -4,7 +4,7 @@ import { Folders, Folder } from "ais-sp-pnp-js/lib/sharepoint/rest/folders";
 import { Files, File, NodeFile } from "ais-sp-pnp-js/lib/sharepoint/rest/files";
 import { List } from "ais-sp-pnp-js/lib/sharepoint/rest/lists";
 import { Item } from "ais-sp-pnp-js/lib/sharepoint/rest/items";
-import { ISPObjectHandler } from "../interfaces/objectHandler/iSpobjectHandler";
+import { ISPObjectHandler } from "../interfaces/objectHandler/iSpObjectHandler";
 import { IFile } from "../interfaces/types/iFile";
 import { IFolder } from "../interfaces/types/iFolder";
 import { IItem } from "../interfaces/types/iItem";
