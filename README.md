@@ -37,7 +37,7 @@ the `./config`. The naming convention of the configuration files is as follows:
 * `partial_*.json` >> all environmental independent elements like content types, list columns, etc. All files starting
   with `partial_` will be combined in the order of their name. For example partial_v1.json, partial_v1_1.json, partial_v2.json
 * `stage_*.json` >> Configuration files starting with `stage_` can be used to define stage dependent parts of the configuration
-  like site url, deployment user, etc. 
+  like site url, deployment user, etc.
 * `config_<stagename>.json` Will contain the combined configuration after you have run the config build task `npm run sp:buildconfig`
 
 ### Compile configuration files
@@ -52,36 +52,56 @@ npm run sp:buildconfig
 npm run sp:deploy
 ```
 
-Be aware that the script above is configured to use a sample configuration file. please change settings in your .\package.json. 
-In addition you can run deployment with different file by using the following.
+Be aware that the script above is configured to use a sample configuration file. Please change settings in your .\package.json.
+In addition, you can run deployment with a different file by using the following.
 
 ```cmd
 node .\deploy\deploy.js -f .\config\<filename>.json
 ```
 
+**Note:** You can run the deployment script multiple times. Any existing items won’t be changed unless you have defined `ControlOption="Delete||Update"`
+
+---
+
 ## Development
 
 ### Clone and Install
 
-```
-git clone https://github.com/agileis/  
-npm install  
+```cmd
+git clone https://github.com/agileis/
+npm install
 tsc || tsc -w (watch)
 ```
 
 ### dev-run
-```
+
+```cmd
 node dist/deploy.js -f config/<config>.json
 ```
 
 ### Build
-```
+
+```cmd
 gulp && npm pack || npm publish
 ```
 
 ### run with child process debug
-```
+
+```cmd
 node deploy -f config/<config>.json -d
 ```
 
-## Feel free to contribute, report bugs and share your thoughts. 
+## Applies to
+
+* SharePoint 2013 (windows authentication)
+* SharePoint 2016 (windows authentication)
+
+### comming but not implemented yet
+
+* SharePoint online (ACS)
+
+---
+
+## Feel free to contribute, report bugs and share your thoughts.
+
+---

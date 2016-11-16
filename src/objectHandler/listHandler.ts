@@ -122,7 +122,7 @@ export class ListHandler implements ISPObjectHandler {
             list.update(properties)
                 .then((listUpdateResult) => {
                     if (listConfig.ContentTypeBindings && listConfig.ContentTypeBindings.length > 0) {
-                        this.updateListContentTypes(listConfig, list)
+                        this.updateListContentTypes(listConfig, listUpdateResult.list)
                             .then((contentTypesUpdateResult) => { Util.Resolve<List>(resolve, this.handlerName, `Updated list: '${listConfig.InternalName}'.`, listUpdateResult.list); })
                             .catch((error) => {
                                 Util.Reject<void>(reject, this.handlerName,
