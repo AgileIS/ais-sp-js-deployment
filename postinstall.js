@@ -80,7 +80,8 @@ function createPackageScript() {
             console.error(error);
         } else {
             let packageObj = JSON.parse(data);
-            packageObj.scripts['deploy'] = deployScript;
+            packageObj.scripts['sp:deploy'] = deployScript;
+            packageObj.scripts['sp:buildconfig'] = deployScript;
             fs.writeFile('../../package.json', JSON.stringify(packageObj, null, 2), 'utf8', error => {
                 if (error) {
                     return console.error(error);
