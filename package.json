@@ -1,6 +1,6 @@
 {
   "name": "ais-sp-js-deployment",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Basic deployment package for sharepoint provisioning",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
