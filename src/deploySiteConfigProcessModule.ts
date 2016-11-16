@@ -1,5 +1,5 @@
 import { DeploymentManager } from "./deploymentManager";
-import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
+import { Logger } from "ais-sp-pnp-js/lib/utils/logging";
 import { ConsoleLogger } from "./logger/consoleLogger";
 import { FileLogger } from "./logger/fileLogger";
 import { ISiteDeploymentConfig } from "./interfaces/config/iSiteDeploymentConfig";

@@ -1,9 +1,9 @@
-import * as Types from "@agileis/sp-pnp-js/lib/sharepoint/rest/types";
-import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
-import { Fields } from "@agileis/sp-pnp-js/lib/sharepoint/rest/Fields";
-import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
-import { Field } from "@agileis/sp-pnp-js/lib/sharepoint/rest/fields";
-import { List } from "@agileis/sp-pnp-js/lib/sharepoint/rest/Lists";
+import * as Types from "ais-sp-pnp-js/lib/sharepoint/rest/types";
+import { Logger } from "ais-sp-pnp-js/lib/utils/logging";
+import { Fields } from "ais-sp-pnp-js/lib/sharepoint/rest/Fields";
+import { Web } from "ais-sp-pnp-js/lib/sharepoint/rest/webs";
+import { Field } from "ais-sp-pnp-js/lib/sharepoint/rest/fields";
+import { List } from "ais-sp-pnp-js/lib/sharepoint/rest/Lists";
 import { ISPObjectHandler } from "../interfaces/objectHandler/iSpObjectHandler";
 import { IPromiseResult } from "../interfaces/iPromiseResult";
 import { IField } from "../interfaces/types/iField";

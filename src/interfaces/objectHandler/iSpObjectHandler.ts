@@ -1,4 +1,4 @@
-import { Queryable } from "@agileis/sp-pnp-js/lib/sharepoint/rest/queryable";
+import { Queryable } from "ais-sp-pnp-js/lib/sharepoint/rest/queryable";
 import { IPromiseResult } from "../iPromiseResult";
 
 export interface ISPObjectHandler {

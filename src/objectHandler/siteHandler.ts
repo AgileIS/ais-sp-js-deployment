@@ -1,6 +1,6 @@
-import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
+import { Web } from "ais-sp-pnp-js/lib/sharepoint/rest/webs";
 import { ISite } from "../Interfaces/Types/ISite";
-import * as PnP from "@agileis/sp-pnp-js";
+import * as PnP from "ais-sp-pnp-js";
 import { ISPObjectHandler } from "../interfaces/objectHandler/iSpObjectHandler";
 import { IPromiseResult } from "../interfaces/iPromiseResult";
 import { Util } from "../util/util";

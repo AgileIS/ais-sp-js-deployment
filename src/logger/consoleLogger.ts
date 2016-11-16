@@ -1,4 +1,4 @@
-import { LogListener, LogEntry, Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
+import { LogListener, LogEntry, Logger } from "ais-sp-pnp-js/lib/utils/logging";
 
 export class ConsoleLogger implements LogListener {
     private logPrefix: string;

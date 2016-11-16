@@ -1,9 +1,9 @@
-import * as PnP from "@agileis/sp-pnp-js";
-import { LibraryConfiguration } from "@agileis/sp-pnp-js/lib/configuration/pnplibconfig";
-import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
-import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
-import { Folder } from "@agileis/sp-pnp-js/lib/sharepoint/rest/folders";
-import { List } from "@agileis/sp-pnp-js/lib/sharepoint/rest/lists";
+import * as PnP from "ais-sp-pnp-js";
+import { LibraryConfiguration } from "ais-sp-pnp-js/lib/configuration/pnplibconfig";
+import { Web } from "ais-sp-pnp-js/lib/sharepoint/rest/webs";
+import { Logger } from "ais-sp-pnp-js/lib/utils/logging";
+import { Folder } from "ais-sp-pnp-js/lib/sharepoint/rest/folders";
+import { List } from "ais-sp-pnp-js/lib/sharepoint/rest/lists";
 import { ISiteDeploymentConfig } from "./interfaces/config/iSiteDeploymentConfig";
 import { ISPObjectHandler } from "./interfaces/objectHandler/iSpObjectHandler";
 import { ISPObjectHandlerCollection } from "./interfaces/objectHandler/iSpObjectHandlerCollection";

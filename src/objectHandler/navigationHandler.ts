@@ -1,5 +1,5 @@
-import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
-import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
+import { Logger } from "ais-sp-pnp-js/lib/utils/logging";
+import { Web } from "ais-sp-pnp-js/lib/sharepoint/rest/webs";
 import { ISPObjectHandler } from "../interfaces/objectHandler/iSpObjectHandler";
 import { IPromiseResult } from "../interfaces/iPromiseResult";
 import { INavigation } from "../interfaces/types/iNavigation";

@@ -1,9 +1,9 @@
-import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
-import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
-import { Folders, Folder } from "@agileis/sp-pnp-js/lib/sharepoint/rest/folders";
-import { Files, File, NodeFile } from "@agileis/sp-pnp-js/lib/sharepoint/rest/files";
-import { List } from "@agileis/sp-pnp-js/lib/sharepoint/rest/lists";
-import { Item } from "@agileis/sp-pnp-js/lib/sharepoint/rest/items";
+import { Logger } from "ais-sp-pnp-js/lib/utils/logging";
+import { Web } from "ais-sp-pnp-js/lib/sharepoint/rest/webs";
+import { Folders, Folder } from "ais-sp-pnp-js/lib/sharepoint/rest/folders";
+import { Files, File, NodeFile } from "ais-sp-pnp-js/lib/sharepoint/rest/files";
+import { List } from "ais-sp-pnp-js/lib/sharepoint/rest/lists";
+import { Item } from "ais-sp-pnp-js/lib/sharepoint/rest/items";
 import { ISPObjectHandler } from "../interfaces/objectHandler/iSpobjectHandler";
 import { IFile } from "../interfaces/types/iFile";
 import { IFolder } from "../interfaces/types/iFolder";

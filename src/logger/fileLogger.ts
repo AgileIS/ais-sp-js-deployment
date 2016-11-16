@@ -1,4 +1,4 @@
-import { LogListener, LogEntry, Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
+import { LogListener, LogEntry, Logger } from "ais-sp-pnp-js/lib/utils/logging";
 import * as fs from "fs";
 
 export class FileLogger implements LogListener {

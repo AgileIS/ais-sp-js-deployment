@@ -1,6 +1,6 @@
-import { Logger } from "@agileis/sp-pnp-js/lib/utils/logging";
-import { Web } from "@agileis/sp-pnp-js/lib/sharepoint/rest/webs";
-import { List } from "@agileis/sp-pnp-js/lib/sharepoint/rest/lists";
+import { Logger } from "ais-sp-pnp-js/lib/utils/logging";
+import { Web } from "ais-sp-pnp-js/lib/sharepoint/rest/webs";
+import { List } from "ais-sp-pnp-js/lib/sharepoint/rest/lists";
 import { ISPObjectHandler } from "../interfaces/objectHandler/iSpObjectHandler";
 import { IList } from "../interfaces/types/iList";
 import { IContentTypeBinding } from "../interfaces/types/iContentTypeBinding";
