@@ -4,8 +4,8 @@ import { IFeature } from "./iFeature";
 import { IFile } from "./iFile";
 import { IField } from "./iField";
 import { INavigation } from "./iNavigation";
-import { IComposedLook } from "./iComposedlook";
-import { IWebSettings } from "./iWebsettings";
+import { IComposedLook } from "./iComposedLook";
+import { IWebSettings } from "./iWebSettings";
 import { IContentType } from "./iContentType";
 import { IPropertyBagEntry } from "./iPropertyBagEntry";
 
