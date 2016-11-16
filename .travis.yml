@@ -3,6 +3,8 @@ node_js:
     - "node"
 install:
     - npm install
+before_script:
+    - npm install -g gulp
 script:
     - gulp
 after_success:
