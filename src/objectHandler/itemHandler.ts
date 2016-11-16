@@ -1,6 +1,6 @@
 import { Logger } from "ais-sp-pnp-js/lib/utils/logging";
 import { List } from "ais-sp-pnp-js/lib/sharepoint/rest/lists";
-import { Item } from "ais-sp-pnp-js/lib/sharepoint/rest/Items";
+import { Item } from "ais-sp-pnp-js/lib/sharepoint/rest/items";
 import { ISPObjectHandler } from "../interfaces/objectHandler/iSpObjectHandler";
 import { IItem } from "../interfaces/types/iItem";
 import { IPromiseResult } from "../interfaces/iPromiseResult";

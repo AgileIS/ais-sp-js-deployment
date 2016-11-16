@@ -1,5 +1,5 @@
 import { Web } from "ais-sp-pnp-js/lib/sharepoint/rest/webs";
-import { ISite } from "../Interfaces/Types/ISite";
+import { ISite } from "../interfaces/types/iSite";
 import * as PnP from "ais-sp-pnp-js";
 import { ISPObjectHandler } from "../interfaces/objectHandler/iSpObjectHandler";
 import { IPromiseResult } from "../interfaces/iPromiseResult";
