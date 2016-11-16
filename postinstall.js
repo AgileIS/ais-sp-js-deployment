@@ -92,21 +92,20 @@ function createPackageScript() {
 
 if(__dirname.includes("node_modules")) {
     console.log('Initialize ais-sp-js-deployment package: ');
-    fs.exists(destPath, exists => {
-        if (!exists) fs.mkdirSync(destPath);
-    });
+    if(!fs.existsSync(destPath)) {
+        fs.mkdirSync(destPath);
+    }
 
     processGulpfile();
     processDeployJs();
 
-    fs.exists(demoSrc, exists => {
-        if (!exists) {
-            fse.copyRecursive(demoSrc, demoDest, error => {
-                console.log('- copy demo configs');
-                if (error) console.error(error);
-            });
-        }
-    });
+    if(!fs.existsSync(demoDest)) {
+        console.log('- copy demo configs');
+        fs.mkdirSync(demoDest);
+        fse.copyRecursive(demoSrc, demoDest, error => { 
+            if (error) console.error(error);
+        });
+    }
 
     createPackageScript();
 } else {
