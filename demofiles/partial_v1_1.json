@@ -1,0 +1,135 @@
+{
+    "Sites": [
+        {
+            "Identifier": "mappingid",
+            "Title": "Demo Site",
+            "ControlOption": "",
+            "PropertyBagEntries": [
+                {
+                    "Title": "mypropertybagkey",
+                    "Value": "value"
+                }
+            ],
+            "Features": [
+                {
+                    "Id": "0af5989a-3aea-4519-8ab0-85d91abe39ff",
+                    "Deactivate": false,
+                    "Description": "Workflows",
+                    "Scope": "Site"
+                }
+            ],
+            "Navigation": {
+                "UseShared": false,
+                "ReCreateQuicklaunch": true,
+                "QuickLaunch": [
+                    {
+                        "Title": "Home",
+                        "Url": "~replaceSite",
+                        "Children": [],
+                        "IsExternal": false,
+                        "ControlOption": ""
+                    }
+                ]
+            },
+            "Fields": [
+                {
+                    "Title": "My Site Column",
+                    "InternalName": "ais_mysitecolumn",
+                    "FieldType": "Text",
+                    "Group": "AIS Groups",
+                    "ControlOption": ""
+                }
+            ],
+            "ContentTypes": [
+                {
+                    "Id": "0x0100857c6968908e4d4489874c403eaf4c17",
+                    "Name": "My Content Type",
+                    "Description": "",
+                    "Group": "AIS Content Types",
+                    "ControlOption": "",
+                    "FieldLinks": [
+                        {
+                            "InternalName": "Title"
+                        },
+                        {
+                            "InternalName": "ais_mysitecolumn"
+                        }
+                    ]
+                }
+                    
+            ],
+            "Lists": [
+                {
+                    "InternalName": "MyList",
+                    "Title": "My List",
+                    "Description": "",
+                    "TemplateType": "GenericList",
+                    "ContentTypeBindings": [
+                        {
+                            "ContentTypeName": "Item",
+                            "Delete": true
+                        },
+                        {
+                            "ContentTypeId": "0x0100a52c10d83afd405da551bee706bc686e"
+                        }
+                    ],
+                    "EnableContentTypes": true,
+                    "EnableVersioning": true,
+                    "ControlOption": "",
+                    "Fields": [
+                        {
+                            "InternalName": "Title",
+                            "Title": "My Title",
+                            "ControlOption": "Update"
+                        }
+                    ],
+                    "Views": [
+                        {
+                            "Title": "My View",
+                            "InternalName": "My%20View.aspx",
+                            "PersonalView": false,
+                            "ViewQuery": "<Where></Where>",
+                            "ControlOption": "",
+                            "ViewFields": [
+                                {
+                                    "InternalName": "Title"
+                                },
+                                {
+                                    "InternalName": "ais_mysitecolumn"
+                                }
+                            ]
+                        }    
+                    ],
+                    "Items": [
+                        {
+                            "Title": "Title Value",
+                            "ais_mysitecolumn": "My site column value"
+                        }
+                    ] 
+                }
+            ],
+            "Files": [
+                {
+                    "Name": "_catalogs/masterpage",
+                    "Files": [
+                        {
+                            "Name": "FolderName",
+                            "Files": [
+                                {
+                                    "Name": "FolderName",
+                                    "Files": [
+                                        {
+                                            "Name": "FileName.js",
+                                            "Src": "./config/files/FileName.js",
+                                            "Overwrite": true
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

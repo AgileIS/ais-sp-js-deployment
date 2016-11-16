@@ -1,0 +1,12 @@
+{
+    "User": {
+        "username": "domain\\user",
+        "authtype": "Ntlm"
+    },
+    "Sites": [
+        {
+            "Identifier": "mappingid",
+            "Url": "<site url>"
+        }
+    ]
+}
