@@ -9,8 +9,8 @@ const concat = require('gulp-concat');
 const replace = require('gulp-replace');
 
 const configDest = 'config/';
-const userConfigPrefix = 'userconfig_*.json';
-const partialConfigPrefix = 'insiderverzeichnis_*.json';
+const stageConfigPrefix = 'stage_*.json';
+const partialConfigPrefix = 'partial_*.json';
 const configPrefix = 'config_';
 /*
  * value: string => merge by field
@@ -129,7 +129,7 @@ function combine(userConfigName) {
 gulp.task('combineAll', () => {
   let streams = [];
 
-  streams.push(gulp.src(configDest + userConfigPrefix, {
+  streams.push(gulp.src(configDest + stageConfigPrefix, {
       read: false
     })
     .pipe(foreach((stream, file) => {
