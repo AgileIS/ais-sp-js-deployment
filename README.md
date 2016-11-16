@@ -1,5 +1,7 @@
 # SharePoint client side deployment and content provisioning engine
 
+[![Build Status](https://travis-ci.org/AgileIS/ais-sp-js-deployment.svg?branch=master)](https://travis-ci.org/AgileIS/ais-sp-js-deployment)
+
 The package provides a powerful client side deployment engine for SharePoint 2013 / 2016 and SharePoint online
 (office 365). All structural elements can be defined within versioned configuration files. Those will be combined with the
 environmental information’s of each stage. A deployment run will then create/update only the difference between the defined
