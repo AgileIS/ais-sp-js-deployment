@@ -12,7 +12,7 @@ life cycle mode.
 
 ### Prerequisites
 
-* You definitely need nodejs on your system. :)
+* You definitely need [Node.js](https://nodejs.org/en/) on your system. :)
 * Create a new provisioning project
   * mkdir \<your project dir name\>
   * npm init
