@@ -15,7 +15,7 @@ let confDest = 'configDest = \'../config/\'';
 const confPrefixReg = /partialConfigPrefix\s=\s'.*'/;
 let confDemoPrefix = 'partialConfigPrefix = \'partial_*.json\'';
 const deployScript = 'cd deploy && gulp && cd .. && node ./deploy/deploy -f config/config_demo.json';
-const buildConfigScript = 'cd deploy && gulp';
+const buildConfigScript = 'cd deploy && gulp && cd ..';
 
 function processGulpfile() {
     fs.exists(gulpDest, exists => {
@@ -82,7 +82,7 @@ function createPackageScript() {
         } else {
             let packageObj = JSON.parse(data);
             packageObj.scripts['sp:deploy'] = deployScript;
-            packageObj.scripts['sp:buildconfig'] = deployScript;
+            packageObj.scripts['sp:buildconfig'] = buildConfigScript;
             fs.writeFile('../../package.json', JSON.stringify(packageObj, null, 2), 'utf8', error => {
                 if (error) {
                     return console.error(error);

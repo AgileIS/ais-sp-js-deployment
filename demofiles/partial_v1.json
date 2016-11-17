@@ -3,7 +3,7 @@
         {
             "Identifier": "mappingid",
             "Title": "Demo Site",
-            "ControlOption": "",
+            "ControlOption": "Update",
             "PropertyBagEntries": [
                 {
                     "Title": "mypropertybagkey",
