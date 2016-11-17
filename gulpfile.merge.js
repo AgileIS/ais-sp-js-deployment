@@ -1,6 +1,6 @@
 const gulp = require('gulp');
 const jsoncombine = require('gulp-jsoncombine');
-const foreach = require('gulp-foreach');
+const foreach = require('gulp-flatmap');
 const mergeStreams = require('merge-stream');
 const jsonFormat = require('gulp-json-format');
 const fs = require('fs');
@@ -110,9 +110,9 @@ function merge(target, source) {
 }
 
 function combine(userConfigName) {
-
+  let userConfigNameParts = userConfigName.split('_');
   return gulp.src([userConfigName, configDest + partialConfigPrefix])
-    .pipe(jsoncombine(configPrefix + userConfigName.split('_')[1], (configs) => {
+    .pipe(jsoncombine(configPrefix + userConfigNameParts[userConfigNameParts.length - 1], (configs) => {
       let configNames = Object.getOwnPropertyNames(configs);
       let resultConfig = {};
 
@@ -139,44 +139,5 @@ gulp.task('combineAll', () => {
 
   return mergeStreams(streams);
 });
-
-gulp.task('spjsom-clean', function () {
-  return fs.stat('./src/node-spjsom/index.js', function (err, stat) {
-    if (err == null) {
-      fs.unlinkSync('./src/node-spjsom/index.js');
-    }
-  });
-});
-
-gulp.task('spjcom-merge-scripts', function () {
-  return gulp.src(['./src/node-spjsom/scripts/INIT.debug.js',
-      './src/node-spjsom/scripts/MicrosoftAjax-4.0.0.0.debug.js',
-      './src/node-spjsom/scripts/SP.Core.debug.js',
-      './src/node-spjsom/scripts/SP.Runtime.debug.js',
-      './src/node-spjsom/scripts/SP.debug.js'
-    ])
-    .pipe(concat({
-      path: 'spjsom.js'
-    }))
-    .pipe(gulp.dest('./src/node-spjsom/scripts'))
-
-});
-
-gulp.task('spjsom-insert-scripts', ['spjcom-merge-scripts'], function () {
-  var fileContent = fs.readFileSync('./src/node-spjsom/scripts/spjsom.js');
-  return gulp.src('./src/node-spjsom/indexDev.js')
-    .pipe(replace('//spjcsom', fileContent))
-    .pipe(rename('index.js'))
-    .pipe(gulp.dest('./src/node-spjsom'));
-});
-
-gulp.task('spjsom-init', ['spjsom-clean', 'spjsom-insert-scripts', 'spjcom-merge-scripts'], function () {
-  return fs.stat('./src/node-spjsom/scripts/spjsom.js', function (err, stat) {
-    if (err == null) {
-      fs.unlinkSync('./src/node-spjsom/scripts/spjsom.js');
-    }
-  });
-});
-
 
 gulp.task('default', ['combineAll']);
