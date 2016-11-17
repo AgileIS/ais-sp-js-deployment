@@ -6,6 +6,8 @@ install:
 - npm install
 script:
 - npm run build
+before_deploy:
+- npm version patch
 deploy:
   provider: npm
   email: bhofmann@agile-is.de
