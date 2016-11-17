@@ -1,6 +1,6 @@
 {
   "name": "ais-sp-js-deployment",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "SharePoint client side deployment and content provisioning engine",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
