@@ -9,7 +9,6 @@ script:
 before_deploy:
 - npm install gulp
 deploy:
-- npm install gulp
   provider: npm
   email: bhofmann@agile-is.de
   api_key:
