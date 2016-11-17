@@ -6,7 +6,7 @@
   "typings": "dist/index.d.ts",
   "scripts": {
     "postinstall": "node postinstall.js",
-    "prepublish": "gulp"
+    "build": "gulp"
   },
   "keywords": [
     "SharePoint",

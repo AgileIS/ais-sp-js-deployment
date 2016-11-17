@@ -41,7 +41,8 @@ the `./config` folder. The naming convention of the configuration files is as fo
   with `partial_` will be combined in the order of their name. For example partial_v1.json, partial_v1_1.json, partial_v2.json
 * `stage_*.json` >> Configuration files starting with `stage_` can be used to define stage dependent parts of the configuration
   like site url, deployment user, etc.
-* `config_<stagename>.json` >> Will contain the combined configuration after you have run the config build task `npm run sp:buildconfig`
+* `config_<stagename>.json` >> Will contain the combined configuration after you have run the config build task
+  `npm run sp:buildconfig`
 
 ### Compile configuration files
 
@@ -55,8 +56,8 @@ npm run sp:buildconfig
 npm run sp:deploy
 ```
 
-Be aware that the script above is configured to use a sample configuration file. You may need to change settings of your .\package.json.
-In addition, you can run deployment with a different file by using the following.
+Be aware that the script above is configured to use a sample configuration file. You may need to change settings of your
+`.\package.json`. In addition, you can run deployment with a different file by using the following.
 
 ```cmd
 node .\deploy\deploy.js -f .\config\<filename>.json
@@ -85,7 +86,7 @@ node dist/deploy.js -f config/<config>.json
 ### Build
 
 ```cmd
-gulp && npm pack || npm publish
+npm run build
 ```
 
 ### run with child process debug
