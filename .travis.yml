@@ -7,8 +7,6 @@ before_script:
 - npm install -g gulp
 script:
 - gulp
-after_success:
-- npm version patch
 deploy:
   provider: npm
   email: bhofmann@agile-is.de
