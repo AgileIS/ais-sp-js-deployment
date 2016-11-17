@@ -44,7 +44,7 @@ const assignments = {
     value: 'Name'
   },
   Items: {
-    value: null
+    value: 'Title'
   },
   Solutions: {
     value: 'Title'
