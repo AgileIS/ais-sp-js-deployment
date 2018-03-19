@@ -7,3 +7,4 @@ config/config_*
 Lorem.*
 *.tgz
 AisDeploy-*.log
+package-lock.json
